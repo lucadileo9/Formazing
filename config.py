@@ -1,0 +1,1 @@
+# Carica le configurazioni e le variabili da .env

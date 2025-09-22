@@ -1,0 +1,1 @@
+# Il file per avviare l'applicazione

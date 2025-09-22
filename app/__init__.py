@@ -1,0 +1,1 @@
+# Inizializza l'app Flask e le sue configurazioni
