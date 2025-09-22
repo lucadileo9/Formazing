@@ -1,1 +1,118 @@
 # Template per i messaggi email/Telegram
+
+# Template per notifiche di nuova formazione
+training_notification:
+  telegram:
+    main_group: |
+      🚀 <b>Nuova opportunità di crescita!</b>
+      
+      🎯 <b>{nome}</b>
+      👥 <b>Area:</b> {area}
+      📅 <b>Quando:</b> {data_ora}
+      
+      � <b><a href="{link_teams}">🔗 Entra in Teams</a></b>
+      
+      � <b>Il tuo codice:</b> <code>{codice}</code>
+      
+      ✨ <i>Un investimento nel tuo futuro che richiede solo qualche ora!</i>
+    
+    area_group: |
+      🎉 <b>È arrivata la vostra formazione!</b>
+      
+      🎯 <b>{nome}</b> 
+      📅 <b>Vi aspettiamo il:</b> {data_ora}
+      
+      � <b><a href="{link_teams}">🚀 Clicca e partecipa</a></b>
+      
+      � <b>Codice da salvare:</b> <code>{codice}</code>
+      
+      💪 <i>Cresciamo insieme! Non mancate! 🌟</i>
+
+  email:
+    subject: "[{area}] 🎯 {nome} - {data_breve} | Codice: {codice}"
+    
+    body: |
+      Ciao team {area}! 👋
+      
+      È il momento di crescere insieme! Abbiamo organizzato una sessione su "{nome}" che non potete perdere.
+      
+      �️ **Quando:** {data_ora}
+      � **Dove:** Microsoft Teams → {link_teams}
+      � **Il vostro codice:** {codice}
+      
+      Questa formazione è stata pensata specificamente per il team {area} e sarà un'occasione fantastica per:
+      ✅ Acquisire nuove competenze
+      ✅ Confrontarsi con i colleghi
+      ✅ Crescere professionalmente
+      
+      🔥 **IMPORTANTE:** Salvate il codice "{codice}" - vi servirà per il feedback finale!
+      
+      Ci vediamo lì! 🚀
+      
+      Il team Formazing ❤️
+
+# Template per richieste feedback
+feedback_request:
+  telegram:
+    message: |
+      ⭐ <b>La vostra opinione vale oro!</b>
+      
+      🎯 <b>Formazione:</b> {nome}
+      👥 <b>Area:</b> {area}
+      � <b>Codice:</b> <code>{codice}</code>
+      
+      � <b><a href="{feedback_link}">✨ Condividi la tua esperienza</a></b>
+      
+      ⚡ <i>2 minuti per aiutarci a creare formazioni ancora più fantastiche!</i>
+
+# Template per promemoria e notifiche speciali
+reminders:
+  formazione_oggi: |
+    🔔 <b>OGGI È IL GIORNO!</b>
+    
+    🎯 <b>{nome}</b>
+    👥 <b>Area:</b> {area}
+    ⏰ <b>Tra poco alle:</b> {ora}
+    
+    � <b><a href="{link_teams}">🏃‍♂️ Corri su Teams!</a></b>
+    
+    🚀 <i>Non perdere questa occasione di crescita!</i>
+  
+  formazione_cancellata: |
+    😔 <b>Piccolo contrattempo...</b>
+    
+    📚 <b>Formazione:</b> {nome}
+    📅 <b>Era prevista per:</b> {data_ora}
+    � <b>Codice:</b> {codice}
+    
+    🔄 <i>Stiamo già organizzando una nuova data fantastica! Stay tuned! 📢</i>
+
+# Configurazioni per la formattazione
+formatting:
+  date_format: "%d/%m/%Y %H:%M"
+  date_short_format: "%d/%m"
+  timezone: "Europe/Rome"
+  
+# Configurazioni specifiche per area
+area_settings:
+  IT:
+    emoji: "💻"
+    color: "#0078D4"
+  "R&D":
+    emoji: "🔬"
+    color: "#107C10"
+  HR:
+    emoji: "👥"
+    color: "#D13438"
+  Legale:
+    emoji: "⚖️"
+    color: "#5C2D91"
+  Commerciale:
+    emoji: "💼"
+    color: "#FF8C00"
+  Marketing:
+    emoji: "📢"
+    color: "#E74856"
+  All:
+    emoji: "🌐"
+    color: "#00BCF2"
