@@ -1,0 +1,69 @@
+# Template messaggi per TESTING - Identici a produzione ma marcati [TEST]
+# Questo file assicura che i test usino la stessa formattazione di produzione
+# ma i messaggi siano chiaramente identificabili come test
+
+training_notification:
+  telegram:
+    main_group: |
+      🧪 <b>[TEST] Nuova formazione programmata!</b>
+      
+      📚 <b>Argomento:</b> {nome}
+      🏢 <b>Area:</b> {area}
+      📅 <b>Data e ora:</b> {data_ora}
+      🔗 <b>Link Teams:</b> <a href="{link_teams}">Partecipa alla formazione</a>
+      🏷 <b>Codice:</b> <code>{codice}</code>
+      
+      💡 <i>Questo è un messaggio di TEST con dati mock!</i>
+      
+      📝 Per maggiori informazioni contatta il team formazione.
+    
+    area_group: |
+      🧪 <b>[TEST] Formazione per {area}!</b>
+      
+      📚 <b>Argomento:</b> {nome}
+      📅 <b>Data e ora:</b> {data_ora}
+      🔗 <b>Link Teams:</b> <a href="{link_teams}">Partecipa qui</a>
+      🏷 <b>Codice:</b> <code>{codice}</code>
+      
+      ✅ <i>Test con dati di esempio - NON una formazione reale!</i>
+
+feedback_request:
+  telegram:
+    message: |
+      🧪 <b>[TEST] Feedback richiesto!</b>
+      
+      📚 <b>Formazione completata:</b> {nome}
+      🏢 <b>Area:</b> {area}
+      🏷 <b>Codice:</b> <code>{codice}</code>
+      
+      📝 <b><a href="{feedback_link}">👆 Clicca qui per inviare il feedback</a></b>
+      
+      ⏰ Il feedback è molto importante per migliorare le nostre formazioni!
+      
+      💡 <i>Test richiesta feedback - Link di esempio!</i>
+
+commands:
+  help: |
+    🧪 <b>[TEST BOT] Comandi disponibili:</b>
+    
+    📅 <b>/oggi</b> - Formazioni di oggi
+    🔜 <b>/domani</b> - Formazioni di domani  
+    📆 <b>/settimana</b> - Formazioni della settimana
+    ❓ <b>/help</b> - Mostra questo messaggio
+    
+    💡 <i>Bot in modalità TEST - Dati non reali!</i>
+  
+  no_trainings: |
+    📭 <b>Nessuna formazione trovata</b>
+    
+    Non ci sono formazioni programmate per il periodo richiesto.
+    
+    💡 <i>[TEST] Messaggio con dati mock</i>
+  
+  error: |
+    ❌ <b>Errore nel recupero dati</b>
+    
+    Si è verificato un problema nel recupero delle informazioni.
+    Riprova più tardi o contatta il supporto.
+    
+    🧪 <i>[TEST] Simulazione errore</i>

@@ -140,6 +140,55 @@ Il bot deve essere aggiunto ai seguenti gruppi:
 | "Un collega potrebbe rovinare tutto" | Basic Auth + nessuna azione automatica | Solo tu puoi inviare |
 | "Voglio sapere le formazioni del giorno" | Bot Telegram con comandi | Info sempre a portata di mano |
 
+## 🧪 Testing e Validazione
+
+Il sistema include una suite di test completa per garantire affidabilità e sicurezza prima del deploy in produzione.
+
+### Script di Test Rapido
+
+```bash
+# Test sicuro (solo preview, nessun invio)
+.\quick_test.bat format
+
+# Test completo interattivo (raccomandato)
+.\quick_test.bat interactive
+
+# Test specifici
+.\quick_test.bat training   # Solo test notifiche formazione
+.\quick_test.bat feedback   # Solo test feedback
+.\quick_test.bat bot        # Solo test comandi bot
+```
+
+### Comandi Disponibili
+
+| Comando | Sicurezza | Descrizione |
+|---------|-----------|-------------|
+| `check` | ✅ Sicuro | Verifica configurazione ambiente |
+| `format` | ✅ Sicuro | Preview messaggi (NO invio) |
+| `safe` | ✅ Sicuro | Test diagnostici (NO invio) |
+| `training` | ⚠️ Reale | Test invio notifiche formazione |
+| `feedback` | ⚠️ Reale | Test invio richieste feedback |
+| `bot` | ⚠️ Reale | Test comandi bot (60s attivo) |
+| `interactive` | ⚠️ Chiede conferma | Test completo con scelte |
+| `real` | ❌ Attenzione | Tutti i test con invio reale |
+
+### Workflow di Testing Raccomandato
+
+1. **Setup iniziale**: `.\quick_test.bat check`
+2. **Durante sviluppo**: `.\quick_test.bat format` (sicuro)
+3. **Prima del deploy**: `.\quick_test.bat interactive` (completo)
+4. **Validazione finale**: `.\quick_test.bat real` (solo se necessario)
+
+### Caratteristiche dei Test
+
+- **🎯 Precisi**: Assert specifici con verifiche dettagliate
+- **🛡️ Sicuri**: Test formatazione mai inviano messaggi
+- **🔍 Completi**: Coprono formattazione, invio, comandi bot
+- **📱 Reali**: Usano bot Telegram vero con dati mock
+- **🏷️ Marcati**: Tutti i messaggi di test hanno `[TEST]`
+
+> 📖 **Documentazione completa**: Vedi [`docs/testing.md`](docs/testing.md) per dettagli tecnici e architettura dei test.
+
 ## 🏗️ Struttura del Progetto
 
 ```
@@ -156,13 +205,24 @@ formazioni_app/
 │   │   └── index.html          # Dashboard HTML
 │   └── static/
 │       └── style.css           # Stili CSS
+├── tests/
+│   ├── conftest.py             # Fixture globali pytest
+│   ├── integration/
+│   │   └── test_real_telegram.py # Test integrazione reali
+│   ├── config/                 # Configurazioni test
+│   └── mocks/                  # Mock services
 ├── config/
 │   ├── telegram_groups.json    # Mappa Aree → ID Chat Telegram
 │   └── message_templates.yaml  # Template messaggi
-├── .env                      # Chiavi segrete
-├── config.py                 # Configurazioni
-├── requirements.txt          # Dipendenze Python
-└── run.py                    # Avvio applicazione
+├── docs/
+│   ├── bot-telegram.md         # Documentazione bot
+│   └── testing.md             # Documentazione test
+├── quick_test.bat              # Script test Windows
+├── quick_test.sh               # Script test Linux/Mac
+├── .env                        # Chiavi segrete
+├── config.py                   # Configurazioni
+├── requirements.txt            # Dipendenze Python
+└── run.py                      # Avvio applicazione
 ```
 
 Formazing: la gestione delle formazioni non è mai stata così semplice.

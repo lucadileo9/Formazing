@@ -1,0 +1,18 @@
+{
+  "_comment": "Configurazione gruppi Telegram per TESTING - Separati da produzione!",
+  "_setup_instructions": [
+    "1. Crea gruppi Telegram dedicati al testing (es: 'Test Formazing Main', 'Test IT', etc.)",
+    "2. Aggiungi il bot a tutti i gruppi",
+    "3. Ottieni gli ID dei gruppi con get_chat_ids.py",
+    "4. Sostituisci gli ID di esempio qui sotto con quelli reali"
+  ],
+  "_warning": "⚠️ MAI usare gruppi di produzione per i test!",
+  
+  "main_group": "-1002605869080",
+  "IT": "-1003002711100",
+  "R&D": "-1002521246693",
+  "HR": "-1002755879096",
+  "Legale": "-1006677889900",
+  "Commerciale": "-1002768585820",
+  "Marketing": "-1003043652052"
+}
