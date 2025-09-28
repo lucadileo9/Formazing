@@ -4,29 +4,25 @@
 training_notification:
   telegram:
     main_group: |
-      🚀 <b>Nuova opportunità di crescita!</b>
+      🚀 <b>[TEST] Nuova formazione programmata!</b>
       
-      🎯 <b>{nome}</b>
-      👥 <b>Area:</b> {area}
-      📅 <b>Quando:</b> {data_ora}
+      📚 <b>Argomento:</b> {nome}
+      🏢 <b>Area:</b> {area}
+      📅 <b>Data e ora:</b> {data_ora}
+      🔗 <b>Link Teams:</b> <a href="{link_teams}">Partecipa alla formazione</a>
+      🏷 <b>Codice:</b> <code>{codice}</code>
       
-      � <b><a href="{link_teams}">🔗 Entra in Teams</a></b>
+      💡 <i>Questo è un messaggio di TEST con dati mock!</i>
       
-      � <b>Il tuo codice:</b> <code>{codice}</code>
-      
-      ✨ <i>Un investimento nel tuo futuro che richiede solo qualche ora!</i>
+      📝 Per maggiori informazioni contatta il team formazione.
     
     area_group: |
-      🎉 <b>È arrivata la vostra formazione!</b>
+      🎉 <b>Formazione per {area}!</b>
       
-      🎯 <b>{nome}</b> 
-      📅 <b>Vi aspettiamo il:</b> {data_ora}
-      
-      � <b><a href="{link_teams}">🚀 Clicca e partecipa</a></b>
-      
-      � <b>Codice da salvare:</b> <code>{codice}</code>
-      
-      💪 <i>Cresciamo insieme! Non mancate! 🌟</i>
+      📚 <b>Argomento:</b> {nome}
+      📅 <b>Data e ora:</b> {data_ora}
+      🔗 <b>Link Teams:</b> <a href="{link_teams}">Partecipa qui</a>
+      🏷 <b>Codice:</b> <code>{codice}</code>
 
   email:
     subject: "[{area}] 🎯 {nome} - {data_breve} | Codice: {codice}"
@@ -34,11 +30,11 @@ training_notification:
     body: |
       Ciao team {area}! 👋
       
-      È il momento di crescere insieme! Abbiamo organizzato una sessione su "{nome}" che non potete perdere.
+      Abbiamo organizzato una formazione su "{nome}" che non potete perdere.
       
-      �️ **Quando:** {data_ora}
-      � **Dove:** Microsoft Teams → {link_teams}
-      � **Il vostro codice:** {codice}
+      **Quando:** {data_ora}
+      **Dove:** Microsoft Teams → {link_teams}
+      **Il codice della formazione:** {codice}
       
       Questa formazione è stata pensata specificamente per il team {area} e sarà un'occasione fantastica per:
       ✅ Acquisire nuove competenze
@@ -47,9 +43,7 @@ training_notification:
       
       🔥 **IMPORTANTE:** Salvate il codice "{codice}" - vi servirà per il feedback finale!
       
-      Ci vediamo lì! 🚀
-      
-      Il team Formazing ❤️
+      Ci vediamo lì! 
 
 # Template per richieste feedback
 feedback_request:
@@ -57,11 +51,13 @@ feedback_request:
     message: |
       ⭐ <b>La vostra opinione vale oro!</b>
       
-      🎯 <b>Formazione:</b> {nome}
-      👥 <b>Area:</b> {area}
-      � <b>Codice:</b> <code>{codice}</code>
+      📚 <b>Formazione completata:</b> {nome}
+      🏢 <b>Area:</b> {area}
+      🏷 <b>Codice:</b> <code>{codice}</code>
       
-      � <b><a href="{feedback_link}">✨ Condividi la tua esperienza</a></b>
+      📝 <b><a href="{feedback_link}">👆 Clicca qui per inviare il feedback</a></b>
+      
+      ⏰ Il feedback è molto importante per migliorare le nostre formazioni!
       
       ⚡ <i>2 minuti per aiutarci a creare formazioni ancora più fantastiche!</i>
 
