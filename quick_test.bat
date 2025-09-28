@@ -9,6 +9,7 @@ if "%1"=="" (
     echo 💡 Uso: quick_test.bat [COMANDO]
     echo.
     echo 📋 COMANDI DISPONIBILI:
+    echo    unit       - Test unitari ^(velocissimi, zero dipendenze^)
     echo    format     - Solo test formattazione ^(sicuro, no invio^)
     echo    safe       - Test sicuri ^(formattazione + diagnostica^)
     echo    interactive - Test completo interattivo ^(chiede conferma per invio^)
@@ -19,6 +20,7 @@ if "%1"=="" (
     echo    check      - Verifica setup ambiente
     echo.
     echo 🎯 ESEMPI:
+    echo    quick_test.bat unit         ^(sviluppo - test velocissimi^)
     echo    quick_test.bat format       ^(più sicuro - solo preview^)
     echo    quick_test.bat interactive  ^(raccomandato - test completi^)
     echo    quick_test.bat training     ^(test specifico invio formazione^)
@@ -55,6 +57,14 @@ if "%1"=="check" (
         goto :error
     )
     echo 🎉 Ambiente configurato correttamente!
+    goto :end
+)
+
+if "%1"=="unit" (
+    echo ⚡ Esecuzione UNIT TEST ^(velocissimi^)...
+    echo 💡 Test pura logica business, zero dipendenze esterne
+    echo ⏳ Avvio pytest...
+    python -m pytest -m unit -v
     goto :end
 )
 

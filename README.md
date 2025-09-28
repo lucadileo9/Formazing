@@ -147,13 +147,16 @@ Il sistema include una suite di test completa per garantire affidabilità e sicu
 ### Script di Test Rapido
 
 ```bash
-# Test sicuro (solo preview, nessun invio)
+# 🟢 Test unitari (velocissimi, zero dipendenze)
+.\quick_test.bat unit
+
+# 🟢 Test sicuro (solo preview, nessun invio)
 .\quick_test.bat format
 
-# Test completo interattivo (raccomandato)
+# 🟡 Test completo interattivo (raccomandato)
 .\quick_test.bat interactive
 
-# Test specifici
+# 🔴 Test specifici (invio reale)
 .\quick_test.bat training   # Solo test notifiche formazione
 .\quick_test.bat feedback   # Solo test feedback
 .\quick_test.bat bot        # Solo test comandi bot
@@ -161,31 +164,52 @@ Il sistema include una suite di test completa per garantire affidabilità e sicu
 
 ### Comandi Disponibili
 
-| Comando | Sicurezza | Descrizione |
-|---------|-----------|-------------|
-| `check` | ✅ Sicuro | Verifica configurazione ambiente |
-| `format` | ✅ Sicuro | Preview messaggi (NO invio) |
-| `safe` | ✅ Sicuro | Test diagnostici (NO invio) |
-| `training` | ⚠️ Reale | Test invio notifiche formazione |
-| `feedback` | ⚠️ Reale | Test invio richieste feedback |
-| `bot` | ⚠️ Reale | Test comandi bot (60s attivo) |
-| `interactive` | ⚠️ Chiede conferma | Test completo con scelte |
-| `real` | ❌ Attenzione | Tutti i test con invio reale |
+| Comando | Sicurezza | Tempo | Descrizione |
+|---------|-----------|-------|-------------|
+| `unit` | 🟢 Sicurissimo | ~0.4s | Test logica pura (formattazione, parsing) |
+| `check` | 🟢 Sicuro | ~2s | Verifica configurazione ambiente |
+| `format` | 🟢 Sicuro | ~5s | Preview messaggi (NO invio) |
+| `safe` | 🟢 Sicuro | ~5s | Test diagnostici (NO invio) |
+| `training` | 🔴 Reale | ~10s | Test invio notifiche formazione |
+| `feedback` | 🔴 Reale | ~10s | Test invio richieste feedback |
+| `bot` | 🔴 Reale | ~60s | Test comandi bot (60s attivo) |
+| `interactive` | 🟡 Chiede conferma | ~30s | Test completo con scelte |
+| `real` | 🔴 Attenzione | ~60s | Tutti i test con invio reale |
 
 ### Workflow di Testing Raccomandato
 
-1. **Setup iniziale**: `.\quick_test.bat check`
-2. **Durante sviluppo**: `.\quick_test.bat format` (sicuro)
-3. **Prima del deploy**: `.\quick_test.bat interactive` (completo)
-4. **Validazione finale**: `.\quick_test.bat real` (solo se necessario)
+#### 🚀 **Durante Sviluppo** (Developer Workflow)
+1. **Setup iniziale**: `.\quick_test.bat check` - Verifica ambiente
+2. **Sviluppo attivo**: `.\quick_test.bat unit` - Test istantanei (0.4s)
+3. **Test funzionalità**: `.\quick_test.bat format` - Preview sicure
+4. **Pre-commit**: `.\quick_test.bat interactive` - Validazione completa
 
-### Caratteristiche dei Test
+#### 🎯 **Prima del Deploy** (Production Workflow)  
+1. **Test sicuri**: `.\quick_test.bat unit` + `.\quick_test.bat format`
+2. **Test controllati**: `.\quick_test.bat interactive` - Con conferme
+3. **Validazione finale**: `.\quick_test.bat real` - Solo se strettamente necessario
 
+### Tipologie di Test
+
+#### 🧪 **Unit Test** (Nuovo!)
+- **⚡ Velocissimi**: 20 test in 0.4 secondi
+- **🔒 Zero dipendenze**: Testano logica pura (parsing date, formattazione)
+- **📋 Copertura completa**: TelegramFormatter con tutti gli edge cases
+- **🎯 Fixture condivise**: Riutilizzano dati da conftest.py
+- **🔄 Pattern DRY**: Template reali caricati da YAML
+
+#### 🔗 **Integration Test**
 - **🎯 Precisi**: Assert specifici con verifiche dettagliate
-- **🛡️ Sicuri**: Test formatazione mai inviano messaggi
+- **🛡️ Sicuri**: Test formatazione mai inviano messaggi reali
 - **🔍 Completi**: Coprono formattazione, invio, comandi bot
-- **📱 Reali**: Usano bot Telegram vero con dati mock
+- **📱 Reali**: Usano bot Telegram vero con dati mock controllati
 - **🏷️ Marcati**: Tutti i messaggi di test hanno `[TEST]`
+
+#### 🏗️ **Architettura Test**
+- **conftest.py**: Fixture centrali condivise (DRY principle)
+- **tests/unit/**: Test logica pura, velocissimi
+- **tests/integration/**: Test end-to-end con servizi reali
+- **Mock intelligenti**: NotionService mock + TelegramService reale
 
 > 📖 **Documentazione completa**: Vedi [`docs/testing.md`](docs/testing.md) per dettagli tecnici e architettura dei test.
 

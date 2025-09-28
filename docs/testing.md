@@ -42,6 +42,8 @@ Il sistema di test Formazing segue una **filosofia "Reale ma Controllato"**:
 ```
 tests/
 ├── conftest.py                 # ❤️ CUORE: Fixture globali pytest
+├── unit/                       # 🧪 NUOVO: Test unitari velocissimi
+│   └── test_telegram_formatter.py  # 📝 Test formattazione messaggi
 ├── integration/
 │   └── test_real_telegram.py   # 🎯 TEST PRINCIPALI: 4 test completi
 ├── config/
@@ -53,13 +55,52 @@ tests/
 
 ### Separazione Responsabilità
 
-| Componente | Responsabilità | Tipo |
-|------------|----------------|------|
-| **conftest.py** | Configurazione globale, fixture condivise | Infrastruttura |
-| **test_real_telegram.py** | Test business logic, verifiche end-to-end | Test Logic |
-| **config/** | Dati di configurazione isolati per test | Configuration |
-| **mocks/** | Simulazione servizi esterni controllati | Mock Layer |
-| **quick_test.bat/.sh** | Automazione esecuzione, UX semplificata | Automation |
+| Componente | Responsabilità | Tipo | Velocità |
+|------------|----------------|------|----------|
+| **conftest.py** | Configurazione globale, fixture condivise | Infrastruttura | - |
+| **unit/test_telegram_formatter.py** | Test logica pura formattazione | Unit Logic | ⚡ 0.4s |
+| **integration/test_real_telegram.py** | Test business logic, verifiche end-to-end | Integration Logic | 🐌 30-60s |
+| **config/** | Dati di configurazione isolati per test | Configuration | - |
+| **mocks/** | Simulazione servizi esterni controllati | Mock Layer | - |
+| **quick_test.bat/.sh** | Automazione esecuzione, UX semplificata | Automation | - |
+
+---
+
+## ⚡ Unit Test - Logica Pura Velocissima
+
+### Filosofia Unit Test
+
+Gli unit test seguono il principio **"Fast, Isolated, Repeatable"**:
+
+- ⚡ **Velocissimi**: 20 test in 0.4 secondi
+- 🔒 **Isolati**: Zero dipendenze esterne (no API, no file, no network)
+- 🎯 **Focalizzati**: Testano una singola unità logica per volta
+- 🔄 **Ripetibili**: Risultati identici ad ogni esecuzione
+
+### Componenti Testati
+
+#### 📝 **TelegramFormatter** (`test_telegram_formatter.py`)
+
+**Focus**: Logica pura di formattazione messaggi e parsing date
+
+| Categoria Test | Numero Test | Cosa Verifica |
+|---------------|-------------|---------------|
+| **Training Messages** | 8 test | Template selection, placeholder substitution, error handling |
+| **Feedback Messages** | 3 test | Template rendering, link injection, fallback scenarios |
+| **Date Parsing** | 6 test | ISO→Italian conversion, custom formats, error handling |
+| **Template Logic** | 3 test | Template selection per gruppo, fallback behaviors |
+
+### Vantaggi Unit Test
+
+#### **🚀 Sviluppo Veloce**
+- **Instant feedback**: Risultati immediati durante coding
+- **Refactoring sicuro**: Modifiche protette da test automatici
+- **Debug preciso**: Errori localizzati a singole funzioni
+
+#### **📋 Documentazione Vivente**
+- **Esempi d'uso**: Ogni test mostra come usare la funzione
+- **Edge cases**: Documentano comportamenti limite
+- **Expected behavior**: Specificano cosa deve succedere
 
 ---
 
@@ -182,7 +223,115 @@ I test dimostrano il **vantaggio principale** del DI pattern:
 
 ---
 
-## 🚀 Sistema di Automazione
+## � Guida Scrittura Nuovi Unit Test
+
+### Step-by-Step per Nuovo Componente
+
+#### **1. Identificare l'Unità da Testare**
+```python
+# ✅ BUONI CANDIDATI per unit test
+class DateUtils:                    # Pure functions matematiche
+    def parse_notion_date(date_str): pass
+    def format_italian_date(dt): pass
+    def is_today(date_str): pass
+
+class ConfigValidator:              # Logica validazione
+    def validate_groups(config): pass
+    def check_required_fields(data): pass
+
+# ❌ CATTIVI CANDIDATI per unit test  
+class TelegramService:              # Troppo integration-heavy
+class NotionService:                # API calls externe
+```
+
+#### **2. Template Completo Nuovo Unit Test**
+
+```python
+"""
+Test unitari per [ComponentName] - [Brief Description]
+
+[Detailed description of what this module tests]
+"""
+
+import pytest
+from unittest.mock import patch, Mock
+from app.services.my_component import MyComponent
+
+@pytest.mark.unit  
+class TestMyComponent:
+    """Test suite per MyComponent - Focus su [specific area]"""
+    
+    # ===== FIXTURE SETUP =====
+    @pytest.fixture
+    def component(self, dependency_from_conftest):
+        """MyComponent configurato per testing"""
+        return MyComponent(dependency_from_conftest)
+    
+    # ===== HAPPY PATH TESTS =====
+    def test_main_method_complete_data(self, component, sample_data_from_conftest):
+        """
+        Test scenario normale con dati completi.
+        
+        Verifica che:
+        - Tutti i campi vengano processati correttamente
+        - Il risultato abbia la struttura attesa
+        - Non ci siano side effects indesiderati
+        """
+        result = component.main_method(sample_data_from_conftest)
+        
+        assert isinstance(result, expected_type)
+        assert expected_field in result
+        
+    # ===== EDGE CASE TESTS =====  
+    def test_main_method_missing_data(self, component):
+        """
+        Test gestione dati incompleti con fallback automatici.
+        
+        Scenario: Dati con campi mancanti
+        Verifica: Fallback corretti, nessun crash
+        """
+        minimal_data = {'required_field': 'value'}
+        
+        result = component.main_method(minimal_data)
+        
+        assert 'fallback_value' in result
+        
+    # ===== ERROR HANDLING =====
+    @patch('app.services.my_component.logger')
+    def test_main_method_logs_errors(self, mock_logger, component):
+        """
+        Test logging automatico errori con mock verification.
+        
+        Verifica che:
+        - Errori vengano loggati correttamente
+        - Il sistema non crashi per input invalidi
+        - Mock verification funzioni
+        """
+        component.main_method('invalid_input')
+        
+        mock_logger.error.assert_called_once()
+```
+
+### Best Practices Unit Test
+
+#### **🎯 Naming & Documentation**
+- **Nomi descrittivi**: `test_method_scenario_expected_behavior`
+- **Docstring dettagliati**: Scenario, verifica, particolarità
+- **Assert specifici**: Verifiche precise, non generiche
+
+#### **🔄 Riutilizzo Fixture**  
+- **Fixture da conftest.py**: Sempre preferire alle fixture locali
+- **Template reali**: Caricare configurazioni di produzione
+- **DRY principle**: Zero duplicazione di setup
+
+#### **⚡ Performance**
+- **Test isolati**: Ogni test indipendente dagli altri
+- **Mock minimali**: Solo dipendenze esterne
+- **Execution speed**: Puntare a <1s per test suite
+
+---
+
+## �🚀 Sistema di Automazione
 
 ### Architettura quick_test Scripts
 
