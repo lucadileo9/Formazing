@@ -239,9 +239,11 @@ formazioni_app/
 ├── docs/
 │   ├── bot-telegram.md         # Documentazione bot
 │   ├── notion-service.md       # Documentazione servizio Notion
-│   ├── testing.md             # Documentazione test
-│   ├── fixture-testing-guide.md # 📚 Guida completa fixture testing
-│   └── fixture-quick-reference.md # 🔧 Reference rapido fixture
+│   └── testing/                # Documentazione testing
+│       ├── telegram-testing.md  # Documentazione test Telegram
+│       ├── notion-testing.md    # Documentazione test Notion
+│       ├── fixture-testing-guide.md # 📚 Guida completa fixture testing
+│       └── fixture-quick-reference.md # 🔧 Reference rapido fixture
 ├── quick_test.bat              # Script test Windows
 ├── quick_test.sh               # Script test Linux/Mac
 ├── .env                        # Chiavi segrete
