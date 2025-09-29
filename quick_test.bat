@@ -10,6 +10,7 @@ if "%1"=="" (
     echo.
     echo 📋 COMANDI DISPONIBILI:
     echo    unit       - Test unitari ^(velocissimi, zero dipendenze^)
+    echo    notion     - Solo moduli Notion ^(veloce, no Telegram^)
     echo    format     - Solo test formattazione ^(sicuro, no invio^)
     echo    safe       - Test sicuri ^(formattazione + diagnostica^)
     echo    interactive - Test completo interattivo ^(chiede conferma per invio^)
@@ -21,6 +22,7 @@ if "%1"=="" (
     echo.
     echo 🎯 ESEMPI:
     echo    quick_test.bat unit         ^(sviluppo - test velocissimi^)
+    echo    quick_test.bat notion       ^(solo componenti Notion^)
     echo    quick_test.bat format       ^(più sicuro - solo preview^)
     echo    quick_test.bat interactive  ^(raccomandato - test completi^)
     echo    quick_test.bat training     ^(test specifico invio formazione^)
@@ -64,7 +66,15 @@ if "%1"=="unit" (
     echo ⚡ Esecuzione UNIT TEST ^(velocissimi^)...
     echo 💡 Test pura logica business, zero dipendenze esterne
     echo ⏳ Avvio pytest...
-    python -m pytest -m unit -v
+    python -m pytest tests/unit/ -v
+    goto :end
+)
+
+if "%1"=="notion" (
+    echo 🗃️ Esecuzione test SOLO NOTION ^(veloce^)...
+    echo 💡 Test tutti i 5 moduli NotionService senza dipendenze Telegram
+    echo ⏳ Avvio pytest...
+    python -m pytest tests/unit/notion/ -v
     goto :end
 )
 

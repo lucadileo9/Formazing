@@ -174,72 +174,91 @@ Il bot deve essere aggiunto ai seguenti gruppi:
 
 Il sistema include una suite di test completa per garantire affidabilità e sicurezza prima del deploy in produzione.
 
-### Script di Test Rapido
+### 🎯 Scenari di Testing Principali
 
+#### **1️⃣ Test SOLO Componenti Notion (Veloce - 0.9s)**
+Testa **tutti i 5 moduli NotionService** senza dipendenze esterne:
 ```bash
-# 🟢 Test unitari (velocissimi, zero dipendenze)
+# Usando quick_test.bat
+.\quick_test.bat notion
+
+# Oppure direttamente con pytest
+python -m pytest tests/unit/notion/ -v
+```
+**Cosa testa:** Parser dati, Query builder, CRUD operations, Client auth, Service facade  
+**Risultato:** 86 test in ~0.9 secondi ✅
+
+#### **2️⃣ Test TUTTE le Componenti (Unit Test Completi - 1.2s)**
+Testa **NotionService + TelegramFormatter** - logica pura, zero invii reali:
+```bash
+# Usando quick_test.bat (RACCOMANDATO)
 .\quick_test.bat unit
 
-# 🟢 Test sicuro (solo preview, nessun invio)
-.\quick_test.bat format
+# Oppure direttamente con pytest  
+python -m pytest tests/unit/ -v
+```
+**Cosa testa:** Tutti i moduli Notion + Formattazione messaggi + Edge cases  
+**Risultato:** 106 test in ~1.2 secondi ✅
 
-# 🟡 Test completo interattivo (raccomandato)
+#### **3️⃣ Test con Invii REALI (Attenzione - 30-60s)**
+Testa con **bot Telegram vero** - invia messaggi reali alle chat di test:
+```bash
+# Test completo interattivo (CON CONFERMA)
 .\quick_test.bat interactive
 
-# 🔴 Test specifici (invio reale)
-.\quick_test.bat training   # Solo test notifiche formazione
-.\quick_test.bat feedback   # Solo test feedback
-.\quick_test.bat bot        # Solo test comandi bot
+# Test specifici (INVIO DIRETTO)
+.\quick_test.bat training    # Solo notifiche formazione
+.\quick_test.bat feedback    # Solo richieste feedback  
+.\quick_test.bat bot         # Solo comandi bot
+
+# Tutti i test reali insieme (MASSIMA ATTENZIONE)
+.\quick_test.bat real
+```
+**⚠️ ATTENZIONE:** Questi inviano messaggi **reali** alle chat Telegram configurate!
+
+### 📋 Quick Test Script - Guida Completa
+
+#### **🟢 Comandi Sicuri (Zero Invii)**
+```bash
+.\quick_test.bat check      # Verifica configurazione ambiente (2s)
+.\quick_test.bat format     # Preview messaggi senza invio (5s)
+.\quick_test.bat notion     # Solo moduli Notion (0.9s)
+.\quick_test.bat unit       # Tutti unit test (1.2s) 👈 RACCOMANDATO
 ```
 
-### Comandi Disponibili
+#### **� Comandi Controllati**
+```bash
+.\quick_test.bat interactive   # Test completo con conferme esplicite
+.\quick_test.bat safe         # Test diagnostici controllati
+```
 
-| Comando | Sicurezza | Tempo | Descrizione |
-|---------|-----------|-------|-------------|
-| `unit` | 🟢 Sicurissimo | ~0.4s | Test logica pura (formattazione, parsing) |
-| `check` | 🟢 Sicuro | ~2s | Verifica configurazione ambiente |
-| `format` | 🟢 Sicuro | ~5s | Preview messaggi (NO invio) |
-| `safe` | 🟢 Sicuro | ~5s | Test diagnostici (NO invio) |
-| `training` | 🔴 Reale | ~10s | Test invio notifiche formazione |
-| `feedback` | 🔴 Reale | ~10s | Test invio richieste feedback |
-| `bot` | 🔴 Reale | ~60s | Test comandi bot (60s attivo) |
-| `interactive` | 🟡 Chiede conferma | ~30s | Test completo con scelte |
-| `real` | 🔴 Attenzione | ~60s | Tutti i test con invio reale |
+#### **🔴 Comandi con Invio Reale**
+```bash
+.\quick_test.bat training     # Invia notifica formazione di test
+.\quick_test.bat feedback     # Invia richiesta feedback di test
+.\quick_test.bat bot          # Attiva bot per 60s (risponde ai comandi)
+.\quick_test.bat real         # TUTTI i test con invio reale
+```
 
-### Workflow di Testing Raccomandato
+### 📊 Matrice Test Completa
 
-#### 🚀 **Durante Sviluppo** (Developer Workflow)
-1. **Setup iniziale**: `.\quick_test.bat check` - Verifica ambiente
-2. **Sviluppo attivo**: `.\quick_test.bat unit` - Test istantanei (0.4s)
-3. **Test funzionalità**: `.\quick_test.bat format` - Preview sicure
-4. **Pre-commit**: `.\quick_test.bat interactive` - Validazione completa
+| Comando | Durata | Invii Reali | Componenti Testate | Uso Raccomandato |
+|---------|--------|-------------|-------------------|------------------|
+| `unit` | 1.2s | ❌ No | Notion + Telegram | ⭐ **Sviluppo quotidiano** |
+| `notion` | 0.9s | ❌ No | Solo Notion | 🔧 Debug Notion specifico |
+| `format` | 5s | ❌ No | Formatting + Preview | ✅ Pre-commit validation |
+| `interactive` | 30s | ⚠️ Con conferma | Tutto + Invii controllati | 🎯 **Pre-deploy completo** |
+| `training` | 10s | ✅ Sì | Solo notifiche formazione | 🔍 Debug invio notifiche |
+| `feedback` | 10s | ✅ Sì | Solo richieste feedback | 🔍 Debug invio feedback |
+| `bot` | 60s | ✅ Sì | Solo comandi bot | 🤖 Test interattivo bot |
+| `real` | 60s | ✅ Sì | **Tutto con invii reali** | ⚠️ **Solo validazione finale** |
 
-#### 🎯 **Prima del Deploy** (Production Workflow)  
-1. **Test sicuri**: `.\quick_test.bat unit` + `.\quick_test.bat format`
-2. **Test controllati**: `.\quick_test.bat interactive` - Con conferme
-3. **Validazione finale**: `.\quick_test.bat real` - Solo se strettamente necessario
+### 🏗️ Architettura Test Implementata
 
-### Tipologie di Test
-
-#### 🧪 **Unit Test** (Nuovo!)
-- **⚡ Velocissimi**: 20 test in 0.4 secondi
-- **🔒 Zero dipendenze**: Testano logica pura (parsing date, formattazione)
-- **📋 Copertura completa**: TelegramFormatter con tutti gli edge cases
-- **🎯 Fixture condivise**: Riutilizzano dati da conftest.py
-- **🔄 Pattern DRY**: Template reali caricati da YAML
-
-#### 🔗 **Integration Test**
-- **🎯 Precisi**: Assert specifici con verifiche dettagliate
-- **🛡️ Sicuri**: Test formatazione mai inviano messaggi reali
-- **🔍 Completi**: Coprono formattazione, invio, comandi bot
-- **📱 Reali**: Usano bot Telegram vero con dati mock controllati
-- **🏷️ Marcati**: Tutti i messaggi di test hanno `[TEST]`
-
-#### 🏗️ **Architettura Test**
-- **conftest.py**: Fixture centrali condivise (DRY principle)
-- **tests/unit/**: Test logica pura, velocissimi
-- **tests/integration/**: Test end-to-end con servizi reali
-- **Mock intelligenti**: NotionService mock + TelegramService reale
+- **106 test totali** organizzati in moduli specializzati
+- **Fixture modulari** per riutilizzo e manutenibilità  
+- **Mock intelligenti** per isolamento senza perdere realismo
+- **Test pyramid** ottimizzata: tanti unit test veloci, pochi integration test mirati
 
 > 📖 **Documentazione completa**: 
 > - **Testing**: [`docs/testing.md`](docs/testing.md) - Architettura test e comandi
