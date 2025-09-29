@@ -97,61 +97,6 @@ L'app fa **2 cose:**
 2. Invia il link via Telegram ai gruppi coinvolti
 3. Aggiorna lo stato → "Conclusa"
 
-## ⚙️ Configurazione Iniziale
-
-### In Notion
-
-#### 1. Crea il database "Formazioni"
-Crea un nuovo database con questi campi esatti:
-
-| Campo | Tipo | Configurazione |
-|-------|------|----------------|
-| **Nome** | Page | Titolo della pagina Notion |
-| **Area** | Multi-select | Opzioni: IT, R&D, HR, Legale, Commerciale, Marketing, All |
-| **Data** | Date | Include orario |
-| **Periodo** | Select | Opzioni: SPRING, AUTUMN, ONCE, EXT, OUT |
-| **Status** | Status | Opzioni: Programmata, Calendarizzata, Conclusa |
-| **Codice** | Text | Lascia vuoto (generato automaticamente) |
-| **Link Teams** | URL | Lascia vuoto (generato automaticamente) |
-
-#### 2. Configura integrazione API
-1. Vai su [https://www.notion.so/my-integrations](https://www.notion.so/my-integrations)
-2. Clicca "Create new integration"
-3. Nome: "Formazing App"
-4. Seleziona il workspace giusto
-5. Copia il **Integration Token** (inizia con `secret_...`)
-
-#### 3. Condividi il database
-1. Apri il database "Formazioni"
-2. Clicca "Share" in alto a destra
-3. Invita l'integrazione "Formazing App"
-4. Imposta permessi: "Can edit"
-
-#### 4. Ottieni Database ID
-1. Apri il database "Formazioni" 
-2. Copia l'URL: `https://notion.so/workspace/DATABASE_ID?v=...`
-3. Il **Database ID** è la parte tra `/` e `?` (32 caratteri)
-
-### Nell'app Flask
-- Copia `.env.example` in `.env` e configura tutte le variabili
-- Configura Basic Auth con una password sicura
-- Testa connessione con `python test_notion_connection.py`
-
-### Telegram Bot
-Il bot deve essere aggiunto ai seguenti gruppi:
-- Gruppo principale (tutta l'associazione)
-- Gruppi per area: IT, R&D, HR, Legale, Commerciale, Marketing
-
-#### Comandi disponibili:
-- `/oggi`: Mostra le formazioni di oggi
-- `/domani`: Mostra le formazioni di domani
-- `/settimana`: Mostra tutte le formazioni della settimana
-
-### Script esterno per feedback
-- Legge TUTTE le formazioni con stato = "Calendarizzata" da Notion
-- Per ogni formazione, genera il link precompilato con Selenium
-- Quando lanciarlo: dopo aver aggiunto nuove formazioni o modificato il template Microsoft Forms
-
 ## 🚀 Flusso in 3 Passi
 
 1. **In Notion:** Compili i dati base → Stato = "Programmata"
@@ -259,11 +204,6 @@ Testa con **bot Telegram vero** - invia messaggi reali alle chat di test:
 - **Fixture modulari** per riutilizzo e manutenibilità  
 - **Mock intelligenti** per isolamento senza perdere realismo
 - **Test pyramid** ottimizzata: tanti unit test veloci, pochi integration test mirati
-
-> 📖 **Documentazione completa**: 
-> - **Testing**: [`docs/testing.md`](docs/testing.md) - Architettura test e comandi
-> - **Fixture**: [`docs/fixture-testing-guide.md`](docs/fixture-testing-guide.md) - Guida completa fixture
-> - **Fixture Reference**: [`docs/fixture-quick-reference.md`](docs/fixture-quick-reference.md) - Reference rapido fixture
 
 ## 🏗️ Struttura del Progetto
 
