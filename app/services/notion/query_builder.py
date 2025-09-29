@@ -2,7 +2,16 @@
 NotionQueryBuilder - Costruzione query Notion API
 
 Questo modulo gestisce:
-- Costruzione filtri Notion API strutturati
+- Costruzione filt            ],
+            "sorts": [
+                {
+                    "property": "Date",
+                    "direction": "ascending"
+                }
+            ]
+        }
+        
+        return queryAPI strutturati
 - Template query riutilizzabili
 - Ordinamenti e configurazioni query
 - Ottimizzazioni query per performance
@@ -49,14 +58,14 @@ class NotionQueryBuilder:
         query = {
             "database_id": database_id,
             "filter": {
-                "property": "Status",
+                "property": "Stato",
                 "status": {
                     "equals": status
                 }
             },
             "sorts": [
                 {
-                    "property": "Data",
+                    "property": "Date",
                     "direction": "ascending"
                 }
             ],
@@ -87,13 +96,13 @@ class NotionQueryBuilder:
             "filter": {
                 "and": [
                     {
-                        "property": "Data",
+                        "property": "Date",
                         "date": {
                             "on_or_after": start_date
                         }
                     },
                     {
-                        "property": "Data", 
+                        "property": "Date", 
                         "date": {
                             "on_or_before": end_date
                         }
@@ -102,7 +111,7 @@ class NotionQueryBuilder:
             },
             "sorts": [
                 {
-                    "property": "Data",
+                    "property": "Date",
                     "direction": "ascending"
                 }
             ]
@@ -135,7 +144,7 @@ class NotionQueryBuilder:
             },
             "sorts": [
                 {
-                    "property": "Data",
+                    "property": "Date",
                     "direction": "ascending"
                 }
             ]
@@ -161,7 +170,7 @@ class NotionQueryBuilder:
         
         filters = [
             {
-                "property": "Status",
+                "property": "Stato",
                 "status": {
                     "equals": status
                 }
@@ -184,7 +193,7 @@ class NotionQueryBuilder:
             } if len(filters) > 1 else filters[0],
             "sorts": [
                 {
-                    "property": "Data",
+                    "property": "Date",
                     "direction": "ascending"
                 }
             ]

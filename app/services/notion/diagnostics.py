@@ -166,8 +166,8 @@ class NotionDiagnostics:
         expected_fields = {
             'Nome': 'title',
             'Area': 'multi_select',
-            'Data': 'date',
-            'Status': 'status',
+            'Date': 'date',
+            'Stato': 'status',
             'Codice': 'rich_text',
             'Link Teams': 'url',
             'Periodo': 'select'

@@ -1,7 +1,11 @@
 """
-NotionCrudOperations - Operazioni CRUD su database Notion
-
-Questo modulo gestisce:
+NotionCrudOperations - Operazioni CRUD su database Not                "properties": {
+                    "Stato": {
+                        "status": {
+                            "name": new_status
+                        }
+                    }
+                }Questo modulo gestisce:
 - Update status, codici, link formazioni
 - Create nuove formazioni (futuro)
 - Delete operations (futuro)
@@ -185,7 +189,7 @@ class NotionCrudOperations:
             # Costruisci properties Notion format da updates
             for field, value in updates.items():
                 if field == 'status':
-                    properties["Status"] = {"status": {"name": value}}
+                    properties["Stato"] = {"status": {"name": value}}
                 elif field == 'codice':
                     properties["Codice"] = {"rich_text": [{"text": {"content": value}}]}
                 elif field == 'link_teams':

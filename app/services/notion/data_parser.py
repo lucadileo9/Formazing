@@ -79,8 +79,8 @@ class NotionDataParser:
             # Estrazione campi obbligatori
             nome = self.extract_page_title_property(properties.get('Nome'))
             area = self.extract_multi_select_property(properties.get('Area'))
-            data_ora = self.extract_date_property(properties.get('Data'))
-            status = self.extract_status_property(properties.get('Status'))
+            data_ora = self.extract_date_property(properties.get('Date'))
+            status = self.extract_status_property(properties.get('Stato'))
             
             # Validazione campi critici
             if not all([nome, area, data_ora, status]):
