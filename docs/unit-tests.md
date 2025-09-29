@@ -62,11 +62,64 @@ pytest -m "unit and notion" tests/unit/notion/test_data_parser.py -v
 
 ---
 
+## QueryBuilder Tests
+
+**File**: `tests/unit/notion/test_query_builder.py`  
+**Modulo**: `app.services.notion.query_builder.NotionQueryBuilder`  
+**Test Count**: 17 test | **Runtime**: ~0.22s
+
+### Categorie Test
+
+#### 1. Status Filter Queries (3 test)
+- ✅ `test_build_status_filter_query_programmata` - Query per formazioni programmate
+- ✅ `test_build_status_filter_query_calendarizzata` - Query per formazioni calendarizzate  
+- ✅ `test_build_status_filter_query_conclusa` - Query per formazioni concluse
+
+#### 2. Date Range Queries (2 test)
+- ✅ `test_build_date_range_filter_query_valid_range` - Range date standard
+- ✅ `test_build_date_range_filter_query_same_day` - Query per giorno specifico
+
+#### 3. Area Filter Queries (3 test)
+- ✅ `test_build_area_filter_query_it` - Filtro per area IT
+- ✅ `test_build_area_filter_query_hr` - Filtro per area HR
+- ✅ `test_build_area_filter_query_marketing` - Filtro per area Marketing
+
+#### 4. Combined Filter Queries (3 test)
+- ✅ `test_build_combined_filter_query_status_only` - Solo status (area None)
+- ✅ `test_build_combined_filter_query_status_and_area` - Status + area combinati
+- ✅ `test_build_combined_filter_query_different_combinations` - Combinazioni diverse
+
+#### 5. Query Validation (4 test)
+- ✅ `test_validate_query_structure_valid_query` - Query valida standard
+- ✅ `test_validate_query_structure_missing_database_id` - Query senza database_id
+- ✅ `test_validate_query_structure_empty_query` - Query vuota
+- ✅ `test_validate_query_structure_minimal_valid_query` - Query minimale valida
+
+#### 6. Edge Cases & Consistency (2 test)
+- ✅ `test_query_builder_initialization` - Inizializzazione corretta
+- ✅ `test_all_queries_include_date_sorting` - Consistency ordinamento date
+
+### Fixture Utilizzate
+- `sample_database_id` - Database ID standard per test
+- `expected_status_query` - Query attesa per filtro status
+- `expected_date_range_query` - Query attesa per range date
+- `expected_area_query` - Query attesa per filtro area
+- `expected_combined_query` - Query attesa per filtri combinati
+- `invalid_query_samples` - Esempi query invalide
+
+### Esecuzione
+```bash
+# Tutti i test QueryBuilder
+pytest tests/unit/notion/test_query_builder.py -v
+
+# Solo test QueryBuilder con marker
+pytest -m "unit and notion" tests/unit/notion/test_query_builder.py -v
+```
+
+---
+
 ## Prossimi Moduli
 
-### QueryBuilder (Priorità #2)
-- **File**: `tests/unit/notion/test_query_builder.py` (TODO)
-- **Focus**: Costruzione query Notion API, filtri, ordinamenti
 
 ### CrudOperations (Priorità #3)
 - **File**: `tests/unit/notion/test_crud_operations.py` (TODO)
