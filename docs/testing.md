@@ -2,7 +2,12 @@
 
 > **Guida all'architettura e funzionamento della suite di test - Come capire e modificare il sistema**
 
-## 📋 Indice
+## � Documentazioni Correlate
+
+- **📖 [Fixture Testing Guide](fixture-testing-guide.md)** - Guida completa alle fixture e struttura modulare
+- **🔧 [Fixture Quick Reference](fixture-quick-reference.md)** - Reference rapido di tutte le fixture disponibili
+
+## �📋 Indice
 
 1. [Panoramica Sistema](#-panoramica-sistema)
 2. [Architettura Test](#-architettura-test)  

@@ -241,7 +241,10 @@ Il sistema include una suite di test completa per garantire affidabilità e sicu
 - **tests/integration/**: Test end-to-end con servizi reali
 - **Mock intelligenti**: NotionService mock + TelegramService reale
 
-> 📖 **Documentazione completa**: Vedi [`docs/testing.md`](docs/testing.md) per dettagli tecnici e architettura dei test.
+> 📖 **Documentazione completa**: 
+> - **Testing**: [`docs/testing.md`](docs/testing.md) - Architettura test e comandi
+> - **Fixture**: [`docs/fixture-testing-guide.md`](docs/fixture-testing-guide.md) - Guida completa fixture
+> - **Fixture Reference**: [`docs/fixture-quick-reference.md`](docs/fixture-quick-reference.md) - Reference rapido fixture
 
 ## 🏗️ Struttura del Progetto
 
@@ -277,7 +280,9 @@ formazioni_app/
 ├── docs/
 │   ├── bot-telegram.md         # Documentazione bot
 │   ├── notion-service.md       # Documentazione servizio Notion
-│   └── testing.md             # Documentazione test
+│   ├── testing.md             # Documentazione test
+│   ├── fixture-testing-guide.md # 📚 Guida completa fixture testing
+│   └── fixture-quick-reference.md # 🔧 Reference rapido fixture
 ├── quick_test.bat              # Script test Windows
 ├── quick_test.sh               # Script test Linux/Mac
 ├── .env                        # Chiavi segrete
