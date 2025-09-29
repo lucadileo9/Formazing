@@ -62,7 +62,7 @@ class NotionCrudOperations:
             response = self.client.pages.update(
                 page_id=notion_id,
                 properties={
-                    "Status": {
+                    "Stato": {
                         "status": {
                             "name": new_status
                         }

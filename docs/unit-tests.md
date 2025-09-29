@@ -118,17 +118,78 @@ pytest -m "unit and notion" tests/unit/notion/test_query_builder.py -v
 
 ---
 
+## CrudOperations Tests
+
+**File**: `tests/unit/notion/test_crud_operations.py`  
+**Modulo**: `app.services.notion.crud_operations.NotionCrudOperations`  
+**Test Count**: 18 test | **Runtime**: ~0.24s
+
+### Categorie Test
+
+#### 1. Update Status Operations (4 test)
+- ✅ `test_update_formazione_status_success` - Update status successful
+- ✅ `test_update_formazione_status_different_statuses` - Tutti gli status workflow
+- ✅ `test_update_formazione_status_api_error` - Gestione APIResponseError
+- ✅ `test_update_formazione_status_generic_error` - Gestione errori generici
+
+#### 2. Update Codice e Link Operations (3 test)
+- ✅ `test_update_codice_e_link_success` - Update codice + link Teams successful
+- ✅ `test_update_codice_e_link_empty_link` - Update solo codice (link vuoto)
+- ✅ `test_update_codice_e_link_api_error` - Gestione errori API update
+
+#### 3. Get Formazione Operations (3 test)
+- ✅ `test_get_formazione_by_id_success` - Retrieve formazione successful
+- ✅ `test_get_formazione_by_id_parse_failure` - Gestione parsing failed
+- ✅ `test_get_formazione_by_id_api_error` - Gestione errori API retrieve
+
+#### 4. Multiple Fields Operations (3 test)
+- ✅ `test_update_multiple_fields_success` - Update atomico multipli campi
+- ✅ `test_update_multiple_fields_partial_update` - Update selettivo campi
+- ✅ `test_update_multiple_fields_api_error` - Gestione errori update multiplo
+
+#### 5. Batch Operations (3 test)
+- ✅ `test_batch_update_status_all_success` - Batch update tutto successful
+- ✅ `test_batch_update_status_partial_failure` - Batch con failures misti
+- ✅ `test_batch_update_status_empty_list` - Batch con lista vuota
+
+#### 6. Edge Cases & Initialization (2 test)
+- ✅ `test_crud_operations_initialization` - Inizializzazione corretta
+- ✅ `test_all_methods_handle_none_gracefully` - Gestione parametri None
+
+### Fixture Utilizzate
+- `mock_notion_client` - Mock client Notion per operazioni CRUD
+- `sample_notion_id` - ID Notion standard per test
+- `sample_update_response` - Response simulata update operations
+- `sample_retrieve_response` - Response simulata retrieve operation
+- `sample_batch_formazioni_ids` - Lista ID per test batch operations
+- `sample_multiple_fields_update` - Dati per test update multipli campi
+- `mock_data_parser` - Mock parser per test retrieve operations
+- `mock_api_error` - Mock APIResponseError per test gestione errori
+
+### Esecuzione
+```bash
+# Tutti i test CrudOperations
+pytest tests/unit/notion/test_crud_operations.py -v
+
+# Solo test CrudOperations con marker
+pytest -m "unit and notion" tests/unit/notion/test_crud_operations.py -v
+```
+
+---
+
 ## Prossimi Moduli
 
+### NotionClient (Priorità #4)
+- **File**: `tests/unit/notion/test_notion_client.py` (TODO)
+- **Focus**: Connessione, autenticazione, retry logic
 
-### CrudOperations (Priorità #3)
-- **File**: `tests/unit/notion/test_crud_operations.py` (TODO)
-- **Focus**: Create, Update, gestione errori API
+### Diagnostics (Priorità #5)
+- **File**: `tests/unit/notion/test_diagnostics.py` (TODO)
+- **Focus**: Health check, validazione configurazione
 
-### Altri Moduli
-- **NotionClient**: Connessione, autenticazione, retry logic
-- **Diagnostics**: Health check, validazione configurazione
-- **Facade**: Integrazione moduli, workflow completi
+### Facade (Priorità #6)
+- **File**: `tests/unit/notion/test_facade.py` (TODO)
+- **Focus**: Integrazione moduli, workflow completi
 
 ---
 
