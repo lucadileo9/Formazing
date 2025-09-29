@@ -69,8 +69,7 @@ class MockNotionService:
                 'Codice': 'PY001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/py001',
                 'Stato/Fase': 'Calendarizzata',
-                'Docente': 'Marco Rossi',
-                'Descrizione': 'Corso base Python per sviluppatori'
+                'Periodo': 'SPRING'
             },
             {
                 'Nome': 'Advanced Git Workflows',
@@ -79,8 +78,7 @@ class MockNotionService:
                 'Codice': 'GIT001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/git001',
                 'Stato/Fase': 'Calendarizzata',
-                'Docente': 'Laura Bianchi',
-                'Descrizione': 'Tecniche avanzate di version control'
+                'Periodo': 'AUTUMN'
             },
             
             # === FORMAZIONI DOMANI ===
@@ -91,8 +89,7 @@ class MockNotionService:
                 'Codice': 'HR001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/hr001',
                 'Stato/Fase': 'Calendarizzata',
-                'Docente': 'Giuseppe Verde',
-                'Descrizione': 'Tecniche di leadership moderna'
+                'Periodo': 'ONCE'
             },
             
             # === FORMAZIONI SETTIMANA ===
@@ -103,8 +100,7 @@ class MockNotionService:
                 'Codice': 'MKT001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/mkt001',
                 'Stato/Fase': 'Calendarizzata',
-                'Docente': 'Francesca Neri',
-                'Descrizione': 'Analisi dei dati di marketing digitale'
+                'Periodo': 'SPRING'
             },
             {
                 'Nome': 'Legal Compliance & GDPR',
@@ -113,8 +109,7 @@ class MockNotionService:
                 'Codice': 'LEG001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/leg001',
                 'Stato/Fase': 'Calendarizzata',
-                'Docente': 'Avv. Paolo Grigio',
-                'Descrizione': 'Aggiornamenti normativi e compliance'
+                'Periodo': 'EXT'
             },
             {
                 'Nome': 'Innovation Workshop R&D',
@@ -123,8 +118,7 @@ class MockNotionService:
                 'Codice': 'RD001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/rd001',
                 'Stato/Fase': 'Calendarizzata',
-                'Docente': 'Dr. Maria Blu',
-                'Descrizione': 'Metodologie innovative per la ricerca'
+                'Periodo': 'OUT'
             },
             
             # === EDGE CASES per testing robusto ===
@@ -135,8 +129,7 @@ class MockNotionService:
                 'Codice': 'EDGE001',
                 'Link Teams': '',  # Link vuoto per testare gestione errori
                 'Stato/Fase': 'Calendarizzata',
-                'Docente': 'Test Docente',
-                'Descrizione': 'Formazione di test senza link Teams'
+                'Periodo': 'ONCE'
             },
             {
                 'Nome': 'Test Formato Data ISO',
@@ -145,8 +138,7 @@ class MockNotionService:
                 'Codice': 'ISO001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/iso001',
                 'Stato/Fase': 'Calendarizzata',
-                'Docente': 'ISO Tester',
-                'Descrizione': 'Test parsing formato data ISO'
+                'Periodo': 'SPRING'
             }
         ]
     
@@ -168,8 +160,7 @@ class MockNotionService:
                 'Codice': 'COMP001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/comp001',
                 'Stato/Fase': 'Completata',
-                'Docente': 'Formatore Test',
-                'Descrizione': 'Corso Python completato ieri'
+                'Periodo': 'SPRING'
             },
             {
                 'Nome': 'HR Workshop Settimana Scorsa',
@@ -178,8 +169,7 @@ class MockNotionService:
                 'Codice': 'COMP002',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/comp002',
                 'Stato/Fase': 'Completata',
-                'Docente': 'HR Trainer',
-                'Descrizione': 'Workshop HR completato la settimana scorsa'
+                'Periodo': 'AUTUMN'
             }
         ]
     
