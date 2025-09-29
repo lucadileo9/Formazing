@@ -1,12 +1,22 @@
 # 📚 Formazing - Documentazione
 
-**Sistema di notifiche automatiche per formazioni aziendali tramite Telegram Bot**
+**Sistema di notifiche automatiche per├── 📂 services/             # Logica di business
+│       ├── 🔗 mgraph_service.py     # Integrazione Microsoft Graph
+│       ├── 📊 notion/               # Servizio Notion (architettura modulare)
+│       │   ├── 🔧 __init__.py            # Facade pattern - API unificata
+│       │   ├── 🔌 notion_client.py       # Core connection e autenticazione
+│       │   ├── 🔍 query_builder.py       # Costruzione query dinamiche
+│       │   ├── 📄 data_parser.py         # Parsing e mapping dati
+│       │   ├── 💾 crud_operations.py     # Operazioni CRUD database
+│       │   └── 🔬 diagnostics.py         # Monitoring e debugging
+│       ├── 🎯 training_service.py   # Orchestrazione formazioni
+│       ├── 📱 telegram_service.py   # Core Telegram Botazioni aziendali tramite Telegram Bot**
 
 ## 📋 Indice Generale
 
 ### 🏗️ Architettura del Sistema
 - [**🤖 Bot Telegram**](bot-telegram.md) - Documentazione completa del sistema bot
-- **🔗 Integrazione Notion** - Sistema di recupero dati formazioni *(da documentare)*
+- [**🔗 Servizio Notion**](notion-service.md) - Architettura modulare per integrazione Notion API
 - **📊 Servizi Core** - Logica di business e orchestrazione *(da documentare)*
 
 ### 🛠️ Componenti Tecnici
@@ -88,7 +98,8 @@ Formazing/
 │
 ├── 📂 docs/                     # Documentazione tecnica
 │   ├── 📚 README.md             # Indice documentazione (questo file)
-│   └── 🤖 bot-telegram.md       # Documentazione bot Telegram
+│   ├── 🤖 bot-telegram.md       # Documentazione bot Telegram
+│   └── 🔗 notion-service.md     # Documentazione servizio Notion
 │
 └── 🎨 Static & Templates        # Assets web (se necessario)
     ├── 📂 static/
@@ -101,7 +112,7 @@ Formazing/
 
 ### 📖 Documentazione Specifica
 - **[🤖 Sistema Bot Telegram](bot-telegram.md)** - Architettura, comandi, formattazione
-- **Notion Integration** *(coming soon)* - API, database schema, sincronizzazione
+- **[🔗 Servizio Notion](notion-service.md)** - Architettura modulare, API, operazioni CRUD
 - **Training Service** *(coming soon)* - Logica orchestrazione e business rules
 - **Configuration Guide** *(coming soon)* - Setup completo ambiente
 

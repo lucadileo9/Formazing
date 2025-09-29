@@ -100,12 +100,42 @@ L'app fa **2 cose:**
 ## ⚙️ Configurazione Iniziale
 
 ### In Notion
-- Crea il database "Formazioni" con i campi obbligatori
-- Non aggiungere formule → lascia Codice e Link Teams vuoti
+
+#### 1. Crea il database "Formazioni"
+Crea un nuovo database con questi campi esatti:
+
+| Campo | Tipo | Configurazione |
+|-------|------|----------------|
+| **Nome** | Page | Titolo della pagina Notion |
+| **Area** | Multi-select | Opzioni: IT, R&D, HR, Legale, Commerciale, Marketing, All |
+| **Data** | Date | Include orario |
+| **Periodo** | Select | Opzioni: SPRING, AUTUMN, ONCE, EXT, OUT |
+| **Status** | Status | Opzioni: Programmata, Calendarizzata, Conclusa |
+| **Codice** | Text | Lascia vuoto (generato automaticamente) |
+| **Link Teams** | URL | Lascia vuoto (generato automaticamente) |
+
+#### 2. Configura integrazione API
+1. Vai su [https://www.notion.so/my-integrations](https://www.notion.so/my-integrations)
+2. Clicca "Create new integration"
+3. Nome: "Formazing App"
+4. Seleziona il workspace giusto
+5. Copia il **Integration Token** (inizia con `secret_...`)
+
+#### 3. Condividi il database
+1. Apri il database "Formazioni"
+2. Clicca "Share" in alto a destra
+3. Invita l'integrazione "Formazing App"
+4. Imposta permessi: "Can edit"
+
+#### 4. Ottieni Database ID
+1. Apri il database "Formazioni" 
+2. Copia l'URL: `https://notion.so/workspace/DATABASE_ID?v=...`
+3. Il **Database ID** è la parte tra `/` e `?` (32 caratteri)
 
 ### Nell'app Flask
+- Copia `.env.example` in `.env` e configura tutte le variabili
 - Configura Basic Auth con una password sicura
-- Crea il file `templates/config.yaml` con i template base
+- Testa connessione con `python test_notion_connection.py`
 
 ### Telegram Bot
 Il bot deve essere aggiunto ai seguenti gruppi:
@@ -221,7 +251,13 @@ formazioni_app/
 │   ├── __init__.py           # Inizializza l'app Flask
 │   ├── routes.py             # Dashboard principale
 │   ├── services/
-│   │   ├── notion_service.py   # API Notion
+│   │   ├── notion/             # Servizio Notion (architettura modulare)
+│   │   │   ├── __init__.py       # Facade pattern - API unificata
+│   │   │   ├── notion_client.py  # Core connection e autenticazione
+│   │   │   ├── query_builder.py  # Costruzione query dinamiche
+│   │   │   ├── data_parser.py    # Parsing e mapping dati
+│   │   │   ├── crud_operations.py # Operazioni CRUD database
+│   │   │   └── diagnostics.py    # Monitoring e debugging
 │   │   ├── mgraph_service.py   # API Microsoft Graph (Teams, Email)
 │   │   ├── telegram_service.py # Messaggi Telegram
 │   │   └── training_service.py # Orchestratore principale
@@ -240,6 +276,7 @@ formazioni_app/
 │   └── message_templates.yaml  # Template messaggi
 ├── docs/
 │   ├── bot-telegram.md         # Documentazione bot
+│   ├── notion-service.md       # Documentazione servizio Notion
 │   └── testing.md             # Documentazione test
 ├── quick_test.bat              # Script test Windows
 ├── quick_test.sh               # Script test Linux/Mac
