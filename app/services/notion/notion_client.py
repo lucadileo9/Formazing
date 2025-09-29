@@ -61,10 +61,10 @@ class NotionClient:
     
     def _validate_credentials(self):
         """Valida che tutte le credenziali necessarie siano configurate."""
-        if not self.token:
-            raise ValueError("NOTION_TOKEN non configurato in .env")
-        if not self.database_id:
-            raise ValueError("NOTION_DATABASE_ID non configurato in .env")
+        if not self.token or not self.token.strip():
+            raise ValueError("NOTION_TOKEN non configurato")
+        if not self.database_id or not self.database_id.strip():
+            raise ValueError("NOTION_DATABASE_ID non configurato")
     
     def get_client(self) -> Client:
         """Ritorna client Notion autenticato."""
