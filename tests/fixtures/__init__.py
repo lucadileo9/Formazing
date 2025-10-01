@@ -23,7 +23,8 @@ from .facade_fixtures import *
 __all__ = [
     # Telegram fixtures
     "mock_telegram_bot",
-    "configured_telegram_service", 
+    "configured_telegram_service",
+    "test_config_paths", 
     "sample_training_data",
     "alternative_training_data",
     "sample_feedback_data",

@@ -18,8 +18,8 @@ import sys
 import os
 from pathlib import Path
 
-# Aggiungi root progetto al path
-sys.path.insert(0, str(Path(__file__).parent))
+# Aggiungi root progetto al path (parent della cartella tests)
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.services.notion import NotionService, NotionServiceError
 from config import Config
