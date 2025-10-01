@@ -1,0 +1,19 @@
+<!-- 🧩 MOLECULE: Flash Message -->
+{% set message_configs = {
+    'error': {'bg': 'alert-danger', 'icon': 'bi bi-exclamation-triangle'},
+    'success': {'bg': 'alert-success', 'icon': 'bi bi-check-circle'},
+    'warning': {'bg': 'alert-warning', 'icon': 'bi bi-exclamation-triangle'},
+    'info': {'bg': 'alert-info', 'icon': 'bi bi-info-circle'}
+} %}
+
+{% set config = message_configs[category] if category in message_configs else message_configs['info'] %}
+
+<div class="alert {{ config.bg }} alert-dismissible fade show" role="alert">
+    {% set name = config.icon %}
+    {% set size = 'me-2' %}
+    {% include 'atoms/icon.html' %}
+    
+    {{ message }}
+    
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>

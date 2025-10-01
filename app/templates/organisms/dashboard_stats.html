@@ -1,0 +1,38 @@
+<!-- 🦠 ORGANISM: Dashboard Stats -->
+<div class="row g-3 mb-4">
+    <!-- Stat Card: Programmate -->
+    <div class="col-3">
+        {% set status_type = 'programmata' %}
+        {% set count = stats.programmata %}
+        {% set title = 'Programmate' %}
+        {% set subtitle = 'Da calendarizzare' %}
+        {% include 'molecules/stat_card.html' %}
+    </div>
+
+    <!-- Stat Card: Calendarizzate -->
+    <div class="col-3">
+        {% set status_type = 'calendarizzata' %}
+        {% set count = stats.calendarizzata %}
+        {% set title = 'Calendarizzate' %}
+        {% set subtitle = 'In programma' %}
+        {% include 'molecules/stat_card.html' %}
+    </div>
+
+    <!-- Stat Card: Concluse -->
+    <div class="col-3">
+        {% set status_type = 'conclusa' %}
+        {% set count = stats.conclusa %}
+        {% set title = 'Concluse' %}
+        {% set subtitle = 'Completate' %}
+        {% include 'molecules/stat_card.html' %}
+    </div>
+
+    <!-- Stat Card: Totale -->
+    <div class="col-3">
+        {% set status_type = 'totale' %}
+        {% set count = stats.totale %}
+        {% set title = 'Totale' %}
+        {% set subtitle = 'Tutte le formazioni' %}
+        {% include 'molecules/stat_card.html' %}
+    </div>
+</div>

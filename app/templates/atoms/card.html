@@ -1,0 +1,18 @@
+<!-- ⚛️ ATOM: Card container base -->
+<div class="card {{ card_class|default('') }}">
+    {% if header %}
+    <div class="card-header {{ header_class|default('') }}">
+        {{ header }}
+    </div>
+    {% endif %}
+    
+    <div class="card-body {{ body_class|default('') }}">
+        {{ content }}
+    </div>
+    
+    {% if footer %}
+    <div class="card-footer {{ footer_class|default('') }}">
+        {{ footer }}
+    </div>
+    {% endif %}
+</div>

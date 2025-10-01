@@ -1,0 +1,23 @@
+<!-- 🧩 MOLECULE: Stat Card -->
+{% set card_configs = {
+    'programmata': {'bg': 'bg-warning text-dark', 'icon': 'bi bi-clock-history'},
+    'calendarizzata': {'bg': 'bg-info text-white', 'icon': 'bi bi-calendar-event'},
+    'conclusa': {'bg': 'bg-success text-white', 'icon': 'bi bi-check-circle'},
+    'totale': {'bg': 'bg-primary text-white', 'icon': 'bi bi-list-ul'}
+} %}
+
+{% set config = card_configs[status_type] if status_type in card_configs else card_configs['totale'] %}
+
+<div class="card {{ config.bg }} border-0 shadow-sm">
+    <div class="card-body text-center">
+        {% set name = config.icon %}
+        {% set size = 'display-4 mb-2' %}
+        {% include 'atoms/icon.html' %}
+        
+        <h3 class="fw-bold mb-1">{{ count|default(0) }}</h3>
+        <h6 class="mb-0">{{ title|default('Statistiche') }}</h6>
+        {% if subtitle %}
+        <small class="opacity-75">{{ subtitle }}</small>
+        {% endif %}
+    </div>
+</div>

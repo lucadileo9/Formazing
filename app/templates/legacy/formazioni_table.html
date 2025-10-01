@@ -1,0 +1,209 @@
+<!-- Template riutilizzabile per tabella formazioni -->
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th scope="col">
+                    <i class="bi bi-tag me-1"></i>Nome
+                </th>
+                <th scope="col">
+                    <i class="bi bi-diagram-3 me-1"></i>Area
+                </th>
+                <th scope="col">
+                    <i class="bi bi-calendar me-1"></i>Data/Ora
+                </th>
+                <th scope="col">
+                    <i class="bi bi-collection me-1"></i>Periodo
+                </th>
+                {% if status == 'Programmata' %}
+                <th scope="col">
+                    <i class="bi bi-gear me-1"></i>Azioni
+                </th>
+                {% elif status == 'Calendarizzata' %}
+                <th scope="col">
+                    <i class="bi bi-link me-1"></i>Link Teams
+                </th>
+                <th scope="col">
+                    <i class="bi bi-gear me-1"></i>Azioni
+                </th>
+                {% else %}
+                <th scope="col">
+                    <i class="bi bi-qr-code me-1"></i>Codice
+                </th>
+                <th scope="col">
+                    <i class="bi bi-link me-1"></i>Link Teams
+                </th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for formazione in formazioni %}
+            <tr>
+                <!-- Nome -->
+                <td>
+                    <div class="fw-bold">{{ formazione['Nome'] }}</div>
+                    {% if formazione.get('Codice') %}
+                        <small class="text-muted">{{ formazione['Codice'] }}</small>
+                    {% endif %}
+                </td>
+                
+                <!-- Area -->
+                <td>
+                    <span class="badge rounded-pill 
+                        {% if formazione['Area'] == 'IT' %}bg-primary
+                        {% elif formazione['Area'] == 'HR' %}bg-success  
+                        {% elif formazione['Area'] == 'Marketing' %}bg-warning
+                        {% elif formazione['Area'] == 'R&D' %}bg-info
+                        {% elif formazione['Area'] == 'All' %}bg-dark
+                        {% else %}bg-secondary{% endif %}">
+                        {{ formazione['Area'] }}
+                    </span>
+                </td>
+                
+                <!-- Data/Ora -->
+                <td>
+                    <div class="small">
+                        <i class="bi bi-calendar-date me-1"></i>
+                        {% if formazione['Data/Ora'] %}
+                            {{ formazione['Data/Ora'] }}
+                        {% else %}
+                            <span class="text-muted">Non programmata</span>
+                        {% endif %}
+                    </div>
+                </td>
+                
+                <!-- Periodo -->
+                <td>
+                    <span class="badge 
+                        {% if formazione.get('Periodo') == 'SPRING' %}bg-light text-dark
+                        {% elif formazione.get('Periodo') == 'AUTUMN' %}bg-warning  
+                        {% elif formazione.get('Periodo') == 'ONCE' %}bg-info
+                        {% elif formazione.get('Periodo') == 'EXT' %}bg-success
+                        {% elif formazione.get('Periodo') == 'OUT' %}bg-danger
+                        {% else %}bg-secondary{% endif %}">
+                        {{ formazione.get('Periodo', 'N/A') }}
+                    </span>
+                </td>
+                
+                <!-- Azioni o Info aggiuntive -->
+                {% if status == 'Programmata' %}
+                <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-primary" 
+                                onclick="previewCommunications('{{ formazione.get('id', '') }}')">
+                            <i class="bi bi-eye me-1"></i>Anteprima
+                        </button>
+                        <button type="button" class="btn btn-primary" disabled>
+                            <i class="bi bi-send me-1"></i>Invia
+                        </button>
+                    </div>
+                </td>
+                
+                {% elif status == 'Calendarizzata' %}
+                <!-- Link Teams -->
+                <td>
+                    {% if formazione.get('Link Teams') %}
+                        <a href="{{ formazione['Link Teams'] }}" target="_blank" 
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-camera-video me-1"></i>Teams
+                        </a>
+                    {% else %}
+                        <span class="text-muted small">Non disponibile</span>
+                    {% endif %}
+                </td>
+                <!-- Azioni -->
+                <td>
+                    <button type="button" class="btn btn-sm btn-success" 
+                            onclick="sendFeedback('{{ formazione.get('id', '') }}')">
+                        <i class="bi bi-chat-left-text me-1"></i>Feedback
+                    </button>
+                </td>
+                
+                {% else %} <!-- Conclusa -->
+                <!-- Codice -->
+                <td>
+                    <div class="small font-monospace">
+                        {{ formazione.get('Codice', 'N/A') }}
+                    </div>
+                </td>
+                <!-- Link Teams -->
+                <td>
+                    {% if formazione.get('Link Teams') %}
+                        <a href="{{ formazione['Link Teams'] }}" target="_blank" 
+                           class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-camera-video me-1"></i>Teams
+                        </a>
+                    {% else %}
+                        <span class="text-muted small">Non disponibile</span>
+                    {% endif %}
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal per anteprima comunicazioni (placeholder) -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-eye me-2"></i>Anteprima Comunicazioni
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="previewContent">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Caricamento...</span>
+                        </div>
+                        <div class="mt-2">Generazione anteprima...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Annulla
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmSendBtn" disabled>
+                    <i class="bi bi-send me-1"></i>Conferma Invio
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Funzioni JavaScript per gestire le azioni
+function previewCommunications(formazioneId) {
+    console.log('Preview comunicazioni per formazione:', formazioneId);
+    
+    // Mostra modal
+    const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+    modal.show();
+    
+    // Simula caricamento anteprima (da implementare)
+    setTimeout(() => {
+        document.getElementById('previewContent').innerHTML = `
+            <div class="alert alert-info">
+                <h6><i class="bi bi-info-circle me-2"></i>Anteprima Comunicazioni</h6>
+                <p><strong>Formazione ID:</strong> ${formazioneId}</p>
+                <p class="mb-0"><em>Funzionalità da implementare nella prossima fase.</em></p>
+            </div>
+        `;
+        document.getElementById('confirmSendBtn').disabled = false;
+    }, 1500);
+}
+
+function sendFeedback(formazioneId) {
+    console.log('Invio feedback per formazione:', formazioneId);
+    
+    // Conferma azione
+    if (confirm('Inviare richiesta feedback per questa formazione?')) {
+        alert('Funzionalità da implementare nella prossima fase.');
+    }
+}
+</script>

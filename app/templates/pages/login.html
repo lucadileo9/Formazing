@@ -1,0 +1,53 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="row justify-content-center w-100">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        {% set name = 'bi bi-shield-lock' %}
+                        {% set size = 'display-1 text-primary mb-3' %}
+                        {% include 'atoms/icon.html' %}
+                        
+                        <h1 class="h3 fw-bold">{{ app_name|default('Formazing') }}</h1>
+                        <p class="text-muted">Gestione Formazioni Aziendali</p>
+                    </div>
+                    
+                    <div class="alert alert-info border-0 mb-4">
+                        {% set name = 'bi bi-info-circle' %}
+                        {% set size = 'me-2' %}
+                        {% include 'atoms/icon.html' %}
+                        <strong>Accesso richiesto:</strong> Inserisci le tue credenziali per accedere alla dashboard.
+                    </div>
+                    
+                    <div class="text-center">
+                        {% set text = 'Accedi alla Dashboard' %}
+                        {% set icon = 'bi bi-speedometer2' %}
+                        {% set variant = 'btn-primary btn-lg' %}
+                        {% set onclick = "window.location.href = '/dashboard'" %}
+                        {% include 'atoms/button.html' %}
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            Utilizza <strong>Basic Authentication</strong> del browser<br>
+                            per accedere al sistema sicuro
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <p class="text-white-50">
+                    {% set name = 'bi bi-database' %}
+                    {% set size = 'me-1' %}
+                    {% include 'atoms/icon.html' %}
+                    Integrato con Notion Database
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

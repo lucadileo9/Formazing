@@ -1,0 +1,5 @@
+<!-- ⚛️ ATOM: Badge universale -->
+<span class="badge {{ color|default('bg-secondary') }}">
+    {% if icon %}<i class="{{ icon }} me-1"></i>{% endif %}
+    {{ text|default('Badge') }}
+</span>

@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    
+    <!-- Header Dashboard -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2 fw-bold">
+                <i class="bi bi-speedometer2 text-primary me-2"></i>Dashboard Formazioni
+            </h1>
+            <p class="text-muted">Panoramica completa di tutte le formazioni da Notion</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-clock-history display-4 text-warning mb-2"></i>
+                    <h3 class="fw-bold">{{ stats.programmata }}</h3>
+                    <h6 class="text-muted">Programmate</h6>
+                    <small class="text-muted">Da calendarizzare</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-calendar-event display-4 text-info mb-2"></i>
+                    <h3 class="fw-bold">{{ stats.calendarizzata }}</h3>
+                    <h6 class="text-muted">Calendarizzate</h6>
+                    <small class="text-muted">In programma</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-check-circle display-4 text-success mb-2"></i>
+                    <h3 class="fw-bold">{{ stats.conclusa }}</h3>
+                    <h6 class="text-muted">Concluse</h6>
+                    <small class="text-muted">Completate</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100 bg-primary text-white">
+                <div class="card-body text-center">
+                    <i class="bi bi-list-ul display-4 mb-2"></i>
+                    <h3 class="fw-bold">{{ stats.totale }}</h3>
+                    <h6>Totale</h6>
+                    <small>Tutte le formazioni</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs for different statuses -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+            <ul class="nav nav-tabs card-header-tabs" id="formazioniTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="programmata-tab" data-bs-toggle="tab" 
+                            data-bs-target="#programmata" type="button" role="tab">
+                        <i class="bi bi-clock me-1"></i>Programmate ({{ stats.programmata }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="calendarizzata-tab" data-bs-toggle="tab" 
+                            data-bs-target="#calendarizzata" type="button" role="tab">
+                        <i class="bi bi-calendar-event me-1"></i>Calendarizzate ({{ stats.calendarizzata }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="conclusa-tab" data-bs-toggle="tab" 
+                            data-bs-target="#conclusa" type="button" role="tab">
+                        <i class="bi bi-check-circle me-1"></i>Concluse ({{ stats.conclusa }})
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card-body">
+            <div class="tab-content" id="formazioniTabsContent">
+                
+                <!-- Programmate Tab -->
+                <div class="tab-pane fade show active" id="programmata" role="tabpanel">
+                    {% if formazioni_programmata %}
+                        <div class="alert alert-warning border-0 mb-3">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Formazioni da calendarizzare:</strong> Queste formazioni sono pronte per l'invio delle comunicazioni.
+                        </div>
+                        <!-- Tabella Programmate -->
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col"><i class="bi bi-tag me-1"></i>Nome</th>
+                                        <th scope="col"><i class="bi bi-diagram-3 me-1"></i>Area</th>
+                                        <th scope="col"><i class="bi bi-calendar me-1"></i>Data/Ora</th>
+                                        <th scope="col"><i class="bi bi-collection me-1"></i>Periodo</th>
+                                        <th scope="col"><i class="bi bi-gear me-1"></i>Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for formazione in formazioni_programmata %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold">{{ formazione.get('Nome', 'N/A') }}</div>
+                                            {% if formazione.get('Codice') %}
+                                                <small class="text-muted">{{ formazione['Codice'] }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge rounded-pill bg-primary">{{ formazione.get('Area', 'N/A') }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="small">
+                                                <i class="bi bi-calendar-date me-1"></i>
+                                                {{ formazione.get('Data/Ora', 'Non programmata') }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ formazione.get('Periodo', 'N/A') }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button type="button" class="btn btn-outline-primary">
+                                                    <i class="bi bi-eye me-1"></i>Anteprima
+                                                </button>
+                                                <button type="button" class="btn btn-primary" disabled>
+                                                    <i class="bi bi-send me-1"></i>Invia
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-check-circle-fill text-success display-1 mb-3"></i>
+                            <h4 class="text-muted">Nessuna formazione da programmare</h4>
+                            <p class="text-muted">Tutte le formazioni sono state calendarizzate o concluse.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Calendarizzate Tab -->
+                <div class="tab-pane fade" id="calendarizzata" role="tabpanel">
+                    {% if formazioni_calendarizzata %}
+                        <div class="alert alert-info border-0 mb-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Formazioni in programma:</strong> Comunicazioni inviate, in attesa di svolgimento.
+                        </div>
+                        <!-- Tabella Calendarizzate -->
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col"><i class="bi bi-tag me-1"></i>Nome</th>
+                                        <th scope="col"><i class="bi bi-diagram-3 me-1"></i>Area</th>
+                                        <th scope="col"><i class="bi bi-calendar me-1"></i>Data/Ora</th>
+                                        <th scope="col"><i class="bi bi-link me-1"></i>Link Teams</th>
+                                        <th scope="col"><i class="bi bi-gear me-1"></i>Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for formazione in formazioni_calendarizzata %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold">{{ formazione.get('Nome', 'N/A') }}</div>
+                                            {% if formazione.get('Codice') %}
+                                                <small class="text-muted">{{ formazione['Codice'] }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge rounded-pill bg-info">{{ formazione.get('Area', 'N/A') }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="small">
+                                                <i class="bi bi-calendar-date me-1"></i>
+                                                {{ formazione.get('Data/Ora', 'Non programmata') }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if formazione.get('Link Teams') %}
+                                                <a href="{{ formazione['Link Teams'] }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-camera-video me-1"></i>Teams
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted small">Non disponibile</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-success">
+                                                <i class="bi bi-chat-left-text me-1"></i>Feedback
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-calendar-x text-muted display-1 mb-3"></i>
+                            <h4 class="text-muted">Nessuna formazione calendarizzata</h4>
+                            <p class="text-muted">Non ci sono formazioni in programma al momento.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Concluse Tab -->
+                <div class="tab-pane fade" id="conclusa" role="tabpanel">
+                    {% if formazioni_conclusa %}
+                        <div class="alert alert-success border-0 mb-3">
+                            <i class="bi bi-check-circle me-2"></i>
+                            <strong>Formazioni completate:</strong> Formazioni svolte e concluse.
+                        </div>
+                        <!-- Tabella Concluse -->
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col"><i class="bi bi-tag me-1"></i>Nome</th>
+                                        <th scope="col"><i class="bi bi-diagram-3 me-1"></i>Area</th>
+                                        <th scope="col"><i class="bi bi-qr-code me-1"></i>Codice</th>
+                                        <th scope="col"><i class="bi bi-link me-1"></i>Link Teams</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for formazione in formazioni_conclusa %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold">{{ formazione.get('Nome', 'N/A') }}</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge rounded-pill bg-success">{{ formazione.get('Area', 'N/A') }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="small font-monospace">{{ formazione.get('Codice', 'N/A') }}</div>
+                                        </td>
+                                        <td>
+                                            {% if formazione.get('Link Teams') %}
+                                                <a href="{{ formazione['Link Teams'] }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="bi bi-camera-video me-1"></i>Teams
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted small">Non disponibile</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-hourglass text-muted display-1 mb-3"></i>
+                            <h4 class="text-muted">Nessuna formazione conclusa</h4>
+                            <p class="text-muted">Le formazioni concluse appariranno qui.</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh formazioni ogni 60 secondi
+let autoRefreshInterval;
+
+function startAutoRefresh() {
+    autoRefreshInterval = setInterval(() => {
+        console.log('Auto-refreshing formazioni data...');
+        // Qui implementeremo l'aggiornamento via AJAX
+        // window.location.reload();
+    }, 60000);
+}
+
+function stopAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+    }
+}
+
+// Avvia auto-refresh
+document.addEventListener('DOMContentLoaded', startAutoRefresh);
+
+// Ferma auto-refresh quando la pagina non è visibile
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        stopAutoRefresh();
+    } else {
+        startAutoRefresh();
+    }
+});
+</script>
+{% endblock %}

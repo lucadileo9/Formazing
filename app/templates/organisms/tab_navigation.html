@@ -1,0 +1,41 @@
+<!-- 🏗️ ORGANISM: Tab Navigation -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white">
+        <ul class="nav nav-tabs card-header-tabs" id="formazioniTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                {% include 'atoms/button.html' %}
+                {% set text = 'Programmate (' + (stats.programmata|string) + ')' %}
+                {% set icon = 'bi bi-clock' %}
+                {% set variant = 'nav-link active' %}
+                {% set data_bs_toggle = 'tab' %}
+                {% set data_bs_target = '#programmata' %}
+                {% set type = 'button' %}
+            </li>
+            <li class="nav-item" role="presentation">
+                {% include 'atoms/button.html' %}
+                {% set text = 'Calendarizzate (' + (stats.calendarizzata|string) + ')' %}
+                {% set icon = 'bi bi-calendar-event' %}
+                {% set variant = 'nav-link' %}
+                {% set data_bs_toggle = 'tab' %}
+                {% set data_bs_target = '#calendarizzata' %}
+                {% set type = 'button' %}
+            </li>
+            <li class="nav-item" role="presentation">
+                {% include 'atoms/button.html' %}
+                {% set text = 'Concluse (' + (stats.conclusa|string) + ')' %}
+                {% set icon = 'bi bi-check-circle' %}
+                {% set variant = 'nav-link' %}
+                {% set data_bs_toggle = 'tab' %}
+                {% set data_bs_target = '#conclusa' %}
+                {% set type = 'button' %}
+            </li>
+        </ul>
+    </div>
+    
+    <div class="card-body">
+        <div class="tab-content" id="formazioniTabsContent">
+            <!-- Tab content will be rendered by parent template -->
+            {{ tab_content }}
+        </div>
+    </div>
+</div>

@@ -18,7 +18,9 @@ class Config:
     
     # ===== FLASK CONFIG =====
     SECRET_KEY = os.getenv('FLASK_SECRET_KEY', 'dev-secret-key-change-in-production')
+    BASIC_AUTH_USERNAME = os.getenv('FLASK_BASIC_AUTH_USERNAME', 'admin')
     BASIC_AUTH_PASSWORD = os.getenv('FLASK_BASIC_AUTH_PASSWORD')
+    FLASK_PORT = int(os.getenv('FLASK_PORT', 5000))
     DEBUG = os.getenv('DEBUG_MODE', 'False').lower() == 'true'
     
     # ===== TELEGRAM CONFIG =====
