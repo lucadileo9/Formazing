@@ -6,5 +6,5 @@
         {% if data_bs_toggle %}data-bs-toggle="{{ data_bs_toggle }}"{% endif %}
         {% if data_bs_target %}data-bs-target="{{ data_bs_target }}"{% endif %}>
     {% if icon %}<i class="{{ icon }} me-1"></i>{% endif %}
-    {{ text|default('Button') }}
+    {{ text|default('') }}
 </button>
