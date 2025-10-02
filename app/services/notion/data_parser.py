@@ -97,7 +97,7 @@ class NotionDataParser:
                 'Nome': nome,
                 'Area': area,
                 'Data/Ora': data_ora,
-                'Stato/Fase': status,
+                'Stato': status,
                 'Codice': codice,
                 'Link Teams': link_teams,
                 'Periodo': periodo,
