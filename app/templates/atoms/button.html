@@ -1,6 +1,7 @@
 <!-- ⚛️ ATOM: Button universale -->
 <button class="btn {{ variant|default('btn-primary') }} {{ size|default('') }}" 
         type="{{ type|default('button') }}"
+        {% if id %}id="{{ id }}"{% endif %}
         {% if onclick %}onclick="{{ onclick }}"{% endif %}
         {% if disabled %}disabled{% endif %}
         {% if data_bs_toggle %}data-bs-toggle="{{ data_bs_toggle }}"{% endif %}
