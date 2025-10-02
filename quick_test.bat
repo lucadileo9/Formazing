@@ -20,11 +20,22 @@ if "%1"=="" (
     echo    bot        - Solo test comandi bot ^(REALE^)
     echo    check      - Verifica setup ambiente
     echo.
+    echo 🚀 NUOVI TEST INTEGRAZIONE REALE:
+    echo    config     - Verifica configurazione Notion+Telegram ^(sicuro^)
+    echo    preview    - Test formattazione con dati reali ^(sicuro^)
+    echo    send       - Test invio controllato con conferma ^(REALE^)
+    echo    workflow   - Test workflow completo ^(modalità SAFE^)
+    echo    workflow-real - Test workflow completo ^(modalità REALE^)
+    echo.
     echo 🎯 ESEMPI:
     echo    quick_test.bat unit         ^(sviluppo - test velocissimi^)
     echo    quick_test.bat notion       ^(solo componenti Notion^)
+    echo    quick_test.bat config       ^(verifica configurazione reale^)
+    echo    quick_test.bat preview      ^(formattazione con dati reali^)
     echo    quick_test.bat format       ^(più sicuro - solo preview^)
     echo    quick_test.bat interactive  ^(raccomandato - test completi^)
+    echo    quick_test.bat workflow     ^(test completo modalità SAFE^)
+    echo    quick_test.bat send         ^(invio controllato con conferma^)
     echo    quick_test.bat training     ^(test specifico invio formazione^)
     echo    quick_test.bat real         ^(tutti i test reali^)
     echo.
@@ -142,6 +153,51 @@ if "%1"=="real" (
     echo 💡 Test precisi con verifiche dettagliate
     echo ⏳ Avvio pytest...
     python -m pytest tests/integration/test_real_telegram.py::TestRealTelegramIntegration -m real_telegram -s -v --tb=short
+    goto :end
+)
+
+if "%1"=="config" (
+    echo 🔍 Verifica CONFIGURAZIONE REALE...
+    echo 💡 Test connessioni Notion e Telegram senza invio messaggi
+    echo ⏳ Avvio script verifica...
+    python tests\e2e\test_real_config.py
+    goto :end
+)
+
+if "%1"=="preview" (
+    echo 🎨 Test FORMATTAZIONE con DATI REALI...
+    echo 💡 Recupera formazioni vere e testa formattazione messaggi
+    echo ⏳ Avvio script formattazione...
+    python tests\e2e\test_real_formatting.py
+    goto :end
+)
+
+if "%1"=="send" (
+    echo 📤 Test INVIO CONTROLLATO con CONFERMA...
+    echo ⚠️ ATTENZIONE: Può inviare messaggi REALI dopo conferma esplicita!
+    echo 💡 Script con selezione manuale e anteprima completa
+    echo ⏳ Avvio script invio...
+    python tests\e2e\test_real_send.py
+    goto :end
+)
+
+if "%1"=="workflow" (
+    echo 🔄 Test WORKFLOW COMPLETO ^(modalità SAFE^)...
+    echo 💡 Simula intero processo senza invio reale
+    echo ⏳ Avvio script workflow...
+    python tests\e2e\test_workflow.py --limit 3
+    goto :end
+)
+
+if "%1"=="workflow-real" (
+    echo.
+    echo ⚠️  ATTENZIONE: WORKFLOW CON INVIO REALE ⚠️
+    echo 🔄 Questo test eseguirà l'intero workflow con messaggi veri!
+    echo 📱 Verranno processate formazioni reali e inviati messaggi veri
+    echo.
+    echo 🚀 Esecuzione WORKFLOW REALE...
+    echo ⏳ Avvio script workflow...
+    python tests\e2e\test_workflow.py --real --limit 2
     goto :end
 )
 
