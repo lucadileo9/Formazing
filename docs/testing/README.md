@@ -187,6 +187,20 @@ python tests/e2e/test_workflow.py --limit 3
 - **Aggiorna stato** → "Calendarizzata" (solo in memoria, non salva)
 - **Report completo** con metriche performance e risultati
 
+**`all`** - Suite Completa Pre-Commit (Nuovo!)
+```bash
+# Comando quick_test
+.\quick_test.bat all
+
+# Equivalente: 4 comandi in sequenza interattiva
+```
+**Cosa fa**: Suite **interattiva step-by-step** per validazione pre-commit:
+- **Step 1**: Test unitari (106 test, 1.2s) con conferma
+- **Step 2**: Verifica connessioni Notion + Telegram con conferma  
+- **Step 3**: Test formattazione template con dati reali con conferma
+- **Step 4**: Workflow simulazione completa con conferma
+- **Report finale** con riepilogo test eseguiti
+
 ---
 
 #### **🔴 Test con Invii Reali (Attenzione)**
@@ -324,6 +338,16 @@ python -m pytest tests/integration/test_real_telegram.py::TestRealTelegramIntegr
 .\quick_test.bat check        # Verifica ambiente in 2s
 ```
 
+### **🚀 Suite Completa Pre-Commit (Nuovo!)**
+```bash
+# ⭐ RACCOMANDATO - Suite interattiva step-by-step
+.\quick_test.bat all          # 4 step con conferme, 10-15s totali
+# → 1. Unit test (106 test)
+# → 2. Connessioni (Notion + Telegram)  
+# → 3. Formattazione (template reali)
+# → 4. Workflow simulazione (safe)
+```
+
 ### **📋 Prima di Commit (Validazione Pre-Push)**
 ```bash
 # ✅ Validazione completa sicura (raccomandato)
@@ -356,4 +380,14 @@ python -m pytest tests/integration/test_real_telegram.py::TestRealTelegramIntegr
 # 🤖 Problemi comandi bot
 .\quick_test.bat bot          # Test interattivo 60s
 ```
+
+### **💎 Raccomandazione Pre-Commit**
+```bash
+# ⭐ NUOVO STANDARD - Suite interattiva completa
+.\quick_test.bat all          # 4 step con conferme, controllo totale
+
+# ⚡ Alternativa veloce per commit frequenti  
+.\quick_test.bat unit && .\quick_test.bat preview  # 3-4s totali
+```
+
 ---
