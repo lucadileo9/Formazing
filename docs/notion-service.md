@@ -370,7 +370,7 @@ NOTION API → FORMATO INTERNO
 Nome (page title) → Nome (string)
 Area (multi_select) → Area (string, comma-separated)  
 Data (date) → Data/Ora (dd/mm/YYYY HH:MM)
-Status (status) → Stato/Fase (string)
+Status (status) → Stato (string)
 Codice (rich_text) → Codice (string)
 Link Teams (url) → Link Teams (string)
 Periodo (select) → Periodo (string)
@@ -425,7 +425,7 @@ Periodo (select) → Periodo (string)
 
 #### 🎯 `extract_status_property(status_prop: Dict) -> str`
 **Scopo:** Estrae valore da campo Status Notion  
-**Utilizzato da:** `parse_single_formazione()` per campo Stato/Fase
+**Utilizzato da:** `parse_single_formazione()` per campo Stato
 
 **Input Notion:**
 ```json

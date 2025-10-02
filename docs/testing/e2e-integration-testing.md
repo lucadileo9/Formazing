@@ -218,7 +218,7 @@ for status in statuses:
 📝 Nome                : str        = Sicurezza Web
 📝 Area                : list       = [2 elementi] ['IT', 'Cybersecurity']...
 📝 Data/Ora            : str        = 2024-12-15T14:00:00
-📝 Stato/Fase          : str        = Programmata
+📝 Stato          : str        = Programmata
 ```
 
 #### `test_training_notification_formatting(sample_formazioni: dict) -> bool`
