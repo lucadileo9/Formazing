@@ -8,17 +8,14 @@ show_help() {
     echo ""
     echo "💡 Uso: ./quick_test.sh [COMANDO]"
     echo ""
-    echo "📋 COMANDI DISPONIBILI:"
-    echo "   format     - Solo test formattazione (sicuro, no invio)"
-    echo "   safe       - Test sicuri (formattazione + diagnostica)"
-    echo "   interactive - Test completo interattivo (chiede conferma per invio)"
-    echo "   real       - Test con invio reale (ATTENZIONE: invia messaggi veri)"
-    echo "   check      - Verifica setup ambiente"
+    echo "🎯 COMANDI PIÙ USATI:"
+    echo "   unit     - Test unitari (1.2s)"
+    echo "   notion   - Test NotionService (0.9s)"
+    echo "   config   - Verifica connessioni"
+    echo "   workflow - Test workflow completo"
+    echo "   send     - Invio controllato con conferma"
     echo ""
-    echo "🎯 ESEMPI:"
-    echo "   ./quick_test.sh format       (più sicuro)"
-    echo "   ./quick_test.sh interactive  (raccomandato)"
-    echo "   ./quick_test.sh real         (solo se sicuro)"
+    echo "📚 Per lista completa comandi: docs/testing/README.md"
     echo ""
 }
 
@@ -49,9 +46,10 @@ if [ -z "$1" ]; then
     exit 0
 fi
 
+check_prerequisites
+
 case "$1" in
     "check")
-        check_prerequisites
         echo "✅ Tutti i file di configurazione sono presenti"
         echo "🔍 Verifica ambiente Python..."
         python3 -c "import pytest; print('✅ pytest disponibile')" 2>/dev/null || {
@@ -62,48 +60,80 @@ case "$1" in
         echo "🎉 Ambiente configurato correttamente!"
         ;;
         
+    "unit")
+        echo "⚡ Test unitari (1.2s)..."
+        python3 -m pytest tests/unit/ -v
+        ;;
+        
+    "notion")
+        echo "🗃️ Test NotionService (0.9s)..."
+        python3 -m pytest tests/unit/notion/ -v
+        ;;
+        
     "format")
-        check_prerequisites
-        echo "🎨 Esecuzione test SOLO FORMATTAZIONE (sicuro)..."
-        echo "⏳ Avvio pytest..."
-        python3 -m pytest tests/quick_real_test.py::test_quick_interactive -s -k "not send" --tb=short
+        echo "🎨 Test formattazione messaggi..."
+        python3 -m pytest tests/integration/test_real_telegram.py::TestRealTelegramIntegration::test_formatter_preview_messages -s -v --tb=short
         ;;
         
     "safe")
-        check_prerequisites
-        echo "🛡️ Esecuzione test SICURI (no invio reale)..."
-        echo "⏳ Avvio pytest..."
-        python3 -m pytest tests/quick_real_test.py::test_quick_interactive -s --tb=short
-        echo ""
-        echo "💡 TIP: Durante il test, rispondi 'N' a tutte le richieste di invio reale"
+        echo "🛡️ Test sicuri (no invio)..."
+        python3 -m pytest tests/integration/test_real_telegram.py::TestRealTelegramIntegration::test_formatter_preview_messages -s -v --tb=short
         ;;
         
     "interactive")
-        check_prerequisites
-        echo "🤖 Esecuzione test INTERATTIVO (raccomandato)..."
-        echo "💡 Il test ti chiederà cosa fare per ogni step"
-        echo "⏳ Avvio pytest..."
-        python3 -m pytest tests/quick_real_test.py::test_quick_interactive -s -v --tb=short
+        echo "🤖 Test interattivi con conferme..."
+        python3 -m pytest tests/integration/test_real_telegram.py::TestRealTelegramIntegration -s -v --tb=short
+        ;;
+        
+    "training")
+        echo "📤 Test invio formazione (REALE)..."
+        python3 -m pytest tests/integration/test_real_telegram.py::TestRealTelegramIntegration::test_send_training_notification_real -s -v --tb=short
+        ;;
+        
+    "feedback")
+        echo "📋 Test feedback (REALE)..."
+        python3 -m pytest tests/integration/test_real_telegram.py::TestRealTelegramIntegration::test_send_feedback_notification_real -s -v --tb=short
+        ;;
+        
+    "bot")
+        echo "🤖 Test bot (REALE 60s)..."
+        python3 -m pytest tests/integration/test_real_telegram.py::TestRealTelegramIntegration::test_bot_commands_interactive -s -v --tb=short
         ;;
         
     "real")
-        check_prerequisites
-        echo ""
-        echo "⚠️  ATTENZIONE: INVIO MESSAGGI REALI ⚠️"
-        echo "📱 Questo test invierà messaggi sui gruppi Telegram configurati!"
-        echo "🔍 I messaggi saranno marcati [TEST] ma sono comunque REALI"
-        echo ""
-        read -p "❓ Sei sicuro di voler continuare? (s/N): " confirm
+        echo "🚨 Test tutti reali..."
+        read -p "❓ Continui? (s/N): " confirm
         if [[ ! "$confirm" =~ ^[Ss]$ ]]; then
-            echo "⏭️ Test annullato"
+            echo "⏭️ Annullato"
             exit 0
         fi
-        echo ""
-        echo "🚀 Esecuzione test con INVIO REALE..."
-        echo "⏳ Avvio pytest..."
-        python3 -m pytest tests/quick_real_test.py::test_quick_interactive -s -v --tb=short
-        echo ""
-        echo "💡 TIP: Durante il test, rispondi 'Y' alle richieste di invio per testare"
+        python3 -m pytest tests/integration/test_real_telegram.py::TestRealTelegramIntegration -m real_telegram -s -v --tb=short
+        ;;
+        
+    "config")
+        echo "� Verifica connessioni..."
+        python3 tests/e2e/test_real_config.py
+        ;;
+        
+    "preview")
+        echo "🎨 Test formattazione con dati reali..."
+        python3 tests/e2e/test_real_formatting.py
+        ;;
+        
+    "send")
+        echo "📤 Test invio controllato..."
+        echo "⚠️ ATTENZIONE: Può inviare messaggi REALI dopo conferma!"
+        python3 tests/e2e/test_real_send.py
+        ;;
+        
+    "workflow")
+        echo "🔄 Test workflow completo (safe)..."
+        python3 tests/e2e/test_workflow.py --limit 3
+        ;;
+        
+    "workflow-real")
+        echo "🔄 Workflow reale..."
+        python3 tests/e2e/test_workflow.py --real --limit 2
         ;;
         
     *)
