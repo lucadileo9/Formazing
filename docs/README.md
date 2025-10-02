@@ -8,6 +8,7 @@
 - [**🤖 Bot Telegram**](bot-telegram.md) - Sistema bot, comandi, formattazione messaggi
 - [**🔗 Servizio Notion**](notion-service.md) - Architettura modulare per integrazione Notion API
 - [**🧪 Testing & Quality**](testing/) - Sistema di test completo, fixture e validazione qualità
+- [**📑 Templates**](templates/) - Guida all'UI dell'applicazione
 
 ### 📚 Guide Specializzate  
 - **📊 Servizi Core** - Logica di business e orchestrazione *(da documentare)*
@@ -15,14 +16,6 @@
 - **🔧 API Reference** - Endpoints Flask, parametri, esempi *(da documentare)*
 
 ---
-
-## 🎯 Quick Documentazione
-
-### 📖 Per Sviluppatori
-1. **[🤖 Sistema Bot](bot-telegram.md)** - Se lavori su comandi bot, formattazione messaggi
-2. **[🔗 Notion Service](notion-service.md)** - Se lavori su integrazione database, query, parsing
-3. **[🧪 Testing](testing/)** - Se lavori su test, fixture, validazione qualità
-
 ## 🎯 Quick Start
 
 ### Panoramica del Sistema
@@ -37,39 +30,67 @@ Formazing è un sistema automatizzato che:
 
 ## 🏗️ Architettura High-Level
 
+```mermaid
+graph TB
+    %% Database e API esterne
+    NotionDB[(Notion Database<br/>Formazioni)]
+    MSGraph[Microsoft Graph API<br/>Email + Teams]
+    TelegramAPI[Telegram Bot API]
+    
+    %% Core Backend
+    Flask[Flask Backend<br/>routes.py]
+    NotionService[NotionService<br/>5 moduli]
+    TelegramService[TelegramService<br/>Bot + Commands]
+    
+    %% Configurazioni
+    Config[Configurazioni<br/>YAML + JSON]
+    Templates[Jinja Templates<br/>UI + Web]
+    
+    %% Flusso principale
+    NotionDB --> NotionService
+    NotionService --> Flask
+    Flask --> TelegramService
+    TelegramService --> TelegramAPI
+    Flask --> MSGraph
+    
+    %% Configurazioni e UI
+    Config --> TelegramService
+    Config --> MSGraph
+    Templates --> Flask
+    
+    %% Styling
+    classDef external fill:#e1f5fe
+    classDef core fill:#f3e5f5
+    classDef config fill:#fff3e0
+    
+    class NotionDB,MSGraph,TelegramAPI external
+    class Flask,NotionService,TelegramService core
+    class Config,Templates config
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│                 │    │                 │    │                 │
-│   Notion API    │◄───┤  Flask Backend  │───►│ Telegram Bot    │
-│   (Database)    │    │  (Orchestratore)│    │  (Notifiche)    │
-│                 │    │                 │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                              │
-                              ▼
-                    ┌─────────────────┐
-                    │  Microsoft      │
-                    │  Graph API      │
-                    │ (Email + Teams) │
-                    └─────────────────┘
-                              │
-                              ▼
-                    ┌─────────────────┐
-                    │ Configurazione  │
-                    │ (YAML + JSON)   │
-                    └─────────────────┘
-```
+
+**Componenti Principali:**
+- **🔵 Servizi Esterni**: Notion (database), Microsoft Graph (email/Teams), Telegram Bot API
+- **🟣 Core Backend**: Flask (orchestratore), NotionService (5 moduli), TelegramService (bot + comandi)  
+- **🟠 Configurazione & UI**: File YAML/JSON (gruppi + template messaggi), Jinja Templates (web UI)
+
+**Flusso Dati:**
+1. **NotionService** recupera formazioni dal database Notion
+2. **Flask** orchestra il workflow e gestisce la web UI con Jinja
+3. **TelegramService** formatta e invia notifiche usando configurazioni YAML/JSON
+4. **Microsoft Graph** gestisce email e meeting Teams
 
 ## 📊 Stack Tecnologico
 
 ### 🔧 Backend Core
 - **🐍 Python 3.9+** - Linguaggio principale
 - **🌐 Flask** - Web framework per dashboard e API
+- **🎨 Jinja2** - Template engine per UI web
 - **🔗 Notion SDK** - Integrazione database formazioni
 
 ### 🤖 Integrazione Bot & Notifiche  
 - **📱 python-telegram-bot** - SDK Telegram Bot API
 - **📧 Microsoft Graph API** - Email e calendari Outlook/Teams
-- **📝 PyYAML** - Template messaggi configurabili
+- **📝 PyYAML** - Template messaggi e configurazioni gruppi
 
 ### 🧪 Quality & Testing
 - **🎯 pytest** - Framework testing principale  
@@ -77,10 +98,3 @@ Formazing è un sistema automatizzato che:
 - **⚡ Quick test scripts** - Automazione testing Windows/Linux
 
 ---
-
-## 📞 Supporto e Contributi
-
-### 🔍 Troubleshooting
-- **Per errori di test**: [docs/testing/README.md](testing/README.md)
-- **Per problemi bot**: [docs/bot-telegram.md](bot-telegram.md)
-- **Per errori Notion**: [docs/notion-service.md](notion-service.md)

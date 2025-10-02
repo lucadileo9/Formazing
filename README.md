@@ -119,13 +119,13 @@ L'app fa **2 cose:**
 
 Il progetto include un sistema di test completo per garantire affidabilità e sicurezza in produzione.
 
-📚 **Per informazioni complete sui test**: [docs/testing/README.md](docs/testing/README.md)
+**Per informazioni complete sui test**: [docs/testing/README.md](docs/testing/README.md)
 
 ## 📚 Documentazione
 
 Per informazioni dettagliate su architettura, API e configurazione:
 
-📖 **Documentazione completa**: [docs/README.md](docs/README.md)
+**Documentazione completa**: [docs/README.md](docs/README.md)
 
 ## 🏗️ Struttura del Progetto
 
@@ -148,8 +148,23 @@ Formazing/
 │   │   ├── mgraph_service.py   # API Microsoft Graph (Teams, Email)
 │   │   ├── telegram_service.py # Orchestratore Telegram
 │   │   └── training_service.py # Orchestratore principale
-│   ├── templates/              # Template web
+│   ├── templates/              # Template web Jinja2
+│   │   ├── layout/               # Layout base e strutture
+│   │   │   ├── base.html           # Template base principale
+│   │   │   └── auth_required.html  # Layout con autenticazione
+│   │   ├── pages/                # Pagine complete
+│   │   ├── organisms/            # Componenti complessi riutilizzabili
+│   │   ├── molecules/            # Componenti medi (form, card, ecc.)
+│   │   ├── atoms/                # Componenti base (button, icon, ecc.)
+│   │   │   ├── badge.html          # Badge di stato
+│   │   │   ├── button.html         # Bottoni
+│   │   │   ├── card.html           # Card containers
+│   │   │   ├── icon.html           # Icone
+│   │   │   └── loading.html        # Indicatori caricamento
+│   │   ├── legacy/               # Template legacy (deprecati)
+│   │   └── error.html            # Pagina errori
 │   └── static/                 # Assets statici
+│       └── style.css             # Fogli di stile CSS
 ├── tests/
 │   ├── conftest.py             # Configurazione pytest
 │   ├── fixtures/               # Fixture modulari per test
@@ -165,6 +180,8 @@ Formazing/
 │   ├── README.md               # Documentazione generale
 │   ├── bot-telegram.md         # Documentazione bot
 │   ├── notion-service.md       # Documentazione servizio Notion
+│   ├── templates/              # Documentazione sistema template
+│   │   └── README.md             # Guida atomic design e componenti
 │   └── testing/                # Documentazione testing
 │       ├── README.md             # Guida testing generale
 │       ├── fixture-testing-guide.md # Guida completa fixture
