@@ -2,15 +2,26 @@
 
 **Sistema di notifiche automatiche per formazioni aziendali tramite Telegram Bot**
 
-## 📋 Indice Generale
+## 📋 Indice Documentazione
 
 ### 🏗️ Architettura del Sistema
-- [**🤖 Bot Telegram**](bot-telegram.md) - Documentazione completa del sistema bot
+- [**🤖 Bot Telegram**](bot-telegram.md) - Sistema bot, comandi, formattazione messaggi
 - [**🔗 Servizio Notion**](notion-service.md) - Architettura modulare per integrazione Notion API
-- [**🧪 Testing & Quality**](testing/) - Sistema di test, fixture e validazione qualità
+- [**🧪 Testing & Quality**](testing/) - Sistema di test completo, fixture e validazione qualità
+
+### 📚 Guide Specializzate  
 - **📊 Servizi Core** - Logica di business e orchestrazione *(da documentare)*
+- **⚙️ Configurazione** - Setup ambiente, deployment, variabili *(da documentare)*
+- **🔧 API Reference** - Endpoints Flask, parametri, esempi *(da documentare)*
 
 ---
+
+## 🎯 Quick Documentazione
+
+### 📖 Per Sviluppatori
+1. **[🤖 Sistema Bot](bot-telegram.md)** - Se lavori su comandi bot, formattazione messaggi
+2. **[🔗 Notion Service](notion-service.md)** - Se lavori su integrazione database, query, parsing
+3. **[🧪 Testing](testing/)** - Se lavori su test, fixture, validazione qualità
 
 ## 🎯 Quick Start
 
@@ -22,12 +33,15 @@ Formazing è un sistema automatizzato che:
 4. **Calendarizza** eventi e invia email tramite Microsoft Graph API
 5. **Gestisce** comandi interattivi per consultazioni manuali
 
-### Architettura High-Level
+---
+
+## 🏗️ Architettura High-Level
+
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │                 │    │                 │    │                 │
 │   Notion API    │◄───┤  Flask Backend  │───►│ Telegram Bot    │
-│   (Formazioni)  │    │   (Orchestr.)   │    │  (Notifiche)    │
+│   (Database)    │    │  (Orchestratore)│    │  (Notifiche)    │
 │                 │    │                 │    │                 │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
                               │
@@ -35,104 +49,38 @@ Formazing è un sistema automatizzato che:
                     ┌─────────────────┐
                     │  Microsoft      │
                     │  Graph API      │
-                    │ (Email + Cal.)  │
+                    │ (Email + Teams) │
                     └─────────────────┘
                               │
                               ▼
                     ┌─────────────────┐
-                    │                 │
-                    │  Configurazione │
+                    │ Configurazione  │
                     │ (YAML + JSON)   │
-                    │                 │
                     └─────────────────┘
 ```
 
-### Stack Tecnologico
+## 📊 Stack Tecnologico
+
+### 🔧 Backend Core
 - **🐍 Python 3.9+** - Linguaggio principale
-- **🌐 Flask** - Web framework per API
-- **🤖 python-telegram-bot** - SDK Telegram Bot API
-- **📄 Notion SDK** - Integrazione database Notion
-- **� Microsoft Graph API** - Integrazione email e calendari Outlook
-- **�📝 PyYAML** - Gestione template messaggi
-- **🔧 python-dotenv** - Gestione variabili ambiente
+- **🌐 Flask** - Web framework per dashboard e API
+- **🔗 Notion SDK** - Integrazione database formazioni
+
+### 🤖 Integrazione Bot & Notifiche  
+- **📱 python-telegram-bot** - SDK Telegram Bot API
+- **📧 Microsoft Graph API** - Email e calendari Outlook/Teams
+- **📝 PyYAML** - Template messaggi configurabili
+
+### 🧪 Quality & Testing
+- **🎯 pytest** - Framework testing principale  
+- **🔧 Fixture modulari** - 39 fixture specializzate per testing
+- **⚡ Quick test scripts** - Automazione testing Windows/Linux
 
 ---
 
-## 📁 Struttura del Progetto
+## 📞 Supporto e Contributi
 
-```
-Formazing/
-├── 📄 README.md                 # Documentazione generale progetto
-├── ⚙️ config.py                 # Configurazione Flask
-├── 🚀 run.py                    # Entry point applicazione
-├── 📦 requirements.txt          # Dipendenze Python
-├── 
-├── 📂 app/                      # Core dell'applicazione
-│   ├── 🔧 __init__.py
-│   ├── 🌐 routes.py             # API endpoints Flask
-│   │
-│   └── 📂 services/             # Logica di business
-│       ├── 🔗 mgraph_service.py     # Integrazione Microsoft Graph
-│       ├── 📊 notion_service.py     # Connettore Notion API
-│       ├── 🎯 training_service.py   # Orchestrazione formazioni
-│       ├── 📱 telegram_service.py   # Core Telegram Bot
-│       │
-│       └── 📂 bot/              # Moduli specializzati bot
-│           ├── 🔧 __init__.py
-│           ├── ⌨️ telegram_commands.py    # Handler comandi bot
-│           └── 🎨 telegram_formatters.py  # Formattazione messaggi
-│
-├── 📂 config/                   # File di configurazione
-│   ├── 📝 message_templates.yaml    # Template messaggi
-│   └── 🔧 telegram_groups.json      # Mapping gruppi Telegram
-│
-├── 📂 docs/                     # Documentazione tecnica
-│   ├── 📚 README.md             # Indice documentazione (questo file)
-│   ├── 🤖 bot-telegram.md       # Documentazione bot Telegram
-│   ├── 🔗 notion-service.md     # Documentazione servizio Notion
-│   │
-│   └── 📂 testing/              # Documentazione testing e qualità
-│       ├── 🧪 testing.md             # Sistema di test e workflow
-│       ├── 🔧 fixture-testing-guide.md  # Guida completa fixture
-│       ├── 📋 fixture-quick-reference.md # Reference rapido fixture
-│       └── ⚡ unit-tests.md          # Documentazione unit testing
-│
-└── 🎨 Static & Templates        # Assets web (se necessario)
-    ├── 📂 static/
-    └── 📂 templates/
-```
-
----
-
-## 🔗 Collegamenti Utili
-
-### 📖 Documentazione Specifica
-- **[🤖 Sistema Bot Telegram](bot-telegram.md)** - Architettura, comandi, formattazione
-- **[🔗 Servizio Notion](notion-service.md)** - Architettura modulare, API, operazioni CRUD
-- **[🧪 Testing & Quality Assurance](testing/)** - Sistema di test completo, fixture modulari e workflow
-- **Training Service** *(coming soon)* - Logica orchestrazione e business rules
-- **Configuration Guide** *(coming soon)* - Setup completo ambiente
-
-#### 🧪 Testing Documentation (docs/testing/)
-- **[🧪 Testing System](testing/testing.md)** - Architettura test, script quick_test.bat, workflow
-- **[🔧 Fixture Guide](testing/fixture-testing-guide.md)** - Guida completa sistema fixture modulari
-- **[📋 Fixture Reference](testing/fixture-quick-reference.md)** - Reference rapido di tutte le fixture
-- **[⚡ Unit Tests](testing/unit-tests.md)** - Documentazione unit testing specifici
-
-### 🛠️ Sviluppo
-- **API Reference** *(coming soon)* - Endpoints Flask e parametri
-- **Database Schema** *(coming soon)* - Struttura dati Notion
-- **Deployment Guide** *(coming soon)* - Produzione e staging
-
-### 🔧 Manutenzione
-- **Troubleshooting** *(coming soon)* - Problemi comuni e soluzioni
-- **Logging Guide** *(coming soon)* - Sistema di logging e debug
-- **Performance Tuning** *(coming soon)* - Ottimizzazioni e monitoring
-
----
-
-## 📞 Contatti
-
-Per supporto tecnico o domande sulla documentazione, contattare il team di sviluppo.
-
-> **Nota**: Questa documentazione è in continuo aggiornamento. Le sezioni marcate con *(coming soon)* o *(da documentare)* verranno completate nelle prossime iterazioni del progetto.
+### 🔍 Troubleshooting
+- **Per errori di test**: [docs/testing/README.md](testing/README.md)
+- **Per problemi bot**: [docs/bot-telegram.md](bot-telegram.md)
+- **Per errori Notion**: [docs/notion-service.md](notion-service.md)

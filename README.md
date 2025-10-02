@@ -117,101 +117,23 @@ L'app fa **2 cose:**
 
 ## 🧪 Testing e Validazione
 
-Il sistema include una suite di test completa per garantire affidabilità e sicurezza prima del deploy in produzione.
+Il progetto include un sistema di test completo per garantire affidabilità e sicurezza in produzione.
 
-### 🎯 Scenari di Testing Principali
+📚 **Per informazioni complete sui test**: [docs/testing/README.md](docs/testing/README.md)
 
-#### **1️⃣ Test SOLO Componenti Notion (Veloce - 0.9s)**
-Testa **tutti i 5 moduli NotionService** senza dipendenze esterne:
-```bash
-# Usando quick_test.bat
-.\quick_test.bat notion
+## 📚 Documentazione
 
-# Oppure direttamente con pytest
-python -m pytest tests/unit/notion/ -v
-```
-**Cosa testa:** Parser dati, Query builder, CRUD operations, Client auth, Service facade  
-**Risultato:** 86 test in ~0.9 secondi ✅
+Per informazioni dettagliate su architettura, API e configurazione:
 
-#### **2️⃣ Test TUTTE le Componenti (Unit Test Completi - 1.2s)**
-Testa **NotionService + TelegramFormatter** - logica pura, zero invii reali:
-```bash
-# Usando quick_test.bat (RACCOMANDATO)
-.\quick_test.bat unit
-
-# Oppure direttamente con pytest  
-python -m pytest tests/unit/ -v
-```
-**Cosa testa:** Tutti i moduli Notion + Formattazione messaggi + Edge cases  
-**Risultato:** 106 test in ~1.2 secondi ✅
-
-#### **3️⃣ Test con Invii REALI (Attenzione - 30-60s)**
-Testa con **bot Telegram vero** - invia messaggi reali alle chat di test:
-```bash
-# Test completo interattivo (CON CONFERMA)
-.\quick_test.bat interactive
-
-# Test specifici (INVIO DIRETTO)
-.\quick_test.bat training    # Solo notifiche formazione
-.\quick_test.bat feedback    # Solo richieste feedback  
-.\quick_test.bat bot         # Solo comandi bot
-
-# Tutti i test reali insieme (MASSIMA ATTENZIONE)
-.\quick_test.bat real
-```
-**⚠️ ATTENZIONE:** Questi inviano messaggi **reali** alle chat Telegram configurate!
-
-### 📋 Quick Test Script - Guida Completa
-
-#### **🟢 Comandi Sicuri (Zero Invii)**
-```bash
-.\quick_test.bat check      # Verifica configurazione ambiente (2s)
-.\quick_test.bat format     # Preview messaggi senza invio (5s)
-.\quick_test.bat notion     # Solo moduli Notion (0.9s)
-.\quick_test.bat unit       # Tutti unit test (1.2s) 👈 RACCOMANDATO
-```
-
-#### **� Comandi Controllati**
-```bash
-.\quick_test.bat interactive   # Test completo con conferme esplicite
-.\quick_test.bat safe         # Test diagnostici controllati
-```
-
-#### **🔴 Comandi con Invio Reale**
-```bash
-.\quick_test.bat training     # Invia notifica formazione di test
-.\quick_test.bat feedback     # Invia richiesta feedback di test
-.\quick_test.bat bot          # Attiva bot per 60s (risponde ai comandi)
-.\quick_test.bat real         # TUTTI i test con invio reale
-```
-
-### 📊 Matrice Test Completa
-
-| Comando | Durata | Invii Reali | Componenti Testate | Uso Raccomandato |
-|---------|--------|-------------|-------------------|------------------|
-| `unit` | 1.2s | ❌ No | Notion + Telegram | ⭐ **Sviluppo quotidiano** |
-| `notion` | 0.9s | ❌ No | Solo Notion | 🔧 Debug Notion specifico |
-| `format` | 5s | ❌ No | Formatting + Preview | ✅ Pre-commit validation |
-| `interactive` | 30s | ⚠️ Con conferma | Tutto + Invii controllati | 🎯 **Pre-deploy completo** |
-| `training` | 10s | ✅ Sì | Solo notifiche formazione | 🔍 Debug invio notifiche |
-| `feedback` | 10s | ✅ Sì | Solo richieste feedback | 🔍 Debug invio feedback |
-| `bot` | 60s | ✅ Sì | Solo comandi bot | 🤖 Test interattivo bot |
-| `real` | 60s | ✅ Sì | **Tutto con invii reali** | ⚠️ **Solo validazione finale** |
-
-### 🏗️ Architettura Test Implementata
-
-- **106 test totali** organizzati in moduli specializzati
-- **Fixture modulari** per riutilizzo e manutenibilità  
-- **Mock intelligenti** per isolamento senza perdere realismo
-- **Test pyramid** ottimizzata: tanti unit test veloci, pochi integration test mirati
+📖 **Documentazione completa**: [docs/README.md](docs/README.md)
 
 ## 🏗️ Struttura del Progetto
 
 ```
-formazioni_app/
+Formazing/
 ├── app/
 │   ├── __init__.py           # Inizializza l'app Flask
-│   ├── routes.py             # Dashboard principale
+│   ├── routes.py             # Dashboard principale e API endpoints
 │   ├── services/
 │   │   ├── notion/             # Servizio Notion (architettura modulare)
 │   │   │   ├── __init__.py       # Facade pattern - API unificata
@@ -220,36 +142,41 @@ formazioni_app/
 │   │   │   ├── data_parser.py    # Parsing e mapping dati
 │   │   │   ├── crud_operations.py # Operazioni CRUD database
 │   │   │   └── diagnostics.py    # Monitoring e debugging
+│   │   ├── bot/                # Sistema bot Telegram
+│   │   │   ├── telegram_commands.py  # Handler comandi bot
+│   │   │   └── telegram_formatters.py # Formattazione messaggi
 │   │   ├── mgraph_service.py   # API Microsoft Graph (Teams, Email)
-│   │   ├── telegram_service.py # Messaggi Telegram
+│   │   ├── telegram_service.py # Orchestratore Telegram
 │   │   └── training_service.py # Orchestratore principale
-│   ├── templates/
-│   │   └── index.html          # Dashboard HTML
-│   └── static/
-│       └── style.css           # Stili CSS
+│   ├── templates/              # Template web
+│   └── static/                 # Assets statici
 ├── tests/
-│   ├── conftest.py             # Fixture globali pytest
-│   ├── integration/
-│   │   └── test_real_telegram.py # Test integrazione reali
+│   ├── conftest.py             # Configurazione pytest
+│   ├── fixtures/               # Fixture modulari per test
+│   ├── unit/                   # Unit test componenti
+│   ├── integration/            # Test integrazione reali
+│   ├── e2e/                    # Test end-to-end workflow
 │   ├── config/                 # Configurazioni test
 │   └── mocks/                  # Mock services
 ├── config/
 │   ├── telegram_groups.json    # Mappa Aree → ID Chat Telegram
 │   └── message_templates.yaml  # Template messaggi
 ├── docs/
+│   ├── README.md               # Documentazione generale
 │   ├── bot-telegram.md         # Documentazione bot
 │   ├── notion-service.md       # Documentazione servizio Notion
 │   └── testing/                # Documentazione testing
-│       ├── telegram-testing.md  # Documentazione test Telegram
-│       ├── notion-testing.md    # Documentazione test Notion
-│       ├── fixture-testing-guide.md # 📚 Guida completa fixture testing
-│       └── fixture-quick-reference.md # 🔧 Reference rapido fixture
+│       ├── README.md             # Guida testing generale
+│       ├── fixture-testing-guide.md # Guida completa fixture
+│       └── fixture-quick-reference.md # Reference rapido fixture
 ├── quick_test.bat              # Script test Windows
 ├── quick_test.sh               # Script test Linux/Mac
-├── .env                        # Chiavi segrete
-├── config.py                   # Configurazioni
+├── .env                        # Variabili ambiente
+├── config.py                   # Configurazioni Flask
 ├── requirements.txt            # Dipendenze Python
-└── run.py                      # Avvio applicazione
+└── run.py                      # Entry point applicazione
 ```
 
-Formazing: la gestione delle formazioni non è mai stata così semplice.
+---
+
+**Formazing: la gestione delle formazioni non è mai stata così semplice.**
