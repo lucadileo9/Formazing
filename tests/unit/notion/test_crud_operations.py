@@ -356,7 +356,7 @@ class TestNotionCrudOperations:
         """
         # Setup
         mock_notion_client.get_client().pages.update.return_value = {"object": "page"}
-        partial_updates = {"status": "Conclusa"}  # Solo status
+        partial_updates = {"Stato": "Conclusa"}  # Solo status
         
         # Test
         result = await crud_operations.update_multiple_fields(sample_notion_id, partial_updates)

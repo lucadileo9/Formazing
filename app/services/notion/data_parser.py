@@ -62,7 +62,7 @@ class NotionDataParser:
         - Nome: page title → Nome (string)
         - Area: multi_select → Area (comma-separated string)
         - Data: date → Data/Ora (dd/mm/YYYY HH:MM)
-        - Status: status → Stato/Fase (string)
+        - Status: status → Stato (string)
         - Codice: rich_text → Codice (string)
         - Link Teams: url → Link Teams (string)
         - Periodo: select → Periodo (string)

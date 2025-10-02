@@ -150,7 +150,7 @@ class WorkflowTester:
         Args:
             formazione (Dict): A dictionary representing a single training event,
                 typically fetched from Notion. Expected to contain keys like
-                'Nome', '_notion_id', and 'Stato/Fase'.
+                'Nome', '_notion_id', and 'Stato'.
         Returns:
             WorkflowResult: A data object containing a comprehensive summary of the
                 operation's outcome, including the number of messages generated and
@@ -160,7 +160,7 @@ class WorkflowTester:
         
         nome = formazione.get('Nome', 'N/A')
         formazione_id = formazione.get('_notion_id', 'unknown')
-        status = formazione.get('Stato/Fase', 'unknown')
+        status = formazione.get('Stato', 'unknown')
         
         errors = []
         groups_targeted = []

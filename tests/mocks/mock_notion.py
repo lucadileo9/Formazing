@@ -68,7 +68,7 @@ class MockNotionService:
                 'Data/Ora': today.strftime('%d/%m/%Y 09:00'),
                 'Codice': 'PY001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/py001',
-                'Stato/Fase': 'Calendarizzata',
+                'Stato': 'Calendarizzata',
                 'Periodo': 'SPRING'
             },
             {
@@ -77,7 +77,7 @@ class MockNotionService:
                 'Data/Ora': today.strftime('%d/%m/%Y 14:30'),
                 'Codice': 'GIT001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/git001',
-                'Stato/Fase': 'Calendarizzata',
+                'Stato': 'Calendarizzata',
                 'Periodo': 'AUTUMN'
             },
             
@@ -88,7 +88,7 @@ class MockNotionService:
                 'Data/Ora': (today + timedelta(days=1)).strftime('%d/%m/%Y 10:00'),
                 'Codice': 'HR001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/hr001',
-                'Stato/Fase': 'Calendarizzata',
+                'Stato': 'Calendarizzata',
                 'Periodo': 'ONCE'
             },
             
@@ -99,7 +99,7 @@ class MockNotionService:
                 'Data/Ora': (today + timedelta(days=2)).strftime('%d/%m/%Y 15:00'),
                 'Codice': 'MKT001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/mkt001',
-                'Stato/Fase': 'Calendarizzata',
+                'Stato': 'Calendarizzata',
                 'Periodo': 'SPRING'
             },
             {
@@ -108,7 +108,7 @@ class MockNotionService:
                 'Data/Ora': (today + timedelta(days=3)).strftime('%d/%m/%Y 11:30'),
                 'Codice': 'LEG001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/leg001',
-                'Stato/Fase': 'Calendarizzata',
+                'Stato': 'Calendarizzata',
                 'Periodo': 'EXT'
             },
             {
@@ -117,7 +117,7 @@ class MockNotionService:
                 'Data/Ora': (today + timedelta(days=4)).strftime('%d/%m/%Y 16:00'),
                 'Codice': 'RD001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/rd001',
-                'Stato/Fase': 'Calendarizzata',
+                'Stato': 'Calendarizzata',
                 'Periodo': 'OUT'
             },
             
@@ -128,7 +128,7 @@ class MockNotionService:
                 'Data/Ora': (today + timedelta(days=5)).strftime('%d/%m/%Y 12:00'),
                 'Codice': 'EDGE001',
                 'Link Teams': '',  # Link vuoto per testare gestione errori
-                'Stato/Fase': 'Calendarizzata',
+                'Stato': 'Calendarizzata',
                 'Periodo': 'ONCE'
             },
             {
@@ -137,7 +137,7 @@ class MockNotionService:
                 'Data/Ora': (today + timedelta(days=6)).isoformat() + 'Z',  # Formato ISO
                 'Codice': 'ISO001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/iso001',
-                'Stato/Fase': 'Calendarizzata',
+                'Stato': 'Calendarizzata',
                 'Periodo': 'SPRING'
             }
         ]
@@ -159,7 +159,7 @@ class MockNotionService:
                 'Data/Ora': yesterday.strftime('%d/%m/%Y 09:00'),
                 'Codice': 'COMP001',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/comp001',
-                'Stato/Fase': 'Completata',
+                'Stato': 'Completata',
                 'Periodo': 'SPRING'
             },
             {
@@ -168,7 +168,7 @@ class MockNotionService:
                 'Data/Ora': last_week.strftime('%d/%m/%Y 14:30'),
                 'Codice': 'COMP002',
                 'Link Teams': 'https://teams.microsoft.com/l/meetup-join/comp002',
-                'Stato/Fase': 'Completata',
+                'Stato': 'Completata',
                 'Periodo': 'AUTUMN'
             }
         ]

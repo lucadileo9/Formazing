@@ -117,7 +117,7 @@ async def test_notion_service():
             # Mostra prime 2 formazioni per validazione struttura dati
             for i, formazione in enumerate(formazioni[:2]):
                 print(f"   [{i+1}] {formazione['Nome']} ({formazione['Area']}) - {formazione['Data/Ora']}")
-                print(f"       Status: {formazione['Stato/Fase']} | Periodo: {formazione.get('Periodo', 'N/A')}")
+                print(f"       Status: {formazione['Stato']} | Periodo: {formazione.get('Periodo', 'N/A')}")
                 print(f"       Codice: {formazione.get('Codice', 'N/A')} | Link: {formazione.get('Link Teams', 'N/A')[:50]}...")
                 
             if formazioni:

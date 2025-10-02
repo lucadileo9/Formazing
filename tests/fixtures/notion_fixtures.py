@@ -197,7 +197,7 @@ def mock_notion_data_parser():
             'Nome': 'Mock Formazione',
             'Area': 'IT',
             'Data/Ora': '15/03/2024 14:00',
-            'Stato/Fase': 'Programmata',
+            'Stato': 'Programmata',
             'Codice': 'MOCK-001',
             'Link Teams': 'https://teams.microsoft.com/mock',
             'Periodo': 'SPRING',

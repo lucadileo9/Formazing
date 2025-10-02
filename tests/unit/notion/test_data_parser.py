@@ -54,7 +54,7 @@ class TestNotionDataParser:
         assert result['Nome'] == "Sicurezza Web Avanzata"
         assert result['Area'] == "IT, R&D"
         assert result['Data/Ora'] == "15/03/2024 14:00"
-        assert result['Stato/Fase'] == "Programmata"
+        assert result['Stato'] == "Programmata"
         assert result['Codice'] == "IT-Sicurezza-2024-SPRING-01"
         assert result['Link Teams'] == "https://teams.microsoft.com/l/meetup-join/abc123"
         assert result['Periodo'] == "SPRING"
@@ -80,7 +80,7 @@ class TestNotionDataParser:
         assert result['Nome'] == "Test Formazione Minimale"
         assert result['Area'] == "IT"
         assert result['Data/Ora'] == "20/03/2024 09:00"
-        assert result['Stato/Fase'] == "Calendarizzata"
+        assert result['Stato'] == "Calendarizzata"
         
         # Campi opzionali vuoti ma presenti
         assert result['Codice'] == ""
@@ -132,7 +132,7 @@ class TestNotionDataParser:
         second = result[1]
         assert second['Nome'] == "Marketing Digital Strategy"
         assert second['Area'] == "Marketing"
-        assert second['Stato/Fase'] == "Conclusa"
+        assert second['Stato'] == "Conclusa"
     
     def test_parse_formazioni_list_empty_response(self, parser):
         """

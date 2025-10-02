@@ -159,7 +159,7 @@ async def preview_messages(formazione: Dict, telegram_service: TelegramService) 
     Args:
         formazione (Dict): A dictionary containing the details of the training
             session. Expected keys include 'Nome', 'Area', 'Data/Ora', and
-            'Stato/Fase'.
+            'Stato'.
         telegram_service (TelegramService): An instance of the TelegramService,
             used to resolve the target group chats for the training session.
     Returns:
@@ -186,7 +186,7 @@ async def preview_messages(formazione: Dict, telegram_service: TelegramService) 
     nome = formazione.get('Nome', 'N/A')
     area = formazione.get('Area', 'N/A')
     data = formazione.get('Data/Ora', 'N/A')
-    status = formazione.get('Stato/Fase', 'N/A')
+    status = formazione.get('Stato', 'N/A')
     
     print(f"📚 Formazione: {nome}")
     print(f"🎯 Area: {area}")

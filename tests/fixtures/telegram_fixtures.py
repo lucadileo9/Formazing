@@ -47,7 +47,7 @@ def sample_training_data():
         'Data/Ora': today.strftime('%d/%m/%Y 14:30'),  # Data dinamica!
         'Codice': 'PY-TEST-001',
         'Link Teams': 'https://teams.microsoft.com/l/meetup-join/py-test-001',
-        'Stato/Fase': 'Calendarizzata',
+        'Stato': 'Calendarizzata',
         'Docente': 'Test Instructor Pro',
         'Descrizione': 'Corso avanzato testing Python con fixture centralizzate'
     }
@@ -63,7 +63,7 @@ def sample_feedback_data():
         'Area': 'IT',
         'Codice': 'PY-COMP-001',
         'Descrizione': 'Corso Python completato con successo',
-        'Stato/Fase': 'Completata'
+        'Stato': 'Completata'
     }
 
 

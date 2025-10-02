@@ -99,9 +99,9 @@ def sample_batch_formazioni_ids():
 def sample_multiple_fields_update():
     """Dati per test update multipli campi."""
     return {
-        "status": "Calendarizzata",
-        "codice": "MULTI-UPDATE-2024-01",
-        "link_teams": "https://teams.microsoft.com/multi-update"
+        "Stato": "Calendarizzata",
+        "Codice": "MULTI-UPDATE-2024-01",
+        "Link Teams": "https://teams.microsoft.com/multi-update"
     }
 
 
