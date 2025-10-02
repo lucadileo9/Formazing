@@ -188,11 +188,13 @@ class NotionCrudOperations:
             
             # Costruisci properties Notion format da updates
             for field, value in updates.items():
-                if field == 'status':
+                if field == 'Stato':
                     properties["Stato"] = {"status": {"name": value}}
-                elif field == 'codice':
+                elif field == 'Codice':
                     properties["Codice"] = {"rich_text": [{"text": {"content": value}}]}
-                elif field == 'link_teams':
+                elif field == 'Link':
+                    properties["Link"] = {"url": value}
+                elif field == 'Link Teams':
                     properties["Link Teams"] = {"url": value}
                 # Aggiungi altri campi se necessario
             
