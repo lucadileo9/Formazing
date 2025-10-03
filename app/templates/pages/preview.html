@@ -1,0 +1,220 @@
+{% extends "layout/base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ action_title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-5">{{ action_icon }} {{ action_title }}</h1>
+            <p class="lead text-muted">Verifica i dettagli prima di procedere con l'operazione</p>
+        </div>
+    </div>
+
+    <!-- Card Informazioni Formazione -->
+    <div class="card mb-4 shadow-sm border-primary">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Informazioni Formazione</h5>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Nome:</dt>
+                <dd class="col-sm-9"><strong>{{ preview.training.Nome }}</strong></dd>
+                
+                <dt class="col-sm-3">Area:</dt>
+                <dd class="col-sm-9">
+                    {% if preview.training.Area %}
+                        {% for area in preview.training.Area %}
+                            <span class="badge bg-secondary me-1">{{ area }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-muted">N/A</span>
+                    {% endif %}
+                </dd>
+                
+                <dt class="col-sm-3">Data:</dt>
+                <dd class="col-sm-9">
+                    {% if preview.training['Data/Ora'] %}
+                        {{ preview.training['Data/Ora'] }}
+                    {% else %}
+                        <span class="text-muted">N/A</span>
+                    {% endif %}
+                </dd>
+                
+                <dt class="col-sm-3">Stato Attuale:</dt>
+                <dd class="col-sm-9">
+                    <span class="badge {% if preview.training.Stato == 'Programmata' %}bg-warning{% elif preview.training.Stato == 'Calendarizzata' %}bg-info{% else %}bg-success{% endif %}">
+                        {{ preview.training.Stato }}
+                    </span>
+                </dd>
+                
+                {% if action_type == 'notification' %}
+                    <dt class="col-sm-3">Nuovo Codice:</dt>
+                    <dd class="col-sm-9">
+                        <code class="bg-light px-2 py-1 rounded fs-6">{{ preview.codice_generato }}</code>
+                    </dd>
+                    
+                    {% if preview.training.LinkTeams %}
+                    <dt class="col-sm-3">Link Teams:</dt>
+                    <dd class="col-sm-9">
+                        <a href="{{ preview.training.LinkTeams }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-microsoft-teams me-1"></i>Vai al meeting Teams
+                        </a>
+                    </dd>
+                    {% endif %}
+                {% else %}
+                    {% if preview.training.Codice %}
+                    <dt class="col-sm-3">Codice Formazione:</dt>
+                    <dd class="col-sm-9">
+                        <code class="bg-light px-2 py-1 rounded fs-6">{{ preview.training.Codice }}</code>
+                    </dd>
+                    {% endif %}
+                {% endif %}
+            </dl>
+        </div>
+    </div>
+
+    <!-- Card Messaggi Telegram -->
+    <div class="card mb-4 shadow-sm border-info">
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-telegram me-2"></i>Messaggi Telegram</h5>
+            <span class="badge bg-light text-dark">{{ preview.messages|length }} gruppo{{ 'i' if preview.messages|length != 1 else '' }}</span>
+        </div>
+        <div class="card-body">
+            {% if preview.messages %}
+                {% for message in preview.messages %}
+                <div class="border rounded p-3 mb-3 bg-light">
+                    <!-- Header messaggio -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-primary">{{ message.area }}</span>
+                        <small class="text-muted">Chat ID: {{ message.chat_id }}</small>
+                    </div>
+                    <!-- Contenuto messaggio -->
+                    <pre class="bg-white p-3 rounded mb-0 border" style="white-space: pre-wrap; font-size: 0.9rem; font-family: 'Courier New', monospace;">{{ message.message }}</pre>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-warning mb-0">
+                    <i class="bi bi-exclamation-triangle me-2"></i>Nessun messaggio da inviare. Verifica la configurazione dei gruppi Telegram.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Card Email (solo per notification) -->
+    {% if action_type == 'notification' and preview.email %}
+    <div class="card mb-4 shadow-sm border-success">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-envelope me-2"></i>Email da Inviare</h5>
+        </div>
+        <div class="card-body">
+            <p class="mb-2">
+                <strong>Destinatari:</strong> 
+                <span class="text-muted">{{ preview.email.recipients|join(', ') }}</span>
+            </p>
+            <p class="mb-2">
+                <strong>Oggetto:</strong> 
+                <span class="text-muted">{{ preview.email.subject }}</span>
+            </p>
+            <div class="border rounded p-3 bg-light">
+                <small class="text-muted">{{ preview.email.body_preview }}</small>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Alert Azioni che verranno eseguite -->
+    <div class="alert alert-warning shadow-sm border-warning">
+        <h5 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i>Azioni che verranno eseguite</h5>
+        <hr>
+        <ul class="mb-0">
+            {% if action_type == 'notification' %}
+                <li>✅ Generazione codice univoco: <code>{{ preview.codice_generato }}</code></li>
+                <li>✅ Creazione evento Microsoft Teams Calendar</li>
+                <li>✅ Aggiornamento Notion: Stato → <strong>Calendarizzata</strong></li>
+                <li>✅ Invio email con allegato Teams</li>
+                <li>✅ Invio messaggi Telegram a <strong>{{ preview.messages|length }}</strong> gruppo{{ 'i' if preview.messages|length != 1 else '' }}</li>
+            {% else %}
+                <li>✅ Invio richiesta feedback Telegram a <strong>{{ preview.messages|length }}</strong> gruppo{{ 'i' if preview.messages|length != 1 else '' }}</li>
+                <li>✅ Aggiornamento Notion: Stato → <strong>Conclusa</strong></li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Form Conferma -->
+    <div class="card shadow-sm border-0 mb-5">
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- Bottone Annulla -->
+                <div class="col-md-6">
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary btn-lg w-100">
+                        <i class="bi bi-x-circle me-2"></i>Annulla e Torna alla Dashboard
+                    </a>
+                </div>
+                
+                <!-- Form Conferma con POST -->
+                <div class="col-md-6">
+                    {% set confirm_message = "⚠️ Sei sicuro di voler procedere?\n\nQuesta azione invierà messaggi reali a " ~ preview.messages|length ~ " gruppo" %}
+                    {% if preview.messages|length != 1 %}
+                        {% set confirm_message = confirm_message ~ "i" %}
+                    {% endif %}
+                    {% set confirm_message = confirm_message ~ " Telegram" %}
+                    {% if action_type == 'notification' %}
+                        {% set confirm_message = confirm_message ~ " e aggiornerà lo stato della formazione" %}
+                    {% endif %}
+                    {% set confirm_message = confirm_message ~ "." %}
+                    
+                    <form method="POST" 
+                          action="{{ url_for('main.confirm_notification' if action_type == 'notification' else 'main.confirm_feedback', training_id=training_id) }}" 
+                          onsubmit="return confirm('{{ confirm_message }}');">
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="bi bi-check-circle me-2"></i>Conferma e Invia
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Stili per evidenziare le card */
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    /* Stili per il codice */
+    code {
+        font-size: 0.95rem;
+        color: #d63384;
+    }
+    
+    /* Stili per messaggi preview */
+    pre {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    /* Breadcrumb personalizzato */
+    .breadcrumb {
+        background-color: #f8f9fa;
+        padding: 0.75rem 1rem;
+        border-radius: 0.375rem;
+    }
+</style>
+{% endblock %}
