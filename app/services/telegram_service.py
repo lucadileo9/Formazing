@@ -191,12 +191,18 @@ class TelegramService:
             List[str]: Lista gruppi target (vuota per formazioni OUT)
         """
         target_groups = []
-        area = training_data.get('Area', '').strip()
+        
+        # Area arriva già normalizzata come lista dal DataParser
+        areas = training_data.get('Area', [])
+        if not isinstance(areas, list):
+            # Fallback per backward compatibility (se arriva ancora come stringa)
+            areas = [a.strip() for a in str(areas).split(',') if a.strip()]
+        
         periodo = training_data.get('Periodo', '').strip()
         
         # Formazioni OUT non ricevono comunicazioni
         if periodo == 'OUT':
-            logger.info(f"Formazione OUT - nessun targeting per area {area}")
+            logger.info(f"Formazione OUT - nessun targeting per area {areas}")
             return []
         
         # Il gruppo principale riceve sempre le comunicazioni (tranne OUT)
@@ -204,19 +210,23 @@ class TelegramService:
             target_groups.append('main_group')
         
         # Logica targeting gruppi area
-        if area == 'All':
+        if 'All' in areas or 'all' in [a.lower() for a in areas]:
             # Formazione per tutti: aggiungi tutti i gruppi area configurati
             for area_name in ['IT', 'R&D', 'HR', 'Legale', 'Commerciale', 'Marketing']:
                 if area_name in self.groups:
                     target_groups.append(area_name)
             logger.info(f"Targeting 'All' areas: {len(target_groups)-1} gruppi area + main_group")
         else:
-            # Formazione per area specifica: aggiungi solo il gruppo dell'area
-            if area in self.groups:
-                target_groups.append(area)
-                logger.info(f"Targeting area specifica: {area} + main_group")
-            else:
-                logger.warning(f"Area '{area}' non configurata in telegram_groups.json")
+            # Formazione per aree specifiche: aggiungi ogni area presente
+            for area in areas:
+                if area in self.groups:
+                    target_groups.append(area)
+                    logger.info(f"Targeting area: {area}")
+                else:
+                    logger.warning(f"Area '{area}' non configurata in telegram_groups.json")
+            
+            if len(areas) > 0:
+                logger.info(f"Targeting {len([a for a in areas if a in self.groups])} aree specifiche + main_group")
         
         return target_groups
     
