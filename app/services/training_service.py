@@ -241,37 +241,27 @@ class TrainingService:
             # Genera link feedback temporaneo per preview
             feedback_link = self._generate_feedback_link(training)
             
-            for area in training.get('Area', []):
-                # Verifica se l'area ha un gruppo configurato
-                if area in self.telegram_service.groups:
-                    chat_id = self.telegram_service.groups[area]
+            # ⚠️ IMPORTANTE: Feedback va SOLO ai gruppi area (NO main_group)
+            # Ottieni target groups e rimuovi main_group
+            all_target_groups = self.telegram_service._get_target_groups(training)
+            target_groups = [group for group in all_target_groups if group != 'main_group']
+            
+            for group_key in target_groups:
+                if group_key in self.telegram_service.groups:
+                    chat_id = self.telegram_service.groups[group_key]
                     # Usa formatter esistente per feedback (richiede feedback_link e group_key)
                     message = self.telegram_service.formatter.format_feedback_message(
                         training, 
                         feedback_link, 
-                        group_key=area
+                        group_key=group_key
                     )
                     messages_preview.append({
-                        'area': area,
+                        'area': group_key,
                         'chat_id': chat_id,
                         'message': message
                     })
             
-            # Aggiungi anche main_group se presente
-            if 'main_group' in self.telegram_service.groups:
-                main_chat_id = self.telegram_service.groups['main_group']
-                main_message = self.telegram_service.formatter.format_feedback_message(
-                    training, 
-                    feedback_link, 
-                    group_key='main_group'
-                )
-                messages_preview.append({
-                    'area': 'Main Group',
-                    'chat_id': main_chat_id,
-                    'message': main_message
-                })
-            
-            logger.info(f"✅ Preview feedback generata con {len(messages_preview)} messaggi")
+            logger.info(f"✅ Preview feedback generata con {len(messages_preview)} messaggi (solo gruppi area)")
             
             return {
                 'training': training,
