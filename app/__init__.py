@@ -46,6 +46,25 @@ def create_app():
     from app.routes import main
     app.register_blueprint(main)
     
+    # ✨ Filtri Jinja2 personalizzati
+    @app.template_filter('format_area')
+    def format_area_filter(area):
+        """
+        Formatta campo Area per visualizzazione in template.
+        
+        Gestisce sia liste che stringhe:
+        - ['IT', 'R&D'] → 'IT, R&D'
+        - ['IT'] → 'IT'
+        - 'IT' → 'IT'
+        - [] → 'N/A'
+        """
+        if isinstance(area, list):
+            return ', '.join(area) if area else 'N/A'
+        elif isinstance(area, str):
+            return area if area else 'N/A'
+        else:
+            return 'N/A'
+    
     # Error handlers
     @app.errorhandler(404)
     def not_found_error(error):
