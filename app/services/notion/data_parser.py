@@ -60,12 +60,13 @@ class NotionDataParser:
         
         MAPPING COMPLETO CAMPI:
         - Nome: page title → Nome (string)
-        - Area: multi_select → Area (comma-separated string)
+        - Area: multi_select → Area (lista di stringhe)
         - Data: date → Data/Ora (dd/mm/YYYY HH:MM)
         - Status: status → Stato (string)
         - Codice: rich_text → Codice (string)
         - Link Teams: url → Link Teams (string)
         - Periodo: select → Periodo (string)
+        - id: page.id → id (string, pronto per uso diretto)
         
         Args:
             page: Pagina singola da API Notion
@@ -75,16 +76,17 @@ class NotionDataParser:
         """
         try:
             properties = page.get('properties', {})
+            notion_id = page.get('id')
             
             # Estrazione campi obbligatori
             nome = self.extract_page_title_property(properties.get('Nome'))
-            area = self.extract_multi_select_property(properties.get('Area'))
+            area_list = self.extract_multi_select_property_as_list(properties.get('Area'))
             data_ora = self.extract_date_property(properties.get('Date'))
             status = self.extract_status_property(properties.get('Stato'))
             
             # Validazione campi critici
-            if not all([nome, area, data_ora, status]):
-                logger.warning(f"Formazione con campi mancanti: {page.get('id', 'unknown')}")
+            if not all([nome, area_list, data_ora, status, notion_id]):
+                logger.warning(f"Formazione con campi mancanti: {notion_id or 'unknown'}")
                 return None
             
             # Estrazione campi opzionali
@@ -92,19 +94,20 @@ class NotionDataParser:
             link_teams = self.extract_url_property(properties.get('Link Teams')) or ''
             periodo = self.extract_select_property(properties.get('Periodo')) or ''
             
-            # Costruzione formazione normalizzata
+            # Costruzione formazione normalizzata - FORMATO PRONTO ALL'USO
             formazione = {
+                'id': notion_id,                # ✅ ID pronto per uso diretto
                 'Nome': nome,
-                'Area': area,
+                'Area': area_list,              # ✅ Già lista: ["IT", "R&D"]
                 'Data/Ora': data_ora,
                 'Stato': status,
                 'Codice': codice,
                 'Link Teams': link_teams,
                 'Periodo': periodo,
-                '_notion_id': page.get('id')  # ID interno per updates
+                '_notion_id': notion_id         # Mantieni per backward compatibility
             }
             
-            logger.debug(f"Formazione parsata: {nome} ({area}) - {data_ora}")
+            logger.debug(f"Formazione parsata: {nome} ({', '.join(area_list)}) - {data_ora}")
             return formazione
             
         except Exception as e:
@@ -139,7 +142,10 @@ class NotionDataParser:
     
     def extract_multi_select_property(self, multi_select_prop: Dict) -> str:
         """
-        Estrae valori da property Multi-Select di Notion.
+        Estrae valori da property Multi-Select di Notion come stringa.
+        
+        DEPRECATO: Usa extract_multi_select_property_as_list() invece.
+        Mantenuto per backward compatibility.
         
         Struttura Notion:
         {"multi_select": [{"name": "IT"}, {"name": "R&D"}]}
@@ -151,6 +157,23 @@ class NotionDataParser:
         
         values = [item.get('name', '') for item in multi_select_prop['multi_select']]
         return ', '.join(filter(None, values))  # Filtra valori vuoti
+    
+    def extract_multi_select_property_as_list(self, multi_select_prop: Dict) -> List[str]:
+        """
+        Estrae valori da property Multi-Select di Notion come lista.
+        
+        FORMATO PREFERITO: Restituisce lista pronta all'uso.
+        
+        Struttura Notion:
+        {"multi_select": [{"name": "IT"}, {"name": "R&D"}]}
+        
+        Output: ["IT", "R&D"]
+        """
+        if not multi_select_prop or not multi_select_prop.get('multi_select'):
+            return []
+        
+        values = [item.get('name', '') for item in multi_select_prop['multi_select']]
+        return [v for v in values if v]  # Filtra valori vuoti, mantieni lista
     
     def extract_status_property(self, status_prop: Dict) -> str:
         """
