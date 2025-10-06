@@ -10,7 +10,7 @@
     
     <!-- Area -->
     <td>
-        {% set area = formazione.get('Area', 'N/A') %}
+        {% set area = formazione.get('Area', 'N/A') | format_area %}
         {% set area_upper = area|upper if area else 'N/A' %}
         {% set text = area %}
         
@@ -97,18 +97,54 @@
     
     <!-- Azioni -->
     <td>
-        <div class="btn-group btn-group-sm" role="group">
-            {% set text = 'Anteprima' %}
-            {% set icon = 'bi bi-eye' %}
-            {% set variant = 'btn-outline-primary' %}
-            {% set onclick = "previewFormazione('" + formazione.get('id', '') + "')" %}
-            {% include 'atoms/button.html' %}
-            
-            {% set text = 'Azioni' %}
-            {% set icon = 'bi bi-gear' %}
-            {% set variant = 'btn-outline-secondary' %}
-            {% set disabled = true %}
-            {% include 'atoms/button.html' %}
+        <div class="d-flex gap-2">
+            {% if formazione.get('Stato') == 'Programmata' %}
+                <!-- Preview Calendarizzazione per formazioni Programmate -->
+                {% set variant = 'btn-primary' %}
+                {% set size = 'btn-sm' %}
+                {% set icon = 'bi bi-eye' %}
+                {% set text = 'Preview Calendarizzazione' %}
+                {% set onclick = "showPreview('" ~ formazione.get('_notion_id', '') ~ "', 'notification')" %}
+                {% include 'atoms/button.html' %}
+            {% elif formazione.get('Stato') == 'Calendarizzata' %}
+                <!-- Preview Feedback per formazioni Calendarizzate -->
+                {% set variant = 'btn-danger' %}
+                {% set size = 'btn-sm' %}
+                {% set icon = 'bi bi-chat-left-text' %}
+                {% set text = 'Preview Feedback' %}
+                {% set onclick = "showPreview('" ~ formazione.get('_notion_id', '') ~ "', 'feedback')" %}
+                {% include 'atoms/button.html' %}
+            {% else %}
+                <!-- Nessuna azione per formazioni Concluse -->
+                {% set text = 'Completata' %}
+                {% set color = 'bg-success' %}
+                {% set icon = 'bi bi-check-circle' %}
+                {% include 'atoms/badge.html' %}
+            {% endif %}
         </div>
     </td>
 </tr>
+
+<script>
+function showPreview(trainingId, actionType) {
+    const titles = {
+        'notification': '📨 Generazione Preview Notifica',
+        'feedback': '📝 Generazione Preview Feedback'
+    };
+    
+    const messages = {
+        'notification': 'Preparazione messaggi Telegram, email e Teams...',
+        'feedback': 'Preparazione richiesta feedback...'
+    };
+
+    // Mostra loading con messaggio personalizzato
+    LoadingOverlay.show(titles[actionType], messages[actionType]);
+    
+    // Naviga alla preview (il loading si nasconderà al caricamento della nuova pagina)
+    const url = actionType === 'notification' 
+        ? `/preview/notification/${trainingId}`
+        : `/preview/feedback/${trainingId}`;
+    
+    window.location.href = url;
+}
+</script>

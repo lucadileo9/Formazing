@@ -12,6 +12,7 @@ Gestisce tutte le pagine web dell'applicazione:
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from app import auth
 from app.services.notion import NotionService, NotionServiceError
+from app.services.training_service import TrainingService, TrainingServiceError
 from config import Config
 import logging
 import traceback
@@ -77,7 +78,6 @@ async def dashboard():
         stats['totale'] = stats['programmata'] + stats['calendarizzata'] + stats['conclusa']
         
         logger.info(f"Dashboard caricata con successo (Atomic Design). Totale formazioni: {stats['totale']}")
-        
         # Usa il nuovo template atomic design
         return render_template('pages/dashboard.html',
                              formazioni_programmata=formazioni_programmata or [],
@@ -98,83 +98,118 @@ async def dashboard():
         flash(f"❌ Errore imprevisto: {e}", 'error')
         return redirect(url_for('main.home'))
 
-@main.route('/formazioni/<status>')
-@auth.login_required  
-async def formazioni_by_status(status):
-    """
-    Visualizza formazioni filtrate per status (Flask Async).
-    NOTA: Questa funzionalità è ora integrata nella dashboard con tab.
-    Redirect alla dashboard per ora.
-    
-    Args:
-        status: Programmata, Calendarizzata, o Conclusa
-    """
-    # Redirect alla dashboard che ha già i tab per status
-    return redirect(url_for('main.dashboard'))
 
+# === PAGINE PREVIEW CON FORM CONFERMA ===
 
-@main.route('/api/config/status')
+@main.route('/preview/notification/<training_id>')
 @auth.login_required
-async def api_config_status():
-    """API endpoint per verificare status configurazione (Flask Async)."""
+async def preview_notification_page(training_id):
+    """Pagina preview calendarizzazione con form conferma."""
     try:
-        validation = Config.validate_config()
-        notion_service = NotionService()
-        service_stats = notion_service.get_service_stats()
+        logger.info(f"📄 Apertura preview calendarizzazione per {training_id}")
         
-        # 🚀 Test connessione Notion con async
-        connection_test = await notion_service.test_connection()
+        # Genera preview usando TrainingService
+        training_service = TrainingService()
+        preview_data = await training_service.generate_preview(training_id)
         
-        return jsonify({
-            'config_validation': validation,
-            'notion_service': service_stats,
-            'connection_test': connection_test,
-            'status': 'ok' if validation['overall_ok'] else 'warning'
-        })
+        # Renderizza template preview
+        return render_template('pages/preview.html',
+                             preview=preview_data,
+                             action_type='notification',
+                             action_title='Calendarizzazione Formazione',
+                             action_icon='📅',
+                             training_id=training_id,
+                             title=f"Preview - {preview_data['training']['Nome']}")
         
+    except TrainingServiceError as e:
+        logger.error(f"Errore preview notification: {e}")
+        flash(f'❌ Errore: {e}', 'error')
+        return redirect(url_for('main.dashboard'))
     except Exception as e:
-        logger.error(f"Errore API config status: {e}")
-        return jsonify({
-            'error': str(e),
-            'status': 'error'
-        }), 500
+        logger.error(f"Errore imprevisto preview notification: {e}")
+        flash(f'❌ Errore imprevisto: {e}', 'error')
+        return redirect(url_for('main.dashboard'))
 
 
-@main.route('/api/formazioni')
+@main.route('/preview/feedback/<training_id>')
 @auth.login_required
-async def api_formazioni():
-    """API endpoint per recuperare formazioni (JSON) con Flask Async."""
+async def preview_feedback_page(training_id):
+    """Pagina preview richiesta feedback con form conferma."""
     try:
-        status = request.args.get('status')
-        notion_service = NotionService()
+        logger.info(f"📄 Apertura preview feedback per {training_id}")
         
-        if status:
-            # Recupera formazioni per status specifico
-            formazioni_data = await notion_service.get_formazioni_by_status(status)
-        else:
-            # 🚀 Recupera tutte le formazioni in parallelo per performance ottimale
-            all_results = await asyncio.gather(
-                notion_service.get_formazioni_by_status('Programmata'),
-                notion_service.get_formazioni_by_status('Calendarizzata'),
-                notion_service.get_formazioni_by_status('Conclusa'),
-                return_exceptions=True
-            )
-            
-            # Organizza i risultati per status
-            formazioni_data = {
-                'programmata': all_results[0] if not isinstance(all_results[0], Exception) else [],
-                'calendarizzata': all_results[1] if not isinstance(all_results[1], Exception) else [],
-                'conclusa': all_results[2] if not isinstance(all_results[2], Exception) else []
-            }
-            
-        return jsonify({
-            'formazioni': formazioni_data,
-            'status': 'success'
-        })
+        # Genera preview usando TrainingService
+        training_service = TrainingService()
+        preview_data = await training_service.generate_feedback_preview(training_id)
         
-    except NotionServiceError as e:
-        logger.error(f"Errore API formazioni: {e}")
-        return jsonify({
-            'error': f'Errore NotionService: {e}',
-            'status': 'error'
-        }), 500
+        # Renderizza template preview
+        return render_template('pages/preview.html',
+                             preview=preview_data,
+                             action_type='feedback',
+                             action_title='Richiesta Feedback',
+                             action_icon='📝',
+                             training_id=training_id,
+                             title=f"Preview Feedback - {preview_data['training']['Nome']}")
+        
+    except TrainingServiceError as e:
+        logger.error(f"Errore preview feedback: {e}")
+        flash(f'❌ Errore: {e}', 'error')
+        return redirect(url_for('main.dashboard'))
+    except Exception as e:
+        logger.error(f"Errore imprevisto preview feedback: {e}")
+        flash(f'❌ Errore imprevisto: {e}', 'error')
+        return redirect(url_for('main.dashboard'))
+
+
+@main.route('/confirm/notification/<training_id>', methods=['POST'])
+@auth.login_required
+async def confirm_notification(training_id):
+    """Conferma ed esegue calendarizzazione (chiamata da form preview)."""
+    try:
+        logger.info(f"✅ Conferma calendarizzazione per {training_id}")
+        
+        # Esegui workflow completo
+        training_service = TrainingService()
+        result = await training_service.send_training_notification(training_id)
+        
+        logger.info(f"Calendarizzazione completata - Codice: {result['codice_generato']}")
+        flash('✅ Comunicazione inviata con successo! La formazione è stata calendarizzata.', 'success')
+        
+        # Redirect a dashboard
+        return redirect(url_for('main.dashboard'))
+        
+    except TrainingServiceError as e:
+        logger.error(f"Errore conferma notification: {e}")
+        flash(f'❌ Errore: {e}', 'error')
+        return redirect(url_for('main.dashboard'))
+    except Exception as e:
+        logger.error(f"Errore imprevisto conferma notification: {e}")
+        flash(f'❌ Errore imprevisto: {e}', 'error')
+        return redirect(url_for('main.dashboard'))
+
+
+@main.route('/confirm/feedback/<training_id>', methods=['POST'])
+@auth.login_required
+async def confirm_feedback(training_id):
+    """Conferma ed esegue invio feedback (chiamata da form preview)."""
+    try:
+        logger.info(f"✅ Conferma feedback per {training_id}")
+        
+        # Esegui workflow feedback
+        training_service = TrainingService()
+        result = await training_service.send_feedback_request(training_id)
+        
+        logger.info("Feedback inviato con successo")
+        flash('✅ Richiesta feedback inviata con successo! La formazione è stata conclusa.', 'success')
+        
+        # Redirect a dashboard
+        return redirect(url_for('main.dashboard'))
+        
+    except TrainingServiceError as e:
+        logger.error(f"Errore conferma feedback: {e}")
+        flash(f'❌ Errore: {e}', 'error')
+        return redirect(url_for('main.dashboard'))
+    except Exception as e:
+        logger.error(f"Errore imprevisto conferma feedback: {e}")
+        flash(f'❌ Errore imprevisto: {e}', 'error')
+        return redirect(url_for('main.dashboard'))

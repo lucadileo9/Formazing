@@ -35,44 +35,54 @@ Bottone configurabile con supporto per icone, varianti di colore, dimensioni e e
 
 #### Bottone Semplice
 ```html
-{% include 'atoms/button.html' %}
 {% set text = 'Salva' %}
+{% include 'atoms/button.html' %}
 ```
 **Risultato**: `<button class="btn btn-primary">Salva</button>`
 
 #### Bottone con Icona
 ```html
-{% include 'atoms/button.html' %}
 {% set text = 'Elimina' %}
 {% set icon = 'bi bi-trash' %}
 {% set variant = 'btn-danger' %}
+{% include 'atoms/button.html' %}
 ```
 **Risultato**: `<button class="btn btn-danger"><i class="bi bi-trash"></i> Elimina</button>`
 
 #### Bottone con Evento JavaScript
 ```html
-{% include 'atoms/button.html' %}
 {% set text = 'Aggiorna Dati' %}
 {% set icon = 'bi bi-arrow-clockwise' %}
 {% set variant = 'btn-outline-secondary' %}
 {% set onclick = 'refreshData()' %}
+{% include 'atoms/button.html' %}
 ```
+
+#### Bottone per Navigazione (Link come Button)
+```html
+{% set text = 'Torna alla Dashboard' %}
+{% set icon = 'bi bi-arrow-left' %}
+{% set variant = 'btn-secondary' %}
+{% set onclick = "window.location.href='" ~ url_for('main.dashboard') ~ "'" %}
+{% include 'atoms/button.html' %}
+```
+**Nota**: Usando `onclick` con `window.location.href`, puoi creare button che navigano come link mantenendo lo stile consistente.
 
 #### Bottone per Modal
 ```html
-{% include 'atoms/button.html' %}
 {% set text = 'Apri Modal' %}
 {% set variant = 'btn-info' %}
 {% set data_bs_toggle = 'modal' %}
 {% set data_bs_target = '#myModal' %}
+{% include 'atoms/button.html' %}
 ```
 
 #### Bottone Disabilitato
 ```html
-{% include 'atoms/button.html' %}
 {% set text = 'Non Disponibile' %}
 {% set variant = 'btn-secondary' %}
 {% set disabled = true %}
+{% include 'atoms/button.html' %}
 ```
 
 ### Varianti Colore Bootstrap
@@ -106,40 +116,40 @@ Piccola etichetta colorata per mostrare status, categorie o contatori. Supporta 
 
 #### Badge Semplice
 ```html
-{% include 'atoms/badge.html' %}
 {% set text = 'Nuovo' %}
 {% set color = 'bg-success' %}
+{% include 'atoms/badge.html' %}
 ```
 **Risultato**: `<span class="badge bg-success">Nuovo</span>`
 
 #### Badge con Icona
 ```html
-{% include 'atoms/badge.html' %}
 {% set text = 'IT' %}
 {% set color = 'bg-info' %}
 {% set icon = 'bi bi-laptop' %}
+{% include 'atoms/badge.html' %}
 ```
 **Risultato**: `<span class="badge bg-info"><i class="bi bi-laptop"></i> IT</span>`
 
 #### Badge Status Formazione
 ```html
 <!-- Area formazione -->
-{% include 'atoms/badge.html' %}
 {% set text = formazione.get('Area', 'N/A') %}
 {% set color = {
     'IT': 'bg-primary',
     'HR': 'bg-success',
     'Marketing': 'bg-warning'
 }.get(formazione.get('Area'), 'bg-secondary') %}
+{% include 'atoms/badge.html' %}
 
 <!-- Periodo formazione -->
-{% include 'atoms/badge.html' %}
 {% set text = formazione.get('Periodo', 'N/A') %}
 {% set color = {
     'SPRING': 'bg-light text-dark',
     'AUTUMN': 'bg-warning',
     'ONCE': 'bg-info'
 }.get(formazione.get('Periodo'), 'bg-secondary') %}
+{% include 'atoms/badge.html' %}
 ```
 
 ### Colori Bootstrap Disponibili
@@ -176,25 +186,25 @@ Container flessibile con header, body e footer opzionali. Base per tutti i conte
 
 #### Card Semplice
 ```html
-{% include 'atoms/card.html' %}
 {% set content = '<h5>Titolo</h5><p>Contenuto della card</p>' %}
+{% include 'atoms/card.html' %}
 ```
 
 #### Card Completa
 ```html
-{% include 'atoms/card.html' %}
 {% set header = '<h6 class="mb-0">Statistiche Formazioni</h6>' %}
 {% set content = '<h3 class="text-center">27</h3><p class="text-center mb-0">Totale</p>' %}
 {% set footer = '<small class="text-muted">Ultimo aggiornamento: oggi</small>' %}
 {% set card_class = 'border-primary' %}
+{% include 'atoms/card.html' %}
 ```
 
 #### Card Colorata
 ```html
-{% include 'atoms/card.html' %}
 {% set content = '<h3 class="text-center text-white">5</h3><p class="text-center text-white mb-0">Programmate</p>' %}
 {% set card_class = 'bg-warning text-dark' %}
 {% set body_class = 'text-center' %}
+{% include 'atoms/card.html' %}
 ```
 
 ### Varianti Card Bootstrap
@@ -224,24 +234,24 @@ Icona Bootstrap Icons configurabile per dimensione e colore.
 
 #### Icona Semplice
 ```html
-{% include 'atoms/icon.html' %}
 {% set name = 'bi bi-house' %}
+{% include 'atoms/icon.html' %}
 ```
 **Risultato**: `<i class="bi bi-house"></i>`
 
 #### Icona Grande Colorata
 ```html
-{% include 'atoms/icon.html' %}
 {% set name = 'bi bi-speedometer2' %}
 {% set size = 'display-4 mb-2' %}
 {% set color = 'text-primary' %}
+{% include 'atoms/icon.html' %}
 ```
 
 #### Icona con Margine
 ```html
-{% include 'atoms/icon.html' %}
 {% set name = 'bi bi-calendar-event' %}
 {% set size = 'me-2' %}
+{% include 'atoms/icon.html' %}
 ```
 
 #### Icone Comuni nell'App
@@ -305,38 +315,97 @@ Spinner di caricamento configurabile con messaggio opzionale.
 
 #### Loading con Messaggio
 ```html
-{% include 'atoms/loading.html' %}
 {% set message = 'Caricamento formazioni...' %}
+{% include 'atoms/loading.html' %}
 ```
 
 #### Loading Piccolo Inline
 ```html
-{% include 'atoms/loading.html' %}
 {% set size = 'spinner-border-sm' %}
 {% set message = 'Salvando...' %}
 {% set color = 'text-success' %}
 {% set container_class = 'p-1' %}
+{% include 'atoms/loading.html' %}
 ```
 
 #### Loading per Tabelle
 ```html
 <tr>
     <td colspan="5">
-        {% include 'atoms/loading.html' %}
         {% set message = 'Caricamento dati...' %}
         {% set container_class = 'py-4' %}
+        {% include 'atoms/loading.html' %}
     </td>
 </tr>
 ```
 ---
 
+## 📱 Telegram Message Preview - Anteprima Messaggio Telegram
+
+**File**: `templates/atoms/telegram_message_preview.html`
+
+### Descrizione
+Card specializzata per mostrare l'anteprima di un singolo messaggio Telegram con badge area e contenuto formattato. Utilizzato nelle pagine di preview notifiche.
+
+### Props Disponibili
+| Prop | Tipo | Default | Descrizione |
+|------|------|---------|-------------|
+| `area` | string | - | Nome dell'area destinataria (IT, HR, etc.) |
+| `message_text` | string | - | Contenuto del messaggio da visualizzare |
+
+### Caratteristiche
+- **Badge automatico**: Usa internamente l'atomo badge con colore `bg-primary`
+- **Formattazione testo**: `<pre>` con `white-space: pre-wrap` per preservare a capo
+- **Scroll automatico**: Per messaggi lunghi (max-height: 400px)
+- **Responsive**: Si adatta automaticamente al container
+
+### Esempi di Utilizzo
+
+#### Messaggio Singolo
+```html
+{% set area = 'IT' %}
+{% set message_text = 'Ciao! Reminder formazione Python domani ore 15:00' %}
+{% include 'atoms/telegram_message_preview.html' %}
+```
+
+#### In un Loop di Messaggi
+```html
+{% for message in telegram_messages %}
+    {% set area = message.area %}
+    {% set message_text = message.message %}
+    {% include 'atoms/telegram_message_preview.html' %}
+{% endfor %}
+```
+
+#### Messaggio con A Capo
+```html
+{% set area = 'HR' %}
+{% set message_text = 'Formazione Leadership\nData: 15/10/2025\nOra: 14:30\n\nNon mancare!' %}
+{% include 'atoms/telegram_message_preview.html' %}
+```
+**Risultato**: Gli a capo (`\n`) vengono preservati nel rendering grazie a `white-space: pre-wrap`
+
+### Styling CSS
+```css
+/* Applicato automaticamente nel template */
+pre {
+    white-space: pre-wrap;      /* Preserva a capo */
+    word-wrap: break-word;       /* Spezza parole lunghe */
+    max-height: 400px;           /* Limite altezza */
+    overflow: auto;              /* Scroll se necessario */
+    font-size: 0.9rem;           /* Dimensione leggibile */
+}
+```
+---
+
 ### 🎯 Quando Usare Ciascun Atom
 
-- **Button**: Qualsiasi azione clickabile (submit, click, modal trigger)
+- **Button**: Qualsiasi azione clickabile (submit, click, modal trigger, **navigazione**)
 - **Badge**: Status, categorie, contatori, etichette
 - **Card**: Raggruppare contenuti, stat displays, form sections
 - **Icon**: Indicatori visuali, decorazioni, navigation hints
 - **Loading**: Stati di caricamento, async operations, data fetching
+- **Telegram Message Preview**: Anteprime messaggi Telegram nelle pagine di conferma/preview
 
 ---
 

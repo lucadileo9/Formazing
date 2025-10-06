@@ -181,7 +181,138 @@ async def dashboard_filtered(filter):
 
 ---
 
-## 🔧 Best Practices per Pages
+## � Preview Page - Pagina Anteprima Azioni
+
+**File**: `templates/pages/preview.html`
+
+### Descrizione
+Pagina di conferma/anteprima che mostra tutti i dettagli prima di eseguire azioni critiche (invio notifiche, richieste feedback). Compone tutte le molecole preview per un'esperienza UX completa e sicura.
+
+### Layout Utilizzato
+Estende `layout/base.html` con container standard.
+
+### Componenti Integrati
+- **Molecules**: 
+  - `preview_training_info.html` - Dettagli formazione
+  - `preview_telegram_messages.html` - Messaggi da inviare
+  - `preview_email_section.html` - Email da inviare (solo notification)
+  - `preview_action_form.html` - Riepilogo + bottoni conferma
+- **Bootstrap**: Breadcrumb, cards, responsive grid
+- **Custom CSS**: Hover effects, code selection
+
+### Caratteristiche Principali
+- **Breadcrumb navigation**: Dashboard → Preview
+- **Header dinamico**: Titolo e icona cambiano per action_type
+- **Composizione modulare**: 4 molecole preview stacked
+- **Conferma sicura**: Alert JavaScript prima del submit
+- **Responsive**: Mobile-first layout
+- **Hover effects**: Cards con animazione subtle
+
+### Parametri Template
+| Prop | Tipo | Descrizione |
+|------|------|-------------|
+| `title` | string | Title HTML della pagina |
+| `action_title` | string | Titolo visualizzato (es. "Preview Notifica") |
+| `action_icon` | string | Emoji/icon per header (📨, 📝, etc.) |
+| `action_type` | string | `'notification'` o `'feedback'` |
+| `training_id` | string | ID Notion formazione |
+| `preview` | object | Oggetto con `training`, `messages`, `email`, `codice_generato` |
+
+### Struttura Preview Object
+```python
+preview = {
+    'training': {
+        'Nome': 'Corso Python Avanzato',
+        'Area': ['IT', 'R&D'],
+        'Data/Ora': '15/10/2025 15:00',
+        'Stato': 'Programmata',
+        'LinkTeams': 'https://teams.microsoft.com/...'
+    },
+    'messages': [
+        {
+            'area': 'IT',
+            'chat_id': '-1001234567890', # Solo per debug, non mostrato
+            'message': 'Formazione Python\nDomani ore 15:00'
+        }
+    ],
+    'email': {  # Solo per notification
+        'recipients': ['team@company.com'],
+        'subject': 'Invito: Formazione Python',
+        'body_preview': 'Gentile partecipante...'
+    },
+    'codice_generato': 'IT-Python-2024-AUTUMN-03'  # Solo per notification
+}
+```
+
+### Esempi di Utilizzo
+
+#### Preview Notification
+```python
+# Nel route Flask
+@app.route('/preview/notification/<training_id>')
+async def preview_notification(training_id):
+    # Prepara preview data
+    preview_data = await prepare_notification_preview(training_id)
+    
+    return render_template(
+        'pages/preview.html',
+        title='Preview Notifica - Formazing',
+        action_title='Preview Notifica Formazione',
+        action_icon='📨',
+        action_type='notification',
+        training_id=training_id,
+        preview=preview_data
+    )
+```
+
+#### Preview Feedback
+```python
+@app.route('/preview/feedback/<training_id>')
+async def preview_feedback(training_id):
+    preview_data = await prepare_feedback_preview(training_id)
+    
+    return render_template(
+        'pages/preview.html',
+        title='Preview Richiesta Feedback - Formazing',
+        action_title='Preview Richiesta Feedback',
+        action_icon='📝',
+        action_type='feedback',
+        training_id=training_id,
+        preview=preview_data
+    )
+```
+
+### User Flow
+```
+1. User clicca "Invia Notifica" da dashboard
+   ↓
+2. Backend prepara preview data
+   ↓
+3. Preview page mostra tutti i dettagli
+   ↓
+4. User verifica informazioni
+   ↓
+5a. User clicca "Annulla" → torna dashboard
+5b. User clicca "Conferma" → alert JS → POST confirm route
+   ↓
+6. Backend esegue azioni reali
+   ↓
+7. Redirect dashboard con flash message
+```
+
+### Differenze Notification vs Feedback
+
+| Feature | Notification | Feedback |
+|---------|-------------|----------|
+| **Codice generato** | ✅ Mostra nuovo codice | ❌ Nascosto |
+| **Email section** | ✅ Mostra card email | ❌ Nascosto |
+| **Azioni alert** | 5 azioni | 2 azioni |
+| **Stato finale** | Calendarizzata | Conclusa |
+| **Icon** | 📨 | 📝 |
+
+---
+
+## �🔧 Best Practices per Pages
 
 ### ✅ Do (Fai così)
 ```html
@@ -267,15 +398,16 @@ async def dashboard():
 |------|--------|-------|-------------------|
 | `login.html` | `base.html` | Accesso pubblico | Icon, Button, Gradient CSS |
 | `dashboard.html` | `auth_required.html` | Dashboard principale | Stats, Table, Tabs, Auto-refresh |
+| `preview.html` | `base.html` | Conferma azioni critiche | 4 molecules preview, Breadcrumb, Dynamic content |
 
 ### Statistiche Sistema Completo
-- **2 Pages** (login, dashboard)
+- **3 Pages** (login, dashboard, preview)
 - **2 Layouts** (base, auth_required)
 - **4 Organisms** (stats, table, tabs, flash_messages)
-- **3 Molecules** (stat_card, formazione_row, flash_message)
-- **5 Atoms** (button, badge, card, icon, loading)
+- **7 Molecules** (stat_card, formazione_row, flash_message, 4x preview molecules)
+- **6 Atoms** (button, badge, card, icon, loading, telegram_message_preview)
 
-**Total: 16 componenti** nel sistema Atomic Design di Formazing! 🎨✨
+**Total: 22 componenti** nel sistema Atomic Design di Formazing! 🎨✨
 
 ---
 

@@ -104,21 +104,61 @@ class NotionService:
             logger.error(f"Errore recupero formazioni '{status}': {e}")
             raise NotionServiceError(f"Errore recupero formazioni: {e}")
     
+    async def update_formazione(self, notion_id: str, updates: Dict) -> bool:
+        """
+        Aggiorna formazione con campi multipli in una singola operazione atomica.
+        
+        METODO UNIFICATO per tutti gli aggiornamenti.
+        Supporta: Stato, Codice, Link Teams, e altri campi.
+        
+        Args:
+            notion_id: ID della formazione da aggiornare
+            updates: Dict con campi da aggiornare (es: {'Stato': 'Calendarizzata', 'Codice': 'IT-01'})
+            
+        Returns:
+            bool: True se aggiornamento riuscito
+            
+        Raises:
+            NotionServiceError: Errori API o validazione
+        """
+        logger.info(f"Aggiornamento formazione {notion_id}: {list(updates.keys())}")
+        
+        try:
+            success = await self.crud_operations.update_multiple_fields(notion_id, updates)
+            
+            if success:
+                logger.info(f"Formazione {notion_id} aggiornata con successo")
+            else:
+                logger.error(f"Fallito aggiornamento formazione {notion_id}")
+            
+            return success
+            
+        except Exception as e:
+            logger.error(f"Errore aggiornamento formazione {notion_id}: {e}")
+            raise NotionServiceError(f"Errore aggiornamento: {e}")
+    
     async def update_formazione_status(self, notion_id: str, new_status: str) -> bool:
         """
         Aggiorna status di una formazione specifica.
         
-        Delega a CrudOperations.
+        DEPRECATO: Usa update_formazione({'Stato': new_status}) invece.
+        Mantenuto per backward compatibility.
         """
-        return await self.crud_operations.update_formazione_status(notion_id, new_status)
+        logger.warning("update_formazione_status è deprecato, usa update_formazione invece")
+        return await self.update_formazione(notion_id, {'Stato': new_status})
     
     async def update_codice_e_link(self, notion_id: str, codice: str, link_teams: str) -> bool:
         """
         Aggiorna codice formazione e link Teams.
         
-        Delega a CrudOperations.
+        DEPRECATO: Usa update_formazione({'Codice': codice, 'Link Teams': link_teams}) invece.
+        Mantenuto per backward compatibility.
         """
-        return await self.crud_operations.update_codice_e_link(notion_id, codice, link_teams)
+        logger.warning("update_codice_e_link è deprecato, usa update_formazione invece")
+        return await self.update_formazione(notion_id, {
+            'Codice': codice,
+            'Link Teams': link_teams
+        })
     
     async def get_formazione_by_id(self, notion_id: str) -> Optional[Dict]:
         """

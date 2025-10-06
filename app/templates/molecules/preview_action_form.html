@@ -1,0 +1,83 @@
+{% macro action_form(action_type, training_id, codice_generato, messages_count) %}
+
+<div class="alert alert-warning border-warning shadow-sm" role="alert">
+    <h5 class="alert-heading">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Azioni che verranno eseguite
+    </h5>
+    <hr>
+    <ul class="mb-0">
+        {% if action_type == 'notification' %}
+            <li>✅ Generazione codice univoco: <code class="text-danger">{{ codice_generato }}</code></li>
+            <li>✅ Creazione evento <strong>Microsoft Teams Calendar</strong></li>
+            <li>✅ Aggiornamento Notion: Stato → {% set text = 'Calendarizzata' %}{% set color = 'bg-info' %}{% include 'atoms/badge.html' %}</li>
+            <li>✅ Invio <strong>email</strong> con allegato Teams</li>
+            <li>✅ Invio messaggi <strong>Telegram</strong> a {{ messages_count }} gruppo{{ 'i' if messages_count != 1 else '' }}</li>
+        {% else %}
+            <li>✅ Invio richiesta feedback <strong>Telegram</strong> a {{ messages_count }} gruppo{{ 'i' if messages_count != 1 else '' }}</li>
+            <li>✅ Aggiornamento Notion: Stato → {% set text = 'Conclusa' %}{% set color = 'bg-success' %}{% include 'atoms/badge.html' %}</li>
+        {% endif %}
+    </ul>
+</div>
+
+<div class="card border-0 shadow-sm mb-5">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                {% set text = 'Annulla e Torna alla Dashboard' %}
+                {% set variant = 'btn-secondary' %}
+                {% set size = 'btn-lg w-100 d-flex align-items-center justify-content-center' %}
+                {% set icon = 'bi bi-x-circle' %}
+                {% set onclick = "handleCancel()" %}
+                {% include 'atoms/button.html' %}
+            </div>
+            
+            <div class="col-md-6">
+                <form method="POST" 
+                      action="{{ url_for('main.confirm_notification' if action_type == 'notification' else 'main.confirm_feedback', training_id=training_id) }}"
+                      onsubmit="return handleConfirm(event, '{{ action_type }}', {{ messages_count }});"
+                      class="h-100">
+                    {% set text = 'Conferma e Invia' %}
+                    {% set variant = 'btn-success' %}
+                    {% set size = 'btn-lg w-100 h-100 d-flex align-items-center justify-content-center' %}
+                    {% set icon = 'bi bi-check-circle' %}
+                    {% set type = 'submit' %}
+                    {% include 'atoms/button.html' %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function handleCancel() {
+    LoadingOverlay.show('🔙 Ritorno alla Dashboard', 'Annullamento operazione...');
+    window.location.href = "{{ url_for('main.dashboard') }}";
+}
+
+function handleConfirm(event, actionType, messagesCount) {
+    const confirmMsg = `⚠️ Sei sicuro di voler procedere?\n\nQuesta azione invierà messaggi reali a ${messagesCount} gruppo${messagesCount !== 1 ? 'i' : ''} Telegram.`;
+    
+    if (!confirm(confirmMsg)) {
+        event.preventDefault();
+        return false;
+    }
+    
+    // Mostra loading specifico per l'azione
+    const titles = {
+        'notification': '📨 Invio Notifiche in Corso',
+        'feedback': '📝 Invio Richiesta Feedback'
+    };
+    
+    const messages = {
+        'notification': 'Creazione Teams, invio email e messaggi Telegram...',
+        'feedback': 'Invio messaggi Telegram e aggiornamento Notion...'
+    };
+    
+    LoadingOverlay.show(titles[actionType], messages[actionType]);
+    
+    return true; // Permette al form di submitare
+}
+</script>
+
+{% endmacro %}

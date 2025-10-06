@@ -52,7 +52,7 @@ class TestNotionDataParser:
         
         # Verifiche campi specifici
         assert result['Nome'] == "Sicurezza Web Avanzata"
-        assert result['Area'] == "IT, R&D"
+        assert result['Area'] == ["IT", "R&D"]  # ✅ Ora è una lista
         assert result['Data/Ora'] == "15/03/2024 14:00"
         assert result['Stato'] == "Programmata"
         assert result['Codice'] == "IT-Sicurezza-2024-SPRING-01"
@@ -78,7 +78,7 @@ class TestNotionDataParser:
         
         # Campi obbligatori presenti
         assert result['Nome'] == "Test Formazione Minimale"
-        assert result['Area'] == "IT"
+        assert result['Area'] == ["IT"]  # ✅ Ora è una lista
         assert result['Data/Ora'] == "20/03/2024 09:00"
         assert result['Stato'] == "Calendarizzata"
         
@@ -126,12 +126,12 @@ class TestNotionDataParser:
         # Prima formazione
         first = result[0]
         assert first['Nome'] == "Sicurezza Web Avanzata"
-        assert first['Area'] == "IT, R&D"
+        assert first['Area'] == ["IT", "R&D"]  # ✅ Ora è una lista
         
         # Seconda formazione
         second = result[1]
         assert second['Nome'] == "Marketing Digital Strategy"
-        assert second['Area'] == "Marketing"
+        assert second['Area'] == ["Marketing"]  # ✅ Ora è una lista
         assert second['Stato'] == "Conclusa"
     
     def test_parse_formazioni_list_empty_response(self, parser):

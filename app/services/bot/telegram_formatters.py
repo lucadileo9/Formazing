@@ -53,7 +53,14 @@ class TelegramFormatter:
         """
         # Estrazione dati con fallback 'N/A'
         nome = training_data.get('Nome', 'N/A')
-        area = training_data.get('Area', 'N/A')
+        area_raw = training_data.get('Area', 'N/A')
+        
+        # Formatta Area: lista → stringa (es. ['IT', 'R&D'] → 'IT, R&D')
+        if isinstance(area_raw, list):
+            area = ', '.join(area_raw) if area_raw else 'N/A'
+        else:
+            area = area_raw if area_raw else 'N/A'
+        
         data_ora = training_data.get('Data/Ora', 'N/A')
         codice = training_data.get('Codice', 'N/A')
         link_teams = training_data.get('Link Teams', 'N/A')
@@ -106,7 +113,14 @@ class TelegramFormatter:
         """
         # Estrazione dati essenziali
         nome = training_data.get('Nome', 'N/A')
-        area = training_data.get('Area', 'N/A') 
+        area_raw = training_data.get('Area', 'N/A')
+        
+        # ✨ Formatta Area: lista → stringa (es. ['IT', 'R&D'] → 'IT, R&D')
+        if isinstance(area_raw, list):
+            area = ', '.join(area_raw) if area_raw else 'N/A'
+        else:
+            area = area_raw if area_raw else 'N/A'
+        
         codice = training_data.get('Codice', 'N/A')
         
         # Preparazione dati template
