@@ -37,64 +37,64 @@ Card specializzata per visualizzare statistiche numeriche con icona, titolo, val
 
 #### Statistica Semplice
 ```html
-{% include 'molecules/stat_card.html' %}
 {% set title = 'Totale Formazioni' %}
 {% set value = formazioni_stats.total %}
 {% set icon = 'bi bi-collection' %}
+{% include 'molecules/stat_card.html' %}
 ```
 **Risultato**: Card con icona, "Totale Formazioni", numero grande al centro
 
 #### Statistica con Descrizione
 ```html
-{% include 'molecules/stat_card.html' %}
 {% set title = 'Programmate' %}
 {% set value = formazioni_stats.programmata %}
 {% set icon = 'bi bi-clock-history' %}
 {% set description = 'In fase di pianificazione' %}
 {% set color = 'text-warning' %}
+{% include 'molecules/stat_card.html' %}
 ```
 
 #### Statistica con Background Colorato
 ```html
-{% include 'molecules/stat_card.html' %}
 {% set title = 'Concluse' %}
 {% set value = formazioni_stats.conclusa %}
 {% set icon = 'bi bi-check-circle' %}
 {% set description = 'Formazioni completate' %}
 {% set color = 'text-white' %}
 {% set bg_class = 'bg-success' %}
+{% include 'molecules/stat_card.html' %}
 ```
 
 #### Griglia di Statistiche Dashboard
 ```html
 <div class="row">
     <div class="col-md-3">
-        {% include 'molecules/stat_card.html' %}
         {% set title = 'Totale' %}
         {% set value = stats.total %}
         {% set icon = 'bi bi-collection' %}
         {% set color = 'text-primary' %}
+        {% include 'molecules/stat_card.html' %}
     </div>
     <div class="col-md-3">
-        {% include 'molecules/stat_card.html' %}
         {% set title = 'Programmate' %}
         {% set value = stats.programmata %}
         {% set icon = 'bi bi-clock-history' %}
         {% set color = 'text-warning' %}
+        {% include 'molecules/stat_card.html' %}
     </div>
     <div class="col-md-3">
-        {% include 'molecules/stat_card.html' %}
         {% set title = 'Calendarizzate' %}
         {% set value = stats.calendarizzata %}
         {% set icon = 'bi bi-calendar-event' %}
         {% set color = 'text-info' %}
+        {% include 'molecules/stat_card.html' %}
     </div>
     <div class="col-md-3">
-        {% include 'molecules/stat_card.html' %}
         {% set title = 'Concluse' %}
         {% set value = stats.conclusa %}
         {% set icon = 'bi bi-check-circle' %}
         {% set color = 'text-success' %}
+        {% include 'molecules/stat_card.html' %}
     </div>
 </div>
 ```
@@ -163,25 +163,25 @@ formazione = {
 ```html
 <tbody>
     {% for formazione in formazioni %}
-        {% include 'molecules/formazione_row.html' %}
         {% set formazione = formazione %}
+        {% include 'molecules/formazione_row.html' %}
     {% endfor %}
 </tbody>
 ```
 
 #### Riga Compatta per Mobile
 ```html
-{% include 'molecules/formazione_row.html' %}
 {% set formazione = formazione %}
 {% set compact = true %}
 {% set show_actions = false %}
+{% include 'molecules/formazione_row.html' %}
 ```
 
 #### Riga con Evidenziazione
 ```html
-{% include 'molecules/formazione_row.html' %}
 {% set formazione = formazione %}
 {% set highlight_status = 'Programmata' %}
+{% include 'molecules/formazione_row.html' %}
 ```
 
 ### Mappature Badge Automatiche
