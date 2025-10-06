@@ -28,16 +28,14 @@
                 {% set variant = 'btn-secondary' %}
                 {% set size = 'btn-lg w-100 d-flex align-items-center justify-content-center' %}
                 {% set icon = 'bi bi-x-circle' %}
-                {% set onclick = "window.location.href='" ~ url_for('main.dashboard') ~ "'" %}
+                {% set onclick = "handleCancel()" %}
                 {% include 'atoms/button.html' %}
             </div>
             
             <div class="col-md-6">
-                {% set confirm_msg = "⚠️ Sei sicuro di voler procedere?\n\nQuesta azione invierà messaggi reali a " ~ messages_count ~ " gruppo" ~ ("i" if messages_count != 1 else "") ~ " Telegram." %}
-                
                 <form method="POST" 
                       action="{{ url_for('main.confirm_notification' if action_type == 'notification' else 'main.confirm_feedback', training_id=training_id) }}"
-                      onsubmit="return confirm('{{ confirm_msg }}');"
+                      onsubmit="return handleConfirm(event, '{{ action_type }}', {{ messages_count }});"
                       class="h-100">
                     {% set text = 'Conferma e Invia' %}
                     {% set variant = 'btn-success' %}
@@ -50,5 +48,36 @@
         </div>
     </div>
 </div>
+
+<script>
+function handleCancel() {
+    LoadingOverlay.show('🔙 Ritorno alla Dashboard', 'Annullamento operazione...');
+    window.location.href = "{{ url_for('main.dashboard') }}";
+}
+
+function handleConfirm(event, actionType, messagesCount) {
+    const confirmMsg = `⚠️ Sei sicuro di voler procedere?\n\nQuesta azione invierà messaggi reali a ${messagesCount} gruppo${messagesCount !== 1 ? 'i' : ''} Telegram.`;
+    
+    if (!confirm(confirmMsg)) {
+        event.preventDefault();
+        return false;
+    }
+    
+    // Mostra loading specifico per l'azione
+    const titles = {
+        'notification': '📨 Invio Notifiche in Corso',
+        'feedback': '📝 Invio Richiesta Feedback'
+    };
+    
+    const messages = {
+        'notification': 'Creazione Teams, invio email e messaggi Telegram...',
+        'feedback': 'Invio messaggi Telegram e aggiornamento Notion...'
+    };
+    
+    LoadingOverlay.show(titles[actionType], messages[actionType]);
+    
+    return true; // Permette al form di submitare
+}
+</script>
 
 {% endmacro %}

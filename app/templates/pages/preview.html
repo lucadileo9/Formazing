@@ -50,6 +50,15 @@
 </div>
 {% endblock %}
 
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Hide loading overlay when preview page is fully loaded
+        LoadingOverlay.hide();
+    });
+</script>
+{% endblock %}
+
 {% block extra_css %}
 <style>
     .card {

@@ -125,3 +125,12 @@
     </div>
 
 {% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Hide loading overlay when dashboard is fully loaded
+        LoadingOverlay.hide();
+    });
+</script>
+{% endblock %}
