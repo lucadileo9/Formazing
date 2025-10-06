@@ -343,11 +343,283 @@ icon_mappings = {
 ```
 ---
 
+## 📋 Preview Training Info - Card Informazioni Formazione
+
+**File**: `templates/molecules/preview_training_info.html`
+
+### Descrizione
+Card macro che mostra tutte le informazioni chiave di una formazione nelle pagine di preview/conferma. Include dettagli formazione, badges area, stato attuale e codice generato.
+
+### Macro Signature
+```jinja
+{% macro training_info_card(training, action_type, codice_generato=None) %}
+```
+
+### Parametri
+| Param | Tipo | Default | Descrizione |
+|-------|------|---------|-------------|
+| `training` | object | - | Oggetto formazione da Notion (richiesto) |
+| `action_type` | string | - | Tipo azione: `'notification'` o `'feedback'` |
+| `codice_generato` | string | `None` | Codice univoco generato (solo per notification) |
+
+### Logica Integrata
+- **Badge dinamici**: Usa `atoms/badge.html` per Area e Stato
+- **Condizionale codice**: Mostra "Nuovo Codice" se `action_type == 'notification'`
+- **Link Teams**: Visualizza link meeting se presente
+- **Formattazione date**: Data/Ora formattata automaticamente
+
+### Esempi di Utilizzo
+
+#### Preview Notifica (con codice generato)
+```html
+{% from 'molecules/preview_training_info.html' import training_info_card %}
+
+{{ training_info_card(
+    training=formazione,
+    action_type='notification',
+    codice_generato='IT-Security-2024-SPRING-01'
+) }}
+```
+**Risultato**: Card con Nome, Area badges, Data, Stato, **Nuovo Codice**, Link Teams
+
+#### Preview Feedback
+```html
+{% from 'molecules/preview_training_info.html' import training_info_card %}
+
+{{ training_info_card(
+    training=formazione,
+    action_type='feedback'
+) }}
+```
+**Risultato**: Card con Nome, Area badges, Data, Stato, Codice esistente (se presente)
+
+### Struttura Training Object
+```python
+training = {
+    'Nome': 'Corso Python Avanzato',
+    'Area': ['IT', 'R&D'],  # Array per multiple aree
+    'Data/Ora': '15/10/2025 15:00',
+    'Stato': 'Programmata',  # Programmata | Calendarizzata | Conclusa
+    'Codice': 'IT-Python-2024-AUTUMN-03',  # Opzionale
+    'LinkTeams': 'https://teams.microsoft.com/...'  # Opzionale
+}
+```
+
+### Badge Automatici
+- **Area badges**: `bg-secondary` per ogni area nell'array
+- **Stato badge**:
+  - `Programmata` → `bg-warning`
+  - `Calendarizzata` → `bg-info`
+  - `Conclusa` → `bg-success`
+
+---
+
+## 📨 Preview Telegram Messages - Card Messaggi Telegram
+
+**File**: `templates/molecules/preview_telegram_messages.html`
+
+### Descrizione
+Card macro che visualizza l'anteprima di tutti i messaggi Telegram che verranno inviati, organizzati per area/gruppo target.
+
+### Macro Signature
+```jinja
+{% macro telegram_messages_card(messages) %}
+```
+
+### Parametri
+| Param | Tipo | Default | Descrizione |
+|-------|------|---------|-------------|
+| `messages` | array | - | Lista messaggi con area, chat_id, message (richiesto) |
+
+### Logica Integrata
+- **Conteggio gruppi**: Badge con numero totale gruppi target
+- **Preview messaggi**: Usa `atoms/telegram_message_preview.html` per ogni messaggio
+- **Empty state**: Alert warning se `messages` è vuoto
+- **Layout verticale**: Stack di cards con gap
+
+### Esempi di Utilizzo
+
+#### Con Messaggi
+```html
+{% from 'molecules/preview_telegram_messages.html' import telegram_messages_card %}
+
+{{ telegram_messages_card(messages=telegram_messages) }}
+```
+
+#### Struttura Messages Array
+```python
+telegram_messages = [
+    {
+        'area': 'IT',
+        'chat_id': '-1001234567890',
+        'message': 'Formazione Python\nDomani ore 15:00\n\nLink: https://...'
+    },
+    {
+        'area': 'HR',
+        'chat_id': '-1009876543210', 
+        'message': 'Reminder Leadership training\nOggi pomeriggio alle 14:30'
+    }
+]
+```
+
+### Empty State
+```html
+<!-- Se messages è vuoto o None -->
+<div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle"></i>
+    <strong>Attenzione!</strong> Nessun messaggio da inviare.
+</div>
+```
+
+---
+
+## 📧 Preview Email Section - Sezione Email
+
+**File**: `templates/molecules/preview_email_section.html`
+
+### Descrizione
+Card macro per visualizzare l'anteprima dell'email che verrà inviata con dettagli meeting Teams. Mostrata solo se email presente.
+
+### Macro Signature
+```jinja
+{% macro email_section_card(email) %}
+```
+
+### Parametri
+| Param | Tipo | Default | Descrizione |
+|-------|------|---------|-------------|
+| `email` | object/None | - | Oggetto email con recipients, subject, body_preview |
+
+### Logica Integrata
+- **Rendering condizionale**: Card mostrata solo se `email` è truthy
+- **Destinatari multipli**: Join con virgola
+- **Body preview**: Anteprima testo email in box grigio
+
+### Esempi di Utilizzo
+
+#### Con Email
+```html
+{% from 'molecules/preview_email_section.html' import email_section_card %}
+
+{{ email_section_card(email=email_data) }}
+```
+
+#### Struttura Email Object
+```python
+email_data = {
+    'recipients': ['team@company.com', 'manager@company.com'],
+    'subject': 'Invito: Formazione Python Avanzato - 15/10/2025',
+    'body_preview': 'Gentile partecipante, sei invitato alla formazione...'
+}
+```
+
+#### Senza Email (non renderizza nulla)
+```html
+{{ email_section_card(email=None) }}
+<!-- Output: nessun HTML -->
+```
+
+### Caratteristiche
+- **Card header verde**: `bg-success` per indicare email
+- **Icon envelope**: `bi bi-envelope` nel header
+- **Recipients list**: Separati da virgola
+- **Preview box**: `bg-light` con padding
+
+---
+
+## ⚡ Preview Action Form - Form Azioni Finali
+
+**File**: `templates/molecules/preview_action_form.html`
+
+### Descrizione
+Macro che renderizza il riepilogo azioni, alert di conferma e i due bottoni finali (Annulla/Conferma). Cuore della UX di conferma operazioni.
+
+### Macro Signature
+```jinja
+{% macro action_form(action_type, training_id, codice_generato, messages_count) %}
+```
+
+### Parametri
+| Param | Tipo | Default | Descrizione |
+|-------|------|---------|-------------|
+| `action_type` | string | - | `'notification'` o `'feedback'` (richiesto) |
+| `training_id` | string | - | ID Notion della formazione (richiesto) |
+| `codice_generato` | string | - | Codice univoco generato (solo notification) |
+| `messages_count` | int | - | Numero gruppi Telegram (richiesto) |
+
+### Logica Integrata
+- **Lista azioni dinamica**: Diversa per notification vs feedback
+- **Badge stato**: Usa `atoms/badge.html` per stati Notion
+- **Conferma JavaScript**: Alert nativo browser prima submit
+- **Bottoni con atoms**: Usa `atoms/button.html` per entrambi i button
+
+### Esempi di Utilizzo
+
+#### Per Notification
+```html
+{% from 'molecules/preview_action_form.html' import action_form %}
+
+{{ action_form(
+    action_type='notification',
+    training_id=formazione.id,
+    codice_generato='IT-Security-2024-SPRING-01',
+    messages_count=3
+) }}
+```
+**Azioni visualizzate:**
+- ✅ Generazione codice univoco
+- ✅ Creazione evento Teams Calendar
+- ✅ Aggiornamento Notion: Stato → `Calendarizzata`
+- ✅ Invio email con allegato Teams
+- ✅ Invio messaggi Telegram a 3 gruppi
+
+#### Per Feedback
+```html
+{{ action_form(
+    action_type='feedback',
+    training_id=formazione.id,
+    codice_generato=None,
+    messages_count=2
+) }}
+```
+**Azioni visualizzate:**
+- ✅ Invio richiesta feedback Telegram a 2 gruppi
+- ✅ Aggiornamento Notion: Stato → `Conclusa`
+
+### Bottoni
+
+#### Bottone Annulla (sinistra)
+```html
+{% set text = 'Annulla e Torna alla Dashboard' %}
+{% set icon = 'bi bi-x-circle' %}
+{% set variant = 'btn-secondary' %}
+{% set size = 'btn-lg w-100' %}
+{% set onclick = "window.location.href='/dashboard'" %}
+{% include 'atoms/button.html' %}
+```
+
+#### Bottone Conferma (destra)
+```html
+<form method="POST" action="/confirm/..." onsubmit="return confirm('...')">
+    {% set text = 'Conferma e Invia' %}
+    {% set icon = 'bi bi-check-circle' %}
+    {% set variant = 'btn-success' %}
+    {% set size = 'btn-lg w-100 h-100' %}
+    {% set type = 'submit' %}
+    {% include 'atoms/button.html' %}
+</form>
+```
+---
+
 ### 🎯 Quando Usare Ciascuna Molecule
 
 - **Stat Card**: KPI, metriche, contatori, dashboard statistics
 - **Formazione Row**: Liste formazioni, tabelle dati, export reports
 - **Flash Message**: Feedback utente, conferme operazioni, errori system
+- **Preview Training Info**: Pagine conferma/preview dettagli formazione
+- **Preview Telegram Messages**: Anteprima messaggi da inviare
+- **Preview Email Section**: Anteprima email notifiche
+- **Preview Action Form**: Riepilogo + conferma azioni critiche
 
 ---
 

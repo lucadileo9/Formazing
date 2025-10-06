@@ -22,16 +22,21 @@ Atoms (Elementi base)
 
 ```
 app/templates/
-├── atoms/                 # 5 componenti base
+├── atoms/                 # 6 componenti base
 │   ├── badge.html
 │   ├── button.html
 │   ├── card.html
 │   ├── icon.html
-│   └── loading.html
-├── molecules/             # 3 componenti intelligenti
+│   ├── loading.html
+│   └── telegram_message_preview.html
+├── molecules/             # 7 componenti intelligenti
 │   ├── flash_message.html
 │   ├── formazione_row.html
-│   └── stat_card.html
+│   ├── stat_card.html
+│   ├── preview_action_form.html
+│   ├── preview_email_section.html
+│   ├── preview_telegram_messages.html
+│   └── preview_training_info.html
 ├── organisms/             # 4 sezioni complete
 │   ├── dashboard_stats.html
 │   ├── flash_messages.html
@@ -40,13 +45,14 @@ app/templates/
 ├── layout/                # 2 strutture base
 │   ├── base.html
 │   └── auth_required.html
-├── pages/                 # 2 pagine complete
+├── pages/                 # 3 pagine complete
 │   ├── dashboard.html
-│   └── login.html
+│   ├── login.html
+│   └── preview.html
 └── legacy/                # Template obsoleti
 ```
 
-**Totale: 16 componenti attivi** + template legacy archiviati
+**Totale: 22 componenti attivi** + template legacy archiviati
 
 ---
 
@@ -54,14 +60,14 @@ app/templates/
 
 ### 1. **[Atoms](atoms.md)** - Componenti Base
 Documentazione dei mattoni fondamentali del sistema:
-- **5 atoms**: button, badge, card, icon, loading
+- **6 atoms**: button, badge, card, icon, loading, telegram_message_preview
 - **Props configurabili**: Per personalizzazione completa
 - **Esempi d'uso**: Codice pratico per ogni atom
 - **Best practices**: Come e quando usare ciascun componente
 
 ### 2. **[Molecules](molecules.md)** - Componenti Intelligenti  
 Documentazione dei componenti con logica di business:
-- **3 molecules**: stat_card, formazione_row, flash_message
+- **7 molecules**: stat_card, formazione_row, flash_message + 4 preview molecules
 - **Logica integrata**: Auto-colorazione, formattazione, comportamenti
 - **Mappature automatiche**: Colori per status, aree, periodi
 - **Integrazione Flask**: Flash messages e oggetti Notion
@@ -82,7 +88,7 @@ Documentazione delle strutture HTML fondamentali:
 
 ### 5. **[Pages](pages.md)** - Pagine Complete
 Documentazione delle esperienze utente finali:
-- **2 pages**: login.html, dashboard.html
+- **3 pages**: login.html, dashboard.html, preview.html
 - **Composizione finale**: Orchestrazione di tutti i componenti
 - **User flows**: Flussi di navigazione e interazione
 - **Business logic**: Integrazione con backend Flask
@@ -251,28 +257,29 @@ atoms/loading.html (componente autonomo)
 ## 📈 Statistiche Sistema
 
 ```
-Componenti Totali: 16
-├── Atoms: 5 (31%)
-├── Molecules: 3 (19%)  
-├── Organisms: 4 (25%)
-├── Layouts: 2 (13%)
-└── Pages: 2 (12%)
+Componenti Totali: 22
+├── Atoms: 6 (27%)
+├── Molecules: 7 (32%)  
+├── Organisms: 4 (18%)
+├── Layouts: 2 (9%)
+└── Pages: 3 (14%)
 
 File Documentazione: 7
 ├── README.md (panoramica generale)
-├── atoms.md (5 componenti base)
-├── molecules.md (3 componenti intelligenti)
+├── atoms.md (6 componenti base)
+├── molecules.md (7 componenti intelligenti)
 ├── organisms.md (4 sezioni complete)
 ├── layouts.md (2 strutture)
-├── pages.md (2 pagine)
+├── pages.md (3 pagine)
 └── dependency_graph.md (analisi dipendenze)
 
-Linee di Codice Template: ~1,200
+Linee di Codice Template: ~1,800
 Dipendenze Esterne: 2 (Bootstrap CSS + Icons)
 Compatibilità Browser: Modern browsers (ES6+)
 Responsive Breakpoints: 4 (xs, sm, md, lg, xl)
 Profondità Massima Dipendenze: 5 livelli
-Componente più utilizzato: atoms/icon.html (3 dipendenze)
+Componente più utilizzato: atoms/icon.html (3+ dipendenze)
+Nuovi componenti (v2.0): 6 (telegram_message_preview + 4 preview molecules + preview page)
 ```
 
 ---
