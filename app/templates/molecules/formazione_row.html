@@ -100,21 +100,26 @@
         <div class="d-flex gap-2">
             {% if formazione.get('Stato') == 'Programmata' %}
                 <!-- Preview Calendarizzazione per formazioni Programmate -->
-                <button onclick="showPreview('{{ formazione.get('_notion_id', '') }}', 'notification')" 
-                        class="btn btn-primary btn-sm">
-                    <i class="bi bi-eye me-1"></i>Preview Calendarizzazione
-                </button>
+                {% set variant = 'btn-primary' %}
+                {% set size = 'btn-sm' %}
+                {% set icon = 'bi bi-eye' %}
+                {% set text = 'Preview Calendarizzazione' %}
+                {% set onclick = "showPreview('" ~ formazione.get('_notion_id', '') ~ "', 'notification')" %}
+                {% include 'atoms/button.html' %}
             {% elif formazione.get('Stato') == 'Calendarizzata' %}
                 <!-- Preview Feedback per formazioni Calendarizzate -->
-                <button onclick="showPreview('{{ formazione.get('_notion_id', '') }}', 'feedback')" 
-                        class="btn btn-success btn-sm">
-                    <i class="bi bi-chat-left-text me-1"></i>Preview Feedback
-                </button>
+                {% set variant = 'btn-danger' %}
+                {% set size = 'btn-sm' %}
+                {% set icon = 'bi bi-chat-left-text' %}
+                {% set text = 'Preview Feedback' %}
+                {% set onclick = "showPreview('" ~ formazione.get('_notion_id', '') ~ "', 'feedback')" %}
+                {% include 'atoms/button.html' %}
             {% else %}
                 <!-- Nessuna azione per formazioni Concluse -->
-                <span class="badge bg-success">
-                    <i class="bi bi-check-circle me-1"></i>Completata
-                </span>
+                {% set text = 'Completata' %}
+                {% set color = 'bg-success' %}
+                {% set icon = 'bi bi-check-circle' %}
+                {% include 'atoms/badge.html' %}
             {% endif %}
         </div>
     </td>

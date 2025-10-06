@@ -15,5 +15,9 @@
     
     {{ message }}
     
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    {% set type = 'button' %}
+    {% set variant = 'btn-close' %}
+    {% set data_bs_dismiss = 'alert' %}
+    {% set aria_label = 'Close' %}
+    {% include 'atoms/button.html' %}
 </div>
