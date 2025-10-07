@@ -108,6 +108,10 @@ async def verify_telegram_connection():
     print("\n🤖 Testing Telegram Service...")
     
     try:
+        # Inizializza NotionService (necessario per TelegramService)
+        notion_service = NotionService()
+        print("✅ NotionService inizializzato")
+        
         # Inizializza TelegramService con token da config
         telegram_token = Config.TELEGRAM_BOT_TOKEN
         if not telegram_token:
@@ -116,6 +120,7 @@ async def verify_telegram_connection():
             
         telegram = TelegramService(
             token=telegram_token,
+            notion_service=notion_service,  # ✅ Passa NotionService
             groups_config_path=Config.TELEGRAM_GROUPS_CONFIG,
             templates_config_path=Config.TELEGRAM_TEMPLATES_CONFIG
         )

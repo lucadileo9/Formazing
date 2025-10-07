@@ -295,11 +295,15 @@ async def main():
         if not formazione:
             return False
         
-        # 3. Inizializza TelegramService
+        # 3. Inizializza servizi (NotionService + TelegramService)
         print_section_header("Inizializzazione Servizi", "🔧")
         try:
+            notion_service = NotionService()
+            print("✅ NotionService inizializzato")
+            
             telegram_service = TelegramService(
                 token=Config.TELEGRAM_BOT_TOKEN,
+                notion_service=notion_service,  # ✅ Passa NotionService
                 groups_config_path=Config.TELEGRAM_GROUPS_CONFIG,
                 templates_config_path=Config.TELEGRAM_TEMPLATES_CONFIG
             )

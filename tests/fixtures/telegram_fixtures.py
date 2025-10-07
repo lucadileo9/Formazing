@@ -127,15 +127,13 @@ def configured_telegram_service(load_test_env, test_config_paths, mock_notion_se
         pytest.skip(f"File {templates_config} non trovato - Crea template test")
     
     try:
-        # Crea TelegramService REALE
+        # Crea TelegramService REALE con NotionService iniettato
         service = TelegramService(
             token=token,
+            notion_service=mock_notion_service,  # ✅ Passa direttamente nell'init
             groups_config_path=groups_config,
             templates_config_path=templates_config
         )
-        
-        # Inietta MockNotionService da fixture
-        service.set_notion_service(mock_notion_service)
         
         print(f"✅ TelegramService configurato con {len(service.groups)} gruppi di test")
         return service
