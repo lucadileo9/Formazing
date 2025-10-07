@@ -12,6 +12,7 @@
 - **[📋 Fixture Quick Reference](fixture-quick-reference.md)** - Reference rapido per sviluppo
 - **[📱 Telegram Testing](telegram-testing.md)** - Test bot, comandi, invii reali
 - **[🔗 Notion Testing](notion-testing.md)** - Test API, query, parsing, CRUD
+- **[🔷 Microsoft Testing](microsoft-testing.md)** - Test Teams integration, calendario, email
 
 ---
 
@@ -238,6 +239,80 @@ python tests/e2e/test_workflow.py --real --limit 2
 
 ---
 
+#### **🔷 Test Microsoft Teams Integration**
+
+**`microsoft`** - Test Microsoft Service Isolato
+```bash
+# Comando quick_test
+.\quick_test.bat microsoft
+
+# Equivalente Python
+python test_real_microsoft.py
+```
+**Cosa fa**: Testa il Microsoft Service in **isolamento** (no Notion):
+- **Crea evento Teams** reale con data/ora futura (+5 minuti)
+- **Genera meeting link** Microsoft Teams automatico
+- **Invia email** reale alla mailing list configurata (es. it@jemore.it)
+- **Validazione completa**: verifica token, permessi, configurazione
+- **Sicurezza**: Richiede conferma esplicita "SI" prima dell'esecuzione
+- **Risultato**: Mostra event ID, Teams link, destinatari email
+
+**`integration`** - Test Integrazione Notion → Microsoft
+```bash
+# Comando quick_test
+.\quick_test.bat integration
+
+# Equivalente Python
+python test_notion_microsoft_integration.py
+```
+**Cosa fa**: Testa **workflow completo** Notion → Microsoft → Notion:
+- **Recupera formazioni** reali da Notion (stato "Programmata")
+- **Selezione interattiva** della formazione da calendarizzare
+- **Crea evento Teams** reale con meeting link
+- **Invia email** alle mailing list delle aree configurate
+- **Aggiorna Notion** con link Teams e stato "Calendarizzata"
+- **Verifica aggiornamento** ricaricando formazione da Notion
+- **Sicurezza**: Richiede conferma "SI" + mostra preview dati
+
+**`teams`** - Suite Completa Test Microsoft
+```bash
+# Comando quick_test
+.\quick_test.bat teams
+
+# Esecuzione interattiva in 2 step
+```
+**Cosa fa**: Suite **interattiva** per validazione completa Microsoft:
+- **Step 1**: Test Microsoft Service isolato (conferma richiesta)
+  - Crea evento test con dati mock
+  - Valida autenticazione e permessi Graph API
+  - Testa invio email a mailing list
+- **Step 2**: Test integrazione con Notion (conferma richiesta)
+  - Workflow completo con formazione reale
+  - Aggiornamento database Notion
+  - Verifica sincronizzazione link Teams
+- **Report finale**: Riepilogo risultati entrambi i test
+
+**Configurazione richiesta** per test Microsoft:
+```env
+# .env - Variabili Microsoft Graph API
+MICROSOFT_TENANT_ID=your-tenant-id
+MICROSOFT_CLIENT_ID=your-app-client-id
+MICROSOFT_CLIENT_SECRET=your-client-secret
+MICROSOFT_USER_EMAIL=organizer@domain.com
+```
+
+```json
+// config/microsoft_emails.json - Mapping aree → email
+{
+  "IT": "it@jemore.it",
+  "R&D": "rd@jemore.it",
+  "HR": "hr@jemore.it",
+  "default": "formazioni@jemore.it"
+}
+```
+
+---
+
 #### **🤖 Test Bot Legacy (Integration)**
 
 **`format`** - Preview Formattazione (Legacy)
@@ -362,11 +437,26 @@ python -m pytest tests/integration/test_real_telegram.py::TestRealTelegramIntegr
 # 🎯 Workflow completo sicuro - SEMPRE fare
 .\quick_test.bat workflow     # Simula produzione senza invii
 
+# 🔷 Test Microsoft Teams (se abilitate notifiche email)
+.\quick_test.bat microsoft     # Test service isolato con dati mock
+
 # ⚠️ Test reale controllato - Solo se necessario  
 .\quick_test.bat send         # 1 messaggio reale con conferme
 
 # 🚨 Workflow produzione - Solo deploy critico
 .\quick_test.bat workflow-real # 2 formazioni reali complete
+```
+
+### **🔷 Test Microsoft Teams Integration**
+```bash
+# 🧪 Test isolato Microsoft service
+.\quick_test.bat microsoft     # Crea evento test + email (5s)
+
+# 🔗 Test integrazione completa Notion → Microsoft
+.\quick_test.bat integration   # Workflow reale con formazione da Notion
+
+# 📅 Suite completa Microsoft (interattiva)
+.\quick_test.bat teams         # 2 step con conferme separate
 ```
 
 ### **🔍 Debug e Troubleshooting**
@@ -376,6 +466,9 @@ python -m pytest tests/integration/test_real_telegram.py::TestRealTelegramIntegr
 
 # 📝 Problemi formattazione messaggi  
 .\quick_test.bat preview      # Test template con dati reali
+
+# 🔷 Problemi Microsoft Teams/Graph API
+.\quick_test.bat microsoft    # Test autenticazione + creazione eventi
 
 # 🤖 Problemi comandi bot
 .\quick_test.bat bot          # Test interattivo 60s
@@ -388,6 +481,9 @@ python -m pytest tests/integration/test_real_telegram.py::TestRealTelegramIntegr
 
 # ⚡ Alternativa veloce per commit frequenti  
 .\quick_test.bat unit && .\quick_test.bat preview  # 3-4s totali
+
+# 🔷 Se modifiche a Microsoft integration
+.\quick_test.bat unit && .\quick_test.bat microsoft  # Valida service
 ```
 
 ---
