@@ -127,6 +127,52 @@ if "%1"=="workflow-real" (
     goto :end
 )
 
+if "%1"=="microsoft" (
+    echo 🔷 Test Microsoft Service ^(isolato^)...
+    python tests\e2e\test_real_microsoft.py
+    goto :end
+)
+
+if "%1"=="integration" (
+    echo 🔗 Test integrazione Notion → Microsoft...
+    python tests\integration\test_notion_microsoft_integration.py
+    goto :end
+)
+
+if "%1"=="teams" (
+    echo 📅 Test completo Microsoft Teams...
+    echo.
+    echo 📋 Piano test Microsoft:
+    echo   1️⃣ Test service isolato ^(crea evento + email^)
+    echo   2️⃣ Test integrazione Notion → Microsoft
+    echo.
+    set /p confirm1="❓ Esegui test isolato Microsoft? (S/N): "
+    if /i "%confirm1%"=="S" (
+        echo 🔷 Test Microsoft Service...
+        python tests\e2e\test_real_microsoft.py
+        if %errorlevel% neq 0 (
+            echo ❌ Test Microsoft fallito
+            goto :error
+        )
+        echo ✅ Test Microsoft completato!
+        echo.
+    )
+    
+    set /p confirm2="❓ Esegui test integrazione Notion → Microsoft? (S/N): "
+    if /i "%confirm2%"=="S" (
+        echo 🔗 Test integrazione...
+        python tests\integration\test_notion_microsoft_integration.py
+        if %errorlevel% neq 0 (
+            echo ❌ Test integrazione fallito
+            goto :error
+        )
+        echo ✅ Test integrazione completato!
+    )
+    echo.
+    echo 🎉 Suite test Microsoft completata!
+    goto :end
+)
+
 if "%1"=="all" (
     echo 🚀 SUITE COMPLETA PRE-COMMIT
     echo.
@@ -237,6 +283,11 @@ if "%1"=="" (
     echo   workflow - Test workflow completo
     echo   all      - Suite completa pre-commit (interattiva)
     echo   send     - Invio controllato con conferma
+    echo.
+    echo 🔷 TEST MICROSOFT TEAMS:
+    echo   microsoft   - Test Microsoft Service isolato
+    echo   integration - Test integrazione Notion → Microsoft
+    echo   teams       - Suite completa test Microsoft
     echo.
     echo 📚 Per lista completa comandi: docs/testing/README.md
     echo.

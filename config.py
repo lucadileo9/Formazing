@@ -36,6 +36,7 @@ class Config:
     MICROSOFT_CLIENT_ID = os.getenv('MICROSOFT_CLIENT_ID')
     MICROSOFT_CLIENT_SECRET = os.getenv('MICROSOFT_CLIENT_SECRET') 
     MICROSOFT_TENANT_ID = os.getenv('MICROSOFT_TENANT_ID')
+    MICROSOFT_USER_EMAIL = os.getenv('MICROSOFT_USER_EMAIL')  # Organizzatore eventi (es. lucadileo@jemore.it)
     
     # ===== LOGGING CONFIG =====
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
@@ -51,12 +52,18 @@ class Config:
         validation = {
             'telegram': bool(cls.TELEGRAM_BOT_TOKEN),
             'notion': bool(cls.NOTION_TOKEN and cls.NOTION_DATABASE_ID),
-            'microsoft_graph': bool(cls.MICROSOFT_CLIENT_ID and cls.MICROSOFT_CLIENT_SECRET and cls.MICROSOFT_TENANT_ID),
+            'microsoft_graph': bool(
+                cls.MICROSOFT_CLIENT_ID and 
+                cls.MICROSOFT_CLIENT_SECRET and 
+                cls.MICROSOFT_TENANT_ID and
+                cls.MICROSOFT_USER_EMAIL
+            ),
             'flask_auth': bool(cls.BASIC_AUTH_PASSWORD),
             'overall_ok': False
         }
         
         # Almeno Telegram e Notion devono essere configurati
+        # Microsoft Graph è opzionale ma consigliato
         validation['overall_ok'] = validation['telegram'] and validation['notion']
         
         return validation

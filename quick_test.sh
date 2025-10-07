@@ -15,6 +15,11 @@ show_help() {
     echo "   workflow - Test workflow completo"
     echo "   send     - Invio controllato con conferma"
     echo ""
+    echo "🔷 TEST MICROSOFT TEAMS:"
+    echo "   microsoft   - Test Microsoft Service isolato"
+    echo "   integration - Test integrazione Notion → Microsoft"
+    echo "   teams       - Suite completa test Microsoft"
+    echo ""
     echo "📚 Per lista completa comandi: docs/testing/README.md"
     echo ""
 }
@@ -134,6 +139,51 @@ case "$1" in
     "workflow-real")
         echo "🔄 Workflow reale..."
         python3 tests/e2e/test_workflow.py --real --limit 2
+        ;;
+        
+    "microsoft")
+        echo "🔷 Test Microsoft Service (isolato)..."
+        python3 tests/e2e/test_real_microsoft.py
+        ;;
+        
+    "integration")
+        echo "🔗 Test integrazione Notion → Microsoft..."
+        python3 tests/integration/test_notion_microsoft_integration.py
+        ;;
+        
+    "teams")
+        echo "📅 Test completo Microsoft Teams..."
+        echo ""
+        echo "📋 Piano test Microsoft:"
+        echo "   1️⃣ Test service isolato (crea evento + email)"
+        echo "   2️⃣ Test integrazione Notion → Microsoft"
+        echo ""
+        
+        read -p "❓ Esegui test isolato Microsoft? (s/N): " confirm1
+        if [[ "$confirm1" =~ ^[Ss]$ ]]; then
+            echo "🔷 Test Microsoft Service..."
+            python3 tests/e2e/test_real_microsoft.py
+            if [ $? -ne 0 ]; then
+                echo "❌ Test Microsoft fallito"
+                exit 1
+            fi
+            echo "✅ Test Microsoft completato!"
+            echo ""
+        fi
+        
+        read -p "❓ Esegui test integrazione Notion → Microsoft? (s/N): " confirm2
+        if [[ "$confirm2" =~ ^[Ss]$ ]]; then
+            echo "🔗 Test integrazione..."
+            python3 tests/integration/test_notion_microsoft_integration.py
+            if [ $? -ne 0 ]; then
+                echo "❌ Test integrazione fallito"
+                exit 1
+            fi
+            echo "✅ Test integrazione completato!"
+        fi
+        
+        echo ""
+        echo "🎉 Suite test Microsoft completata!"
         ;;
         
     *)

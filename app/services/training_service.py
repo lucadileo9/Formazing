@@ -15,6 +15,7 @@ import logging
 from typing import Dict, List, Optional
 from app.services.notion import NotionService, NotionServiceError
 from app.services.telegram_service import TelegramService
+from app.services.microsoft import MicrosoftService, MicrosoftServiceError
 from config import Config
 
 logger = logging.getLogger(__name__)
@@ -44,7 +45,8 @@ class TrainingService:
             groups_config_path=Config.TELEGRAM_GROUPS_CONFIG,
             templates_config_path=Config.TELEGRAM_TEMPLATES_CONFIG
         )
-        logger.info("TrainingService inizializzato con NotionService e TelegramService")
+        self.microsoft_service = MicrosoftService()
+        logger.info("TrainingService inizializzato con NotionService, TelegramService e MicrosoftService")
     
     async def generate_preview(self, training_id: str) -> Dict:
         """
@@ -62,7 +64,11 @@ class TrainingService:
                 'training': dict formazione,
                 'messages': [{'area': 'IT', 'chat_id': -123, 'message': '...'}, ...],
                 'codice_generato': str codice generato,
-                'email': dict (opzionale)
+                'email': {
+                    'attendee_emails': ['it@jemore.it', ...],
+                    'subject': 'Oggetto email',
+                    'body_preview': 'Anteprima corpo email...'
+                }
             }
             
         Raises:
@@ -84,14 +90,18 @@ class TrainingService:
             # Genera codice
             generated_code = self._generate_training_code(training)
             
-            # Genera messaggi preview per ogni area
+            # Aggiungi codice temporaneamente per preview
+            training_preview = training.copy()
+            training_preview['Codice'] = generated_code
+            
+            # Genera messaggi preview Telegram per ogni area
             messages_preview = []
             for area in training.get('Area', []):
                 # Verifica se l'area ha un gruppo configurato
                 if area in self.telegram_service.groups:
                     chat_id = self.telegram_service.groups[area]
                     # Usa formatters per generare messaggio
-                    message = self.telegram_service.formatter.format_training_message(training, group_key=area)
+                    message = self.telegram_service.formatter.format_training_message(training_preview, group_key=area)
                     messages_preview.append({
                         'area': area,
                         'chat_id': chat_id,
@@ -101,22 +111,55 @@ class TrainingService:
             # Aggiungi anche main_group se presente
             if 'main_group' in self.telegram_service.groups and training.get('Periodo') != 'OUT':
                 main_chat_id = self.telegram_service.groups['main_group']
-                main_message = self.telegram_service.formatter.format_training_message(training, group_key='main_group')
+                main_message = self.telegram_service.formatter.format_training_message(training_preview, group_key='main_group')
                 messages_preview.append({
                     'area': 'Main Group',
                     'chat_id': main_chat_id,
                     'message': main_message
                 })
             
+            # Genera preview email usando MicrosoftService
+            email_preview = None
+            try:
+                # Ottieni destinatari email dalle aree
+                attendee_emails = self.microsoft_service.calendar_operations._get_attendee_emails_for_areas(
+                    training.get('Area', [])
+                )
+                
+                # Genera subject e body preview
+                subject = self.microsoft_service.email_formatter.format_subject(training_preview)
+                body_preview = self.microsoft_service.email_formatter.format_calendar_body(training_preview)
+                                
+                email_preview = {
+                    'attendee_emails': attendee_emails,
+                    'subject': subject,
+                    'body_preview': body_preview  
+                }
+                
+                logger.debug(f"Email preview generata - Destinatari: {', '.join(attendee_emails)}")
+                
+            except Exception as e:
+                logger.warning(f"Impossibile generare preview email: {e}")
+                # Preview email opzionale - se fallisce, procedi comunque
+                email_preview = {
+                    'error': str(e),
+                    'attendee_emails': [],
+                    'subject': 'N/A',
+                    'body_preview': 'Errore generazione preview'
+                }
+            
             preview_data = {
                 'training': training,
                 'messages': messages_preview,
                 'codice_generato': generated_code,
-                # TODO: Aggiungere preview email quando integrazione Graph API sarà pronta
-                'email': None
+                'email': email_preview
             }
             
-            logger.info(f"Preview generata con successo per {training.get('Nome', 'N/A')} con {len(messages_preview)} messaggi")
+            logger.info(
+                f"Preview generata con successo per {training.get('Nome', 'N/A')} - "
+                f"Telegram: {len(messages_preview)} messaggi - "
+                f"Email: {len(email_preview.get('attendee_emails', []))} destinatari"
+            )
             return preview_data
             
         except NotionServiceError as e:
@@ -132,9 +175,10 @@ class TrainingService:
         
         Steps atomici:
         1. Valida formazione (stato "Programmata")
-        2. Genera codice univoco e Teams link
-        3. Aggiorna stato Notion → "Calendarizzata"
-        4. Invia messaggi Telegram ai gruppi target
+        2. Genera codice univoco
+        3. Crea evento Teams e invia email (Microsoft Graph API) - FAIL-FAST se fallisce
+        4. Aggiorna stato Notion → "Calendarizzata" con codice e link Teams
+        5. Invia messaggi Telegram ai gruppi target
         
         Args:
             training_id: ID della formazione da Notion
@@ -143,17 +187,19 @@ class TrainingService:
             Dict con risultati operazione: {
                 'codice_generato': str,
                 'teams_link': str,
+                'attendee_emails': List[str],
                 'telegram_results': dict,
                 'nuovo_stato': str
             }
             
         Raises:
             TrainingServiceError: Se operazione fallisce
+            MicrosoftServiceError: Se creazione evento Teams fallisce (fail-fast)
         """
         try:
             logger.info(f"Avvio invio comunicazione per formazione {training_id}")
             
-            # Valida formazione
+            # 1. Valida formazione
             training = await self.notion_service.get_formazione_by_id(training_id)
             if not training:
                 raise TrainingServiceError(f"Formazione {training_id} non trovata")
@@ -161,36 +207,60 @@ class TrainingService:
             if training.get('Stato') != 'Programmata':
                 raise TrainingServiceError("Formazione già processata o stato non valido")
             
-            # Genera codice e Teams link
-            generated_code = self._generate_training_code(training) 
-            teams_link = await self._create_teams_meeting(training)
+            # 2. Genera codice
+            generated_code = self._generate_training_code(training)
             
-            # Aggiorna Notion PRIMA dell'invio (per consistenza) - USA METODO UNIFICATO
+            # Aggiungi codice alla formazione per passarlo a Microsoft
+            training['Codice'] = generated_code
+            
+            # 3. Crea evento Teams + invia email (FAIL-FAST se fallisce)
+            try:
+                microsoft_result = await self._create_teams_meeting(training)
+                teams_link = microsoft_result['teams_link']
+                attendee_emails = microsoft_result['attendee_emails']
+                logger.info(f"Microsoft integration completata - Email inviate a: {', '.join(attendee_emails)}")
+            except MicrosoftServiceError as e:
+                # FAIL-FAST: Se Microsoft fallisce, non proseguiamo
+                logger.error(f"FAIL-FAST: Creazione evento Microsoft fallita per {training_id}: {e}")
+                raise TrainingServiceError(f"Impossibile creare evento Teams: {e}")
+            
+            # 4. Aggiorna Notion con codice + link Teams + stato
             await self.notion_service.update_formazione(training_id, {
                 'Codice': generated_code,
                 'Link Teams': teams_link,
                 'Stato': 'Calendarizzata'
             })
             
-            # Recupera formazione aggiornata per invio
+            # 5. Recupera formazione aggiornata per invio Telegram
             updated_training = await self.notion_service.get_formazione_by_id(training_id)
             
-            # Invia messaggi Telegram
+            # 6. Invia messaggi Telegram
             send_results = await self.telegram_service.send_training_notification(updated_training)
             
             result = {
                 'codice_generato': generated_code,
                 'teams_link': teams_link,
+                'attendee_emails': attendee_emails,
                 'telegram_results': send_results,
                 'nuovo_stato': 'Calendarizzata'
             }
             
-            logger.info(f"Comunicazione inviata con successo: {updated_training.get('Nome', 'N/A')} - Codice: {generated_code}")
+            logger.info(
+                f"Comunicazione inviata con successo: {updated_training.get('Nome', 'N/A')} - "
+                f"Codice: {generated_code} - Email: {len(attendee_emails)} - "
+                f"Telegram: {len(send_results.get('sent', []))} messaggi"
+            )
             return result
             
         except NotionServiceError as e:
             logger.error(f"Errore Notion in send {training_id}: {e}")
             raise TrainingServiceError(f"Errore aggiornamento dati: {e}")
+        except MicrosoftServiceError:
+            # Già loggato e wrappato sopra, propaga
+            raise
+        except TrainingServiceError:
+            # Già loggato, propaga
+            raise
         except Exception as e:
             logger.error(f"Errore imprevisto in send {training_id}: {e}")
             raise TrainingServiceError(f"Errore invio: {e}")
@@ -362,19 +432,48 @@ class TrainingService:
         logger.debug(f"Codice generato: {code}")
         return code
     
-    async def _create_teams_meeting(self, training: Dict) -> str:
+    async def _create_teams_meeting(self, training: Dict) -> Dict:
         """
         Crea meeting Teams tramite Microsoft Graph API.
         
-        TODO: Implementare integrazione reale con Microsoft Graph.
-        Per ora ritorna placeholder URL.
-        """
-        # Placeholder - da sostituire con Microsoft Graph API
-        nome_safe = training.get('Nome', 'formazione').replace(' ', '-').lower()
-        teams_link = f"https://teams.microsoft.com/meeting-{nome_safe}"
+        Integrazione reale con MicrosoftService per:
+        - Creare evento calendario
+        - Generare Teams meeting link
+        - Inviare email a mailing list area
         
-        logger.debug(f"Teams link generato (placeholder): {teams_link}")
-        return teams_link
+        Args:
+            training: Dict con dati formazione (deve includere Nome, Data/Ora, Area, Codice)
+            
+        Returns:
+            Dict con:
+                - teams_link: str (URL meeting Teams)
+                - event_id: str (ID evento calendario)
+                - attendee_emails: List[str] (email destinatari)
+                - calendar_link: str (link calendario Outlook)
+                
+        Raises:
+            MicrosoftServiceError: Se creazione evento fallisce
+        """
+        try:
+            logger.info(f"Creazione evento Teams per: {training.get('Nome', 'N/A')}")
+            
+            # Chiama MicrosoftService per creare evento completo
+            result = await self.microsoft_service.create_training_event(training)
+            
+            logger.info(
+                f"Evento Teams creato con successo - "
+                f"Link: {result['teams_link'][:50]}... - "
+                f"Email inviate a: {', '.join(result['attendee_emails'])}"
+            )
+            
+            return result
+            
+        except MicrosoftServiceError as e:
+            logger.error(f"Errore Microsoft Graph API: {e}")
+            raise  # Propaga l'errore per fail-fast
+        except Exception as e:
+            logger.error(f"Errore imprevisto in creazione Teams meeting: {e}")
+            raise MicrosoftServiceError(f"Errore creazione evento: {e}")
     
     def _generate_feedback_link(self, training: Dict) -> str:
         """

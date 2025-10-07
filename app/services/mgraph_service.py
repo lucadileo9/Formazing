@@ -1,1 +1,0 @@
-# Logica per l'API Microsoft Graph (Teams, Email)
