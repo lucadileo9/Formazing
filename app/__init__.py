@@ -18,6 +18,9 @@ import logging
 # Inizializza l'autenticazione Basic HTTP
 auth = HTTPBasicAuth()
 
+# Logger per app factory
+logger = logging.getLogger(__name__)
+
 def create_app():
     """
     Factory pattern per creare l'applicazione Flask.
@@ -45,6 +48,13 @@ def create_app():
     # Registra le routes
     from app.routes import main
     app.register_blueprint(main)
+    
+    # 🎯 Inizializza TrainingService Singleton all'avvio
+    # Questo garantisce che il bot Telegram sia online PRIMA di gestire richieste
+    logger.info("🎯 Inizializzazione TrainingService Singleton...")
+    from app.services.training_service import TrainingService
+    training_service = TrainingService.get_instance()
+    logger.info("✅ TrainingService pronto (bot Telegram avviato se processo principale)")
     
     # ✨ Filtri Jinja2 personalizzati
     @app.template_filter('format_area')
