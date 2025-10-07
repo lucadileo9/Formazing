@@ -8,7 +8,7 @@
     <div class="card-body">
         <div class="mb-3">
             <strong class="d-block mb-1">Destinatari:</strong>
-            <span class="text-muted">{{ email.recipients|join(', ') }}</span>
+            <span class="text-muted">{{ email.attendee_emails|join(', ') }}</span>
         </div>
         
         <div class="mb-3">
@@ -18,8 +18,8 @@
         
         <div class="mb-0">
             <strong class="d-block mb-2">Anteprima:</strong>
-            <div class="border rounded p-3 bg-light">
-                <small class="text-muted">{{ email.body_preview }}</small>
+            <div class="border rounded p-3 bg-light" style="max-height: 400px; overflow-y: auto; font-size: 0.9rem; line-height: 1.6;">
+                {{ email.body_preview | safe }}
             </div>
         </div>
     </div>
