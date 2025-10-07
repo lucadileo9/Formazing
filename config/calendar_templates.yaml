@@ -1,0 +1,17 @@
+# Template per eventi calendario Microsoft Teams
+# Variabili disponibili: {Nome}, {Codice}, {Data}, {Area}
+# Note: Il link Teams viene inserito automaticamente da Outlook
+
+calendar_event:
+  subject: |
+    {Nome}
+  
+  body: |
+    🎓 Formazione Programmata
+    
+    📋 Codice: {Codice}
+    📅 Data: {Data}
+    🎯 Area: {Area}
+    
+    ---
+    Per maggiori informazioni contattare il coordinatore della formazione.
