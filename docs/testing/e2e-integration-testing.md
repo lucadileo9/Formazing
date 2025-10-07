@@ -131,9 +131,11 @@ required_vars = ['NOTION_TOKEN', 'NOTION_DATABASE_ID', 'TELEGRAM_BOT_TOKEN']
 
 **Logica**:
 ```python
-# Inizializza TelegramService con configurazioni esplicite
+# Inizializza servizi con dependency injection
+notion_service = NotionService()
 telegram = TelegramService(
     token=Config.TELEGRAM_BOT_TOKEN,
+    notion_service=notion_service,  # ✅ NotionService richiesto per comandi bot
     groups_config_path=Config.TELEGRAM_GROUPS_CONFIG,
     templates_config_path=Config.TELEGRAM_TEMPLATES_CONFIG
 )
@@ -479,8 +481,14 @@ if not formazioni_by_status: return False
 formazione = select_formazione(formazioni_by_status)
 if not formazione: return False
 
-# 3. Inizializza servizi
-telegram_service = TelegramService(...)
+# 3. Inizializza servizi con dependency injection
+notion_service = NotionService()
+telegram_service = TelegramService(
+    token=Config.TELEGRAM_BOT_TOKEN,
+    notion_service=notion_service,
+    groups_config_path=Config.TELEGRAM_GROUPS_CONFIG,
+    templates_config_path=Config.TELEGRAM_TEMPLATES_CONFIG
+)
 
 # 4. Anteprima completa
 messages = await preview_messages(formazione, telegram_service)
