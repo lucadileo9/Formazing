@@ -7,6 +7,7 @@
 ### 🏗️ Architettura del Sistema
 - [**🤖 Bot Telegram**](bot-telegram.md) - Sistema bot, comandi, formattazione messaggi
 - [**🔗 Servizio Notion**](notion-service.md) - Architettura modulare per integrazione Notion API
+- [**🔷 Servizio Microsoft**](microsoft-service.md) - Integrazione Microsoft Graph API, Teams e calendario
 - [**🧪 Testing & Quality**](testing/) - Sistema di test completo, fixture e validazione qualità
 - [**📑 Templates**](templates/) - Guida all'UI dell'applicazione
 
@@ -40,6 +41,7 @@ graph TB
     %% Core Backend
     Flask[Flask Backend<br/>routes.py]
     NotionService[NotionService<br/>5 moduli]
+    MicrosoftService[MicrosoftService<br/>3 moduli]
     TelegramService[TelegramService<br/>Bot + Commands]
     
     %% Configurazioni
@@ -50,12 +52,13 @@ graph TB
     NotionDB --> NotionService
     NotionService --> Flask
     Flask --> TelegramService
+    Flask --> MicrosoftService
     TelegramService --> TelegramAPI
-    Flask --> MSGraph
+    MicrosoftService --> MSGraph
     
     %% Configurazioni e UI
     Config --> TelegramService
-    Config --> MSGraph
+    Config --> MicrosoftService
     Templates --> Flask
     
     %% Styling
@@ -70,14 +73,14 @@ graph TB
 
 **Componenti Principali:**
 - **🔵 Servizi Esterni**: Notion (database), Microsoft Graph (email/Teams), Telegram Bot API
-- **🟣 Core Backend**: Flask (orchestratore), NotionService (5 moduli), TelegramService (bot + comandi)  
+- **🟣 Core Backend**: Flask (orchestratore), NotionService (5 moduli), MicrosoftService (3 moduli), TelegramService (bot + comandi)  
 - **🟠 Configurazione & UI**: File YAML/JSON (gruppi + template messaggi), Jinja Templates (web UI)
 
 **Flusso Dati:**
 1. **NotionService** recupera formazioni dal database Notion
 2. **Flask** orchestra il workflow e gestisce la web UI con Jinja
-3. **TelegramService** formatta e invia notifiche usando configurazioni YAML/JSON
-4. **Microsoft Graph** gestisce email e meeting Teams
+3. **MicrosoftService** crea eventi Teams e invia email via Graph API
+4. **TelegramService** formatta e invia notifiche usando configurazioni YAML/JSON
 
 ## 📊 Stack Tecnologico
 
