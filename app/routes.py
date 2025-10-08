@@ -52,9 +52,10 @@ async def dashboard():
     try:
         logger.info("Caricamento dashboard con Flask Async...")
         
-        # Inizializzazione NotionService
-        notion_service = NotionService()
-        logger.info("NotionService inizializzato correttamente")
+        # Inizializzazione NotionService (via Singleton)
+        training_service = TrainingService.get_instance()
+        notion_service = training_service.notion_service
+        logger.info("NotionService recuperato da TrainingService (Singleton)")
         
         # PERFORMANCE BOOST: Chiamate parallele con asyncio.gather()
         formazioni_results = await asyncio.gather(
@@ -108,8 +109,8 @@ async def preview_notification_page(training_id):
     try:
         logger.info(f"📄 Apertura preview calendarizzazione per {training_id}")
         
-        # Genera preview usando TrainingService
-        training_service = TrainingService()
+        # Usa Singleton TrainingService
+        training_service = TrainingService.get_instance()
         preview_data = await training_service.generate_preview(training_id)
         
         # Renderizza template preview
@@ -138,8 +139,8 @@ async def preview_feedback_page(training_id):
     try:
         logger.info(f"📄 Apertura preview feedback per {training_id}")
         
-        # Genera preview usando TrainingService
-        training_service = TrainingService()
+        # Usa Singleton TrainingService
+        training_service = TrainingService.get_instance()
         preview_data = await training_service.generate_feedback_preview(training_id)
         
         # Renderizza template preview
@@ -168,8 +169,8 @@ async def confirm_notification(training_id):
     try:
         logger.info(f"✅ Conferma calendarizzazione per {training_id}")
         
-        # Esegui workflow completo
-        training_service = TrainingService()
+        # Usa Singleton TrainingService
+        training_service = TrainingService.get_instance()
         result = await training_service.send_training_notification(training_id)
         
         logger.info(f"Calendarizzazione completata - Codice: {result['codice_generato']}")
@@ -195,8 +196,8 @@ async def confirm_feedback(training_id):
     try:
         logger.info(f"✅ Conferma feedback per {training_id}")
         
-        # Esegui workflow feedback
-        training_service = TrainingService()
+        # Usa Singleton TrainingService
+        training_service = TrainingService.get_instance()
         result = await training_service.send_feedback_request(training_id)
         
         logger.info("Feedback inviato con successo")

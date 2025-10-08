@@ -36,7 +36,7 @@ class TelegramCommands:
             telegram_service: Istanza TelegramService per accesso a gruppi e bot
         """
         self.service = telegram_service
-        self.notion_service = None  # Impostato da telegram_service.set_notion_service()
+        self.notion_service = None  # Configurato da TelegramService.__init__ tramite self.commands.notion_service
         logger.debug("TelegramCommands inizializzato")
     
     def register_handlers(self, application):

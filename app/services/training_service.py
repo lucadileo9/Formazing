@@ -9,9 +9,17 @@ Centralizza tutta la logica business per:
 - Aggiornamenti stati
 
 Separazione netta tra controllo HTTP (routes) e business logic (questo service).
+
+DESIGN PATTERN: Singleton
+- Garantisce una sola istanza per tutta la vita dell'app
+- Bot Telegram sempre online (no restart continui)
+- Riutilizzo connessioni Notion/Microsoft/Telegram
 """
 
 import logging
+import os
+import threading
+import asyncio
 from typing import Dict, List, Optional
 from app.services.notion import NotionService, NotionServiceError
 from app.services.telegram_service import TelegramService
@@ -30,6 +38,11 @@ class TrainingService:
     """
     Orchestratore principale per operazioni su formazioni.
     
+    DESIGN PATTERN: Singleton
+    - Una sola istanza per tutta la vita dell'applicazione
+    - Bot Telegram sempre online senza restart
+    - Thread-safe per ambienti multi-worker
+    
     Separa la logica business dai route Flask per:
     - Maggiore testabilità
     - Riutilizzo del codice
@@ -37,16 +50,94 @@ class TrainingService:
     - Error handling centralizzato
     """
     
+    # Singleton state
+    _instance = None
+    _lock = threading.Lock()
+    _bot_thread = None
+    
+    def __new__(cls):
+        """Garantisce una sola istanza (thread-safe)."""
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:  # Double-checked locking
+                    cls._instance = super().__new__(cls)
+        return cls._instance
+    
     def __init__(self):
-        """Inizializza servizi dipendenti."""
+        """Inizializza servizi dipendenti UNA SOLA VOLTA."""
+        # Evita reinizializzazione se già fatto
+        if hasattr(self, '_initialized'):
+            return
+        self._initialized = True
+        
+        logger.info("🎯 Inizializzazione TrainingService (Singleton)")
+        
+        # Inizializza servizi dipendenti
         self.notion_service = NotionService()
         self.telegram_service = TelegramService(
             token=Config.TELEGRAM_BOT_TOKEN,
+            notion_service=self.notion_service,  # ✅ Passa NotionService direttamente nell'init
             groups_config_path=Config.TELEGRAM_GROUPS_CONFIG,
             templates_config_path=Config.TELEGRAM_TEMPLATES_CONFIG
         )
         self.microsoft_service = MicrosoftService()
+        
         logger.info("TrainingService inizializzato con NotionService, TelegramService e MicrosoftService")
+        
+        # Avvia bot Telegram in background (solo processo principale)
+        self._start_bot_if_main_process()
+    
+    @classmethod
+    def get_instance(cls):
+        """
+        Factory method per ottenere istanza singleton.
+        
+        Usage nelle routes:
+            training_service = TrainingService.get_instance()
+        """
+        return cls()
+    
+    def _start_bot_if_main_process(self):
+        """
+        Avvia bot Telegram solo nel processo principale.
+        
+        Previene conflitti in development mode (Flask reloader)
+        e production mode (multiple worker Gunicorn).
+        """
+        # Check: siamo nel processo reloader Flask?
+        is_reloader = os.environ.get('WERKZEUG_RUN_MAIN') != 'true'
+        
+        # Check: bot già avviato?
+        if self._bot_thread is not None and self._bot_thread.is_alive():
+            logger.info("⏭️ Bot Telegram già attivo, skip")
+            return
+        
+        # Avvia bot solo nel worker principale (non nel reloader)
+        if not is_reloader:
+            self._start_bot_background()
+            logger.info("🤖 Bot Telegram avviato in background")
+        else:
+            logger.info("⏭️ Bot Telegram skippato (processo reloader)")
+    
+    def _start_bot_background(self):
+        """Avvia bot Telegram in thread daemon separato."""
+        def run_bot():
+            try:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                loop.run_until_complete(self.telegram_service.start_bot())
+                # Mantieni event loop attivo per bot
+                loop.run_forever()
+            except Exception as e:
+                logger.error(f"❌ Errore critico bot Telegram: {e}")
+        
+        # Thread daemon si chiude automaticamente con l'app
+        self._bot_thread = threading.Thread(
+            target=run_bot, 
+            daemon=True, 
+            name="TelegramBotThread"
+        )
+        self._bot_thread.start()
     
     async def generate_preview(self, training_id: str) -> Dict:
         """

@@ -87,9 +87,10 @@ class WorkflowTester:
             self.notion_service = NotionService()
             print("✅ NotionService inizializzato")
             
-            # 2. TelegramService
+            # 2. TelegramService (con NotionService iniettato)
             self.telegram_service = TelegramService(
                 token=Config.TELEGRAM_BOT_TOKEN,
+                notion_service=self.notion_service,  # ✅ Passa NotionService
                 groups_config_path=Config.TELEGRAM_GROUPS_CONFIG,
                 templates_config_path=Config.TELEGRAM_TEMPLATES_CONFIG
             )

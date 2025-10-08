@@ -134,14 +134,20 @@ Il sistema usa un **pattern Bottom-Up a 4 livelli** dove ogni fixture dipende da
 
 ### Meccanismo Dependency Injection
 
-Il cuore del sistema è la **sostituzione trasparente** del NotionService:
+Il cuore del sistema è la **sostituzione trasparente** del NotionService attraverso il costruttore:
 
-1. **TelegramService viene creato normalmente** con configurazioni reali
-2. **MockNotionService viene iniettato** tramite `set_notion_service()`  
+1. **MockNotionService viene creato** dalla fixture `mock_notion_service`
+2. **TelegramService viene creato** passando il mock come parametro: `TelegramService(token, notion_service=mock_notion_service, ...)`
 3. **Il service non sa** di stare usando un mock invece del service reale
 4. **I test ottengono comportamento reale** (Telegram) con dati controllati (Notion)
 
 Questo permette di testare l'**intero flusso reale** senza impattare i dati di produzione.
+
+**Vantaggi del Design Attuale:**
+- ✅ **Fail-fast**: Se dimentichi di passare NotionService, errore immediato alla creazione
+- ✅ **Type-safe**: `notion_service` è sempre presente (non Optional)
+- ✅ **Esplicito**: La dipendenza è chiara dalla firma del costruttore
+- ✅ **Testing semplificato**: Passa MockNotionService direttamente nell'`__init__`
 
 ---
 
@@ -437,11 +443,21 @@ Questo permette esecuzione selettiva:
 ### 3. Dependency Injection Pattern
 Il **cuore del sistema** che permette test realistici con dati controllati:
 
-**Service Layer** - TelegramService mantiene interfaccia reale
+**Service Layer** - TelegramService riceve NotionService tramite costruttore
 **Mock Layer** - MockNotionService implementa stessa interfaccia con dati fake
-**Injection Point** - Metodo `set_notion_service()` per sostituzione trasparente
+**Injection Point** - Parametro `notion_service` nel costruttore `__init__` per dependency injection esplicita
 
-Questo pattern elimina la necessità di modificare il codice business per i test.
+```python
+# Esempio di dependency injection nei test
+telegram_service = TelegramService(
+    token=token,
+    notion_service=mock_notion_service,  # ✅ Mock iniettato tramite costruttore
+    groups_config_path=groups_config,
+    templates_config_path=templates_config
+)
+```
+
+Questo pattern elimina la necessità di modificare il codice business per i test e garantisce fail-fast in caso di dipendenze mancanti.
 
 ### 4. Gestione Async/Await
 **Async functions** richiedono marker `@pytest.mark.asyncio`

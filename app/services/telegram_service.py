@@ -51,18 +51,26 @@ class TelegramService:
     - TelegramCommands: gestione comandi bot interattivi
     """
     
-    def __init__(self, token: str, groups_config_path: str = None, templates_config_path: str = None):
+    def __init__(
+        self, 
+        token: str, 
+        notion_service,  # NotionService dependency (obbligatorio per comandi bot)
+        groups_config_path: str = None, 
+        templates_config_path: str = None
+    ):
         """
-        Inizializza servizio con configurazioni esterne.
+        Inizializza servizio con configurazioni esterne e dipendenze.
         
         Args:
             token (str): Token bot Telegram da BotFather
+            notion_service: Istanza NotionService per comandi bot interattivi
             groups_config_path (str): Path telegram_groups.json
             templates_config_path (str): Path message_templates.yaml
         """
         self.token = token
         self.bot = telegram.Bot(token=token)
         self.application = None
+        self.notion_service = notion_service  # ✅ Dipendenza esplicita e obbligatoria
         
         # Carica configurazioni
         if groups_config_path is None:
@@ -76,15 +84,10 @@ class TelegramService:
         # Componenti helper
         self.formatter = TelegramFormatter(self.templates)
         self.commands = TelegramCommands(self)
-        
-        self.notion_service = None
-        logger.info(f"TelegramService inizializzato con {len(self.groups)} gruppi")
-    
-    def set_notion_service(self, notion_service):
-        """Imposta riferimento al servizio Notion per recupero dati formazioni."""
-        self.notion_service = notion_service
+        # ✅ NotionService configurato subito nei comandi (no setter separato)
         self.commands.notion_service = notion_service
-        logger.info("Notion service configurato")
+        
+        logger.info(f"TelegramService inizializzato con {len(self.groups)} gruppi e NotionService")
     
     # ===============================
     # CONFIGURAZIONE
