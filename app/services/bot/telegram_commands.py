@@ -109,7 +109,7 @@ class TelegramCommands:
             formazioni = await self._get_formazioni_by_date_range(start_of_week, end_of_week)
             
             # Header risposta con date range
-            message = f"📅 <b>FORMAZIONI SETTIMANA</b> ({start_of_week.strftime('%d/%m')} - {end_of_week.strftime('%d/%m/%Y')}):\\n\\n"
+            message = f"📅 <b>FORMAZIONI SETTIMANA</b> ({start_of_week.strftime('%d/%m')} - {end_of_week.strftime('%d/%m/%Y')}):\n\n"
             
             if not formazioni:
                 message += "🤷‍♂️ <i>Nessuna formazione in programma questa settimana</i>"
@@ -126,19 +126,28 @@ class TelegramCommands:
                 # Ordinamento e formattazione per giorno
                 for data in sorted(formazioni_per_giorno.keys()):
                     day_name = self._get_day_name(data)
-                    message += f"📆 <b>{day_name} {data}</b>:\\n"
+                    message += f"📆 <b>{day_name} {data}</b>:\n"
                     
                     # Formazioni del giorno ordinate per ora
                     for formazione in formazioni_per_giorno[data]:
-                        area = formazione.get('Area', 'N/A')
+                        # Formattazione Area: lista → stringa pulita
+                        area_raw = formazione.get('Area', 'N/A')
+                        if isinstance(area_raw, list) and area_raw:
+                            area = ', '.join(area_raw)
+                        else:
+                            area = area_raw if area_raw else 'N/A'
+                        
                         nome = formazione.get('Nome', 'N/A')
                         ora = self._extract_time_from_formazione(formazione)
-                        codice = formazione.get('Codice', 'N/A')
+                        codice = formazione.get('Codice', '')
+                        link_teams = formazione.get('Link Teams', '')
                         
-                        message += f"  • <b>{area}</b> - {nome} (<b>{ora}</b>)\\n"
-                        if codice != 'N/A':
-                            message += f"    🏷 <code>{codice}</code>\\n"
-                    message += "\\n"
+                        message += f"  • <b>{area}</b> - {nome} (<b>{ora}</b>)\n"
+                        if codice:
+                            message += f"    🏷 <code>{codice}</code>\n"
+                        if link_teams:
+                            message += f"    🔗 <a href='{link_teams}'>Link Teams</a>\n"
+                    message += "\n"
             
             await update.message.reply_text(message, parse_mode='HTML')
             
@@ -204,25 +213,31 @@ class TelegramCommands:
             formazioni = await self._get_formazioni_by_date(target_date)
             
             # Header messaggio
-            message = f"📅 <b>FORMAZIONI DI {period_name.upper()}</b> ({target_date.strftime('%d/%m/%Y')}):\\n\\n"
+            message = f"📅 <b>FORMAZIONI DI {period_name.upper()}</b> ({target_date.strftime('%d/%m/%Y')}):\n\n"
             
             if not formazioni:
                 message += f"🤷‍♂️ <i>Nessuna formazione in programma {period_name}</i>"
             else:
                 # Lista numerata formazioni ordinate per ora
                 for i, formazione in enumerate(formazioni, 1):
-                    area = formazione.get('Area', 'N/A')
+                    # Formattazione Area: lista → stringa pulita
+                    area_raw = formazione.get('Area', 'N/A')
+                    if isinstance(area_raw, list) and area_raw:
+                        area = ', '.join(area_raw)
+                    else:
+                        area = area_raw if area_raw else 'N/A'
+                    
                     nome = formazione.get('Nome', 'N/A')
                     ora = self._extract_time_from_formazione(formazione)
-                    codice = formazione.get('Codice', 'N/A')
+                    codice = formazione.get('Codice', '')
                     link_teams = formazione.get('Link Teams', '')
                     
-                    message += f"<b>{i}.</b> <b>{area}</b> - {nome} (<b>{ora}</b>)\\n"
-                    if codice != 'N/A':
-                        message += f"    🏷 Codice: <code>{codice}</code>\\n"
+                    message += f"<b>{i}.</b> <b>{area}</b> - {nome} (<b>{ora}</b>)\n"
+                    if codice:
+                        message += f"    🏷 Codice: <code>{codice}</code>\n"
                     if link_teams:
-                        message += f"    🔗 <a href='{link_teams}'>Link Teams</a>\\n"
-                    message += "\\n"
+                        message += f"    🔗 <a href='{link_teams}'>Link Teams</a>\n"
+                    message += "\n"
             
             await update.message.reply_text(message, parse_mode='HTML')
             
