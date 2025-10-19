@@ -104,14 +104,14 @@ async def dashboard():
 
 @main.route('/preview/notification/<training_id>')
 @auth.login_required
-async def preview_notification_page(training_id):
+def preview_notification_page(training_id):
     """Pagina preview calendarizzazione con form conferma."""
     try:
         logger.info(f"📄 Apertura preview calendarizzazione per {training_id}")
         
         # Usa Singleton TrainingService
         training_service = TrainingService.get_instance()
-        preview_data = await training_service.generate_preview(training_id)
+        preview_data = asyncio.run(training_service.generate_preview(training_id))
         
         # Renderizza template preview
         return render_template('pages/preview.html',
@@ -134,14 +134,14 @@ async def preview_notification_page(training_id):
 
 @main.route('/preview/feedback/<training_id>')
 @auth.login_required
-async def preview_feedback_page(training_id):
+def preview_feedback_page(training_id):
     """Pagina preview richiesta feedback con form conferma."""
     try:
         logger.info(f"📄 Apertura preview feedback per {training_id}")
         
         # Usa Singleton TrainingService
         training_service = TrainingService.get_instance()
-        preview_data = await training_service.generate_feedback_preview(training_id)
+        preview_data = asyncio.run(training_service.generate_feedback_preview(training_id))
         
         # Renderizza template preview
         return render_template('pages/preview.html',
@@ -164,14 +164,14 @@ async def preview_feedback_page(training_id):
 
 @main.route('/confirm/notification/<training_id>', methods=['POST'])
 @auth.login_required
-async def confirm_notification(training_id):
+def confirm_notification(training_id):
     """Conferma ed esegue calendarizzazione (chiamata da form preview)."""
     try:
         logger.info(f"✅ Conferma calendarizzazione per {training_id}")
         
         # Usa Singleton TrainingService
         training_service = TrainingService.get_instance()
-        result = await training_service.send_training_notification(training_id)
+        result = asyncio.run(training_service.send_training_notification(training_id))
         
         logger.info(f"Calendarizzazione completata - Codice: {result['codice_generato']}")
         flash('✅ Comunicazione inviata con successo! La formazione è stata calendarizzata.', 'success')
@@ -191,14 +191,14 @@ async def confirm_notification(training_id):
 
 @main.route('/confirm/feedback/<training_id>', methods=['POST'])
 @auth.login_required
-async def confirm_feedback(training_id):
+def confirm_feedback(training_id):
     """Conferma ed esegue invio feedback (chiamata da form preview)."""
     try:
         logger.info(f"✅ Conferma feedback per {training_id}")
         
         # Usa Singleton TrainingService
         training_service = TrainingService.get_instance()
-        result = await training_service.send_feedback_request(training_id)
+        result = asyncio.run(training_service.send_feedback_request(training_id))
         
         logger.info("Feedback inviato con successo")
         flash('✅ Richiesta feedback inviata con successo! La formazione è stata conclusa.', 'success')
