@@ -1,11 +1,26 @@
 {
-  "_comment": "Mappa Aree -> ID Chat di Telegram",
-  "_created": "Generato con get_chat_ids.py",
-  "main_group": "-1002605869080",
-  "IT": "-1003002711100",
-  "R&D": "-1002521246693",
-  "HR": "-1002755879096",
-  "Legale": "-1006677889900",
-  "Commerciale": "-1002768585820",
-  "Marketing": "-1003043652052"
+  "_comment": "Mappa Aree -> ID Chat e Topic ID di Telegram. topic_id è opzionale.",
+  "_created": "Generato con get_chat_ids.py e modificato per supportare i topic",
+  "main_group": {
+    "chat_id": "-1002605869080",
+    "topic_id": "5"
+  },
+  "IT": {
+    "chat_id": "-1003002711100"
+  },
+  "R&D": {
+    "chat_id": "-1002521246693"
+  },
+  "HR": {
+    "chat_id": "-1002755879096"
+  },
+  "Legale": {
+    "chat_id": "-1006677889900"
+  },
+  "Commerciale": {
+    "chat_id": "-1002768585820"
+  },
+  "Marketing": {
+    "chat_id": "-1003043652052"
+  }
 }

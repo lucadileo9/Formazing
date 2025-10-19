@@ -240,17 +240,12 @@ class TelegramService:
     
     async def send_message_to_group(self, group_key: str, message: str, parse_mode: str = 'HTML') -> bool:
         """
-        Invia un messaggio a un gruppo Telegram specifico.
+        Invia un messaggio a un gruppo Telegram specifico, con supporto per i topic.
         
         FUNZIONE CORE:
-        - Metodo base per tutti gli invii messaggi del servizio
-        - Utilizzato da send_training_notification() e send_feedback_notification()
-        - Gestisce validazione gruppo e invio effettivo tramite bot API
-        
-        QUANDO USARE:
-        - Per invio diretto messaggi a gruppi specifici
-        - Come base per tutte le altre funzioni di messaging
-        - Per messaggi personalizzati non template-based
+        - Legge la configurazione del gruppo, che ora è un oggetto con `chat_id` e `topic_id` opzionale.
+        - Invia il messaggio al topic specificato, se presente.
+        - Mantiene la compatibilità con la vecchia configurazione (stringa semplice).
         
         Args:
             group_key (str): Chiave del gruppo in telegram_groups.json ('IT', 'main_group', etc.)
@@ -259,27 +254,42 @@ class TelegramService:
             
         Returns:
             bool: True se messaggio inviato con successo, False in caso di errore
-            
-        VALIDAZIONI:
-        - Verifica esistenza group_key nella configurazione
-        - Gestisce errori di connessione Telegram
-        - Logga risultati per debugging
         """
-        # Valida che il gruppo esista nella configurazione caricata
         if group_key not in self.groups:
             logger.error(f"Gruppo non configurato in telegram_groups.json: {group_key}")
             return False
+
+        group_config = self.groups[group_key]
         
-        # Ottieni chat_id dal mapping
-        chat_id = self.groups[group_key]
-        
+        if isinstance(group_config, dict):
+            chat_id = group_config.get('chat_id')
+            topic_id = group_config.get('topic_id')
+        else:
+            # Fallback per retrocompatibilità se la config non è un oggetto
+            chat_id = group_config
+            topic_id = None
+
+        if not chat_id:
+            logger.error(f"chat_id non trovato per il gruppo {group_key}")
+            return False
+
         try:
-            await self.bot.send_message(
-                chat_id=chat_id,
-                text=message,
-                parse_mode=parse_mode
-            )
-            logger.info(f"✅ Messaggio inviato con successo al gruppo {group_key} (chat_id: {chat_id})")
+            kwargs = {
+                'chat_id': chat_id,
+                'text': message,
+                'parse_mode': parse_mode
+            }
+            if topic_id:
+                kwargs['message_thread_id'] = topic_id
+            
+            await self.bot.send_message(**kwargs)
+            
+            log_message = f"✅ Messaggio inviato a {group_key} (chat_id: {chat_id}"
+            if topic_id:
+                log_message += f", topic_id: {topic_id}"
+            log_message += ")"
+            logger.info(log_message)
+            
             return True
             
         except telegram.error.TelegramError as e:
@@ -607,48 +617,42 @@ async def test_telegram_connection(service: TelegramService) -> bool:
         return False
 
 
-def validate_groups_config(groups_config: Dict[str, str]) -> List[str]:
+def validate_groups_config(groups_config: Dict[str, Dict]) -> List[str]:
     """
-    Valida completezza e correttezza configurazione gruppi Telegram.
-    
-    SCOPO:
-    - Verifica presenza gruppi obbligatori (main_group + aree standard)
-    - Valida formato chat_id Telegram (devono iniziare con '-')
-    - Previene errori runtime durante invio messaggi
+    Valida completezza e correttezza della nuova configurazione gruppi Telegram.
     
     VALIDAZIONI:
-    1. main_group presente (obbligatorio per comunicazioni generali)
-    2. Aree standard presenti (IT, R&D, HR, Legale, Commerciale, Marketing)
-    3. Chat ID formato corretto (string che inizia con '-')
-    
-    Args:
-        groups_config (Dict[str, str]): Mapping area -> chat_id da telegram_groups.json
-        
-    Returns:
-        List[str]: Lista errori trovati. Lista vuota = configurazione valida.
-    UTILIZZO:
-        errors = validate_groups_config(service.groups)
-        if errors:
-            for error in errors:
-                logger.error(f"Configurazione: {error}")
+    1. Presenza di 'main_group'.
+    2. Presenza delle aree standard.
+    3. Ogni gruppo deve essere un dizionario con una chiave 'chat_id'.
+    4. Il valore di 'chat_id' deve essere una stringa che inizia con '-'.
+    5. 'topic_id' (se presente) deve essere un numero intero.
     """
     errors = []
     
-    # Verifica gruppo principale obbligatorio
     if 'main_group' not in groups_config:
         errors.append("Gruppo principale 'main_group' mancante")
     
-    # Verifica aree standard dell'azienda
     standard_areas = ['IT', 'R&D', 'HR', 'Legale', 'Commerciale', 'Marketing']
     for area in standard_areas:
         if area not in groups_config:
             errors.append(f"Gruppo per area '{area}' mancante")
     
-    # Verifica formato chat_id Telegram (gruppi iniziano con -)
-    for group_name, chat_id in groups_config.items():
-        if not isinstance(chat_id, str) or not chat_id.startswith('-'):
-            errors.append(f"Chat ID per gruppo '{group_name}' non valido: {chat_id}")
-    
+    for group_name, config in groups_config.items():
+        if not isinstance(config, dict):
+            errors.append(f"La configurazione per il gruppo '{group_name}' non è un oggetto JSON.")
+            continue
+
+        chat_id = config.get('chat_id')
+        if not chat_id:
+            errors.append(f"'chat_id' mancante per il gruppo '{group_name}'")
+        elif not isinstance(chat_id, str) or not chat_id.startswith('-'):
+            errors.append(f"'chat_id' per il gruppo '{group_name}' non è valido: {chat_id}")
+
+        topic_id = config.get('topic_id')
+        if topic_id and not isinstance(topic_id, int):
+            errors.append(f"'topic_id' per il gruppo '{group_name}' deve essere un numero intero.")
+            
     return errors
 
 
