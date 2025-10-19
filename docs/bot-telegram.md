@@ -827,5 +827,76 @@ flowchart TD
 
 ---
 
+## 🧵 Gestione dei Topic (Thread) di Gruppo
 
-*Documentazione aggiornata al 22/09/2025 - Versione 2.0*
+Per migliorare l'organizzazione delle notifiche all'interno dei gruppi Telegram, è stato implementato il supporto per l'invio di messaggi in **topic specifici** (chiamati anche *threads*).
+
+### 1. Modifica della Configurazione
+
+Il file `config/telegram_groups.json` è stato aggiornato per supportare questa funzionalità. La struttura per ogni gruppo è stata trasformata da una stringa a un oggetto JSON.
+
+**Formato Precedente:**
+```json
+{
+  "IT": "-1003002711100"
+}
+```
+
+**Nuovo Formato:**
+```json
+{
+  "IT": {
+    "chat_id": "-1003002711100",
+    "topic_id": 2
+  },
+  "R&D": {
+    "chat_id": "-1002521246693"
+  }
+}
+```
+
+- **`chat_id`** (obbligatorio): L'identificativo del gruppo Telegram.
+- **`topic_id`** (opzionale): L'identificativo numerico del topic in cui inviare il messaggio. Se omesso, il messaggio verrà inviato nella chat generale ("General") del gruppo.
+
+### 2. Aggiornamento della Logica di Invio
+
+La funzione `send_message_to_group` in `app/services/telegram_service.py` è stata modificata per gestire la nuova struttura.
+
+**Logica di Funzionamento:**
+
+1.  Quando viene richiesto l'invio a un gruppo (es. "IT"), la funzione legge l'oggetto di configurazione corrispondente.
+2.  Estrae il `chat_id` e verifica la presenza di un `topic_id`.
+3.  Se `topic_id` è presente, viene aggiunto alla chiamata API di Telegram tramite il parametro `message_thread_id`.
+
+**Estratto del codice aggiornato:**
+```python
+# in telegram_service.py
+
+async def send_message_to_group(self, group_key: str, message: str, parse_mode: str = 'HTML') -> bool:
+    # ... (validazione iniziale)
+
+    group_config = self.groups[group_key]
+    
+    chat_id = group_config.get('chat_id')
+    topic_id = group_config.get('topic_id')
+
+    # ... (controllo se chat_id esiste)
+
+    try:
+        kwargs = {
+            'chat_id': chat_id,
+            'text': message,
+            'parse_mode': parse_mode
+        }
+        if topic_id:
+            kwargs['message_thread_id'] = topic_id
+        
+        await self.bot.send_message(**kwargs)
+        # ... (logging e return)
+```
+
+Questo approccio garantisce la massima flessibilità: è possibile decidere per ogni singolo gruppo se utilizzare un topic specifico o meno, semplicemente modificando il file di configurazione JSON, senza bisogno di ulteriori interventi sul codice.
+
+---
+
+*Documentazione aggiornata al 19/10/2025 - Versione 2.1*
