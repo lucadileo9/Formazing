@@ -56,12 +56,7 @@ function handleCancel() {
 }
 
 function handleConfirm(event, actionType, messagesCount) {
-    const confirmMsg = `⚠️ Sei sicuro di voler procedere?\n\nQuesta azione invierà messaggi reali a ${messagesCount} gruppo${messagesCount !== 1 ? 'i' : ''} Telegram.`;
-    
-    if (!confirm(confirmMsg)) {
-        event.preventDefault();
-        return false;
-    }
+    // Rimosso il 'confirm' per rendere l'azione immediata.
     
     // Mostra loading specifico per l'azione
     const titles = {
