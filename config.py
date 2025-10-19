@@ -16,6 +16,8 @@ load_dotenv()
 class Config:
     """Configurazione base application."""
     
+    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+    
     # ===== FLASK CONFIG =====
     SECRET_KEY = os.getenv('FLASK_SECRET_KEY', 'dev-secret-key-change-in-production')
     BASIC_AUTH_USERNAME = os.getenv('FLASK_BASIC_AUTH_USERNAME', 'admin')

@@ -20,6 +20,7 @@ import logging
 import os
 import threading
 import asyncio
+from datetime import datetime
 from typing import Dict, List, Optional
 from app.services.notion import NotionService, NotionServiceError
 from app.services.telegram_service import TelegramService
@@ -92,7 +93,6 @@ class TrainingService:
             training_service = TrainingService.get_instance()
         """
         return cls()
-    
     async def generate_preview(self, training_id: str) -> Dict:
         """
         Genera anteprima completa per una formazione.
@@ -133,7 +133,7 @@ class TrainingService:
                 )
             
             # Genera codice
-            generated_code = self._generate_training_code(training)
+            generated_code = self._generate_training_code(training, write=False)
             
             # Aggiungi codice temporaneamente per preview
             training_preview = training.copy()
@@ -458,13 +458,31 @@ class TrainingService:
     
     # === PRIVATE UTILITY METHODS ===
     
-    def _generate_training_code(self, training: Dict) -> str:
+    def _generate_training_code(self, training: Dict, write: bool = True) -> str:
         """
         Genera codice formazione univoco.
+        Il booleano 'write' indica se salvare il contatore (True per invio reale, False per preview).
         
         Formato: {Area}-{Nome}-{Anno}-{Periodo}-{Sequenza}
         Esempio: IT-Security_Training-2024-SPRING-01
         """
+        # File per il contatore di sequenza
+        counter_file = os.path.join(Config.BASE_DIR, 'sequence_counter.txt')
+
+        # Leggi il contatore corrente, incrementalo e salvalo
+        try:
+            with open(counter_file, 'r') as f:
+                current_sequence = int(f.read().strip())
+        except FileNotFoundError:
+            current_sequence = 0
+
+        next_sequence = current_sequence + 1
+
+        # Salva il contatore aggiornato solo se in modalità reale
+        if write:
+            with open(counter_file, 'w') as f:
+                f.write(str(next_sequence))
+
         # Area può essere lista o stringa - gestisci entrambi i casi
         area_raw = training.get('Area', ['IT'])
         if isinstance(area_raw, list):
@@ -474,10 +492,8 @@ class TrainingService:
         
         nome = training.get('Nome', 'Formazione').replace(' ', '_').replace('-', '_')
         periodo = training.get('Periodo', 'ONCE')
-        anno = '2024'  # TODO: datetime.now().year
-        
-        # TODO: Implementare sequenza intelligente basata su database
-        sequenza = '01'
+        anno = str(datetime.now().year)
+        sequenza = str(next_sequence).zfill(2)
         
         code = f"{area}-{nome}-{anno}-{periodo}-{sequenza}"
         logger.debug(f"Codice generato: {code}")
