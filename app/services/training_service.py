@@ -53,8 +53,7 @@ class TrainingService:
     # Singleton state
     _instance = None
     _lock = threading.Lock()
-    _bot_thread = None
-    
+
     def __new__(cls):
         """Garantisce una sola istanza (thread-safe)."""
         if cls._instance is None:
@@ -62,7 +61,7 @@ class TrainingService:
                 if cls._instance is None:  # Double-checked locking
                     cls._instance = super().__new__(cls)
         return cls._instance
-    
+
     def __init__(self):
         """Inizializza servizi dipendenti UNA SOLA VOLTA."""
         # Evita reinizializzazione se già fatto
@@ -76,17 +75,14 @@ class TrainingService:
         self.notion_service = NotionService()
         self.telegram_service = TelegramService(
             token=Config.TELEGRAM_BOT_TOKEN,
-            notion_service=self.notion_service,  # ✅ Passa NotionService direttamente nell'init
+            notion_service=self.notion_service,
             groups_config_path=Config.TELEGRAM_GROUPS_CONFIG,
             templates_config_path=Config.TELEGRAM_TEMPLATES_CONFIG
         )
         self.microsoft_service = MicrosoftService()
         
         logger.info("TrainingService inizializzato con NotionService, TelegramService e MicrosoftService")
-        
-        # Avvia bot Telegram in background (solo processo principale)
-        self._start_bot_if_main_process()
-    
+
     @classmethod
     def get_instance(cls):
         """
@@ -96,48 +92,6 @@ class TrainingService:
             training_service = TrainingService.get_instance()
         """
         return cls()
-    
-    def _start_bot_if_main_process(self):
-        """
-        Avvia bot Telegram solo nel processo principale.
-        
-        Previene conflitti in development mode (Flask reloader)
-        e production mode (multiple worker Gunicorn).
-        """
-        # Check: siamo nel processo reloader Flask?
-        is_reloader = os.environ.get('WERKZEUG_RUN_MAIN') != 'true'
-        
-        # Check: bot già avviato?
-        if self._bot_thread is not None and self._bot_thread.is_alive():
-            logger.info("⏭️ Bot Telegram già attivo, skip")
-            return
-        
-        # Avvia bot solo nel worker principale (non nel reloader)
-        if not is_reloader:
-            self._start_bot_background()
-            logger.info("🤖 Bot Telegram avviato in background")
-        else:
-            logger.info("⏭️ Bot Telegram skippato (processo reloader)")
-    
-    def _start_bot_background(self):
-        """Avvia bot Telegram in thread daemon separato."""
-        def run_bot():
-            try:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                loop.run_until_complete(self.telegram_service.start_bot())
-                # Mantieni event loop attivo per bot
-                loop.run_forever()
-            except Exception as e:
-                logger.error(f"❌ Errore critico bot Telegram: {e}")
-        
-        # Thread daemon si chiude automaticamente con l'app
-        self._bot_thread = threading.Thread(
-            target=run_bot, 
-            daemon=True, 
-            name="TelegramBotThread"
-        )
-        self._bot_thread.start()
     
     async def generate_preview(self, training_id: str) -> Dict:
         """
@@ -461,25 +415,31 @@ class TrainingService:
         try:
             logger.info(f"Avvio invio feedback per formazione {training_id}")
             
-            # Valida formazione
+            logger.info(f"STEP 1: Recupero dati formazione da Notion per {training_id}")
             training = await self.notion_service.get_formazione_by_id(training_id)
             if not training:
                 raise TrainingServiceError(f"Formazione {training_id} non trovata")
-                
+            logger.info(f"STEP 1 OK: Dati recuperati: {training.get('Nome')}")
+
+            logger.info(f"STEP 2: Validazione stato formazione per {training_id}")
             if training.get('Stato') != 'Calendarizzata':
-                raise TrainingServiceError("Formazione non ancora calendarizzata")
-            
-            # Genera link feedback
-            feedback_link = self._generate_feedback_link(training) # TODO: TROVARE UN MODO PER PRENDERE IL LINK VERO
-            
-            # Invia feedback via Telegram
+                raise TrainingServiceError(f"Formazione non ancora calendarizzata. Stato attuale: {training.get('Stato')}")
+            logger.info("STEP 2 OK: Stato 'Calendarizzata' confermato.")
+
+            logger.info(f"STEP 3: Generazione link feedback per {training_id}")
+            feedback_link = self._generate_feedback_link(training)
+            logger.info(f"STEP 3 OK: Link generato: {feedback_link}")
+
+            logger.info(f"STEP 4: Invio notifica feedback via Telegram per {training_id}")
             send_results = await self.telegram_service.send_feedback_notification(training, feedback_link)
-            
-            # Aggiorna stato a Conclusa
+            logger.info(f"STEP 4 OK: Risultati invio Telegram: {send_results}")
+
+            logger.info(f"STEP 5: Aggiornamento stato Notion a 'Conclusa' per {training_id}")
             await self.notion_service.update_formazione(training_id, {
                 'Stato': 'Conclusa'
             })
-            
+            logger.info("STEP 5 OK: Stato aggiornato in Notion.")
+
             result = {
                 'feedback_link': feedback_link,
                 'telegram_results': send_results,
@@ -493,7 +453,7 @@ class TrainingService:
             logger.error(f"Errore Notion in feedback {training_id}: {e}")
             raise TrainingServiceError(f"Errore aggiornamento dati: {e}")
         except Exception as e:
-            logger.error(f"Errore imprevisto in feedback {training_id}: {e}")
+            logger.error(f"Errore imprevisto in feedback {training_id}: {e}", exc_info=True)
             raise TrainingServiceError(f"Errore invio feedback: {e}")
     
     # === PRIVATE UTILITY METHODS ===
