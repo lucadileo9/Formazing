@@ -354,7 +354,7 @@ class TrainingService:
             messages_preview = []
             
             # Genera link feedback temporaneo per preview
-            feedback_link = self._generate_feedback_link(training)
+            feedback_link = self._generate_feedback_link()
             
             # ⚠️ IMPORTANTE: Feedback va SOLO ai gruppi area (NO main_group)
             # Ottieni target groups e rimuovi main_group
@@ -427,7 +427,7 @@ class TrainingService:
             logger.info("STEP 2 OK: Stato 'Calendarizzata' confermato.")
 
             logger.info(f"STEP 3: Generazione link feedback per {training_id}")
-            feedback_link = self._generate_feedback_link(training)
+            feedback_link = self._generate_feedback_link()
             logger.info(f"STEP 3 OK: Link generato: {feedback_link}")
 
             logger.info(f"STEP 4: Invio notifica feedback via Telegram per {training_id}")
@@ -526,15 +526,14 @@ class TrainingService:
             logger.error(f"Errore imprevisto in creazione Teams meeting: {e}")
             raise MicrosoftServiceError(f"Errore creazione evento: {e}")
     
-    def _generate_feedback_link(self, training: Dict) -> str:
+    def _generate_feedback_link(self) -> str:
         """
-        Genera link feedback personalizzato.
-        
-        TODO: Integrare con sistema reale di raccolta feedback.
-        Utilizza il codice formazione per creare URL univoco.
+        Alla fine inviamo sempre lo stesso link di feedback.
+        Sarà l'utente ad inserire il codice formazione nel form.
+
+        Returns:
+            str: Link di feedback
         """
-        codice = training.get('Codice', 'placeholder')
-        feedback_link = f"https://forms.office.com/feedback-{codice}"
-        
-        logger.debug(f"Feedback link generato: {feedback_link}")
+
+        feedback_link = "https://forms.office.com/e/6dbjt4hkiV"
         return feedback_link

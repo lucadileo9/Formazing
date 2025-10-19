@@ -23,9 +23,8 @@ I problemi sono stati classificati per gravità: **Seria**, **Media** e **Bassa*
 
 2.  **Funzionalità di Feedback Non Implementata:**
     *   **File:** `app/services/training_service.py`
-    *   **Problema:** La funzione `_generate_feedback_link` e il relativo workflow usano un link placeholder (`https://forms.office.com/feedback-{codice}`). La funzionalità di raccolta feedback, che è un requisito chiave del workflow (Stato "Conclusa"), non è reale.
-    *   **Impatto:** Una delle funzionalità principali dell'applicazione è incompleta e non utilizzabile.
-
+    *   **FATTO** La funzione `_generate_feedback_link` non utilizza i dati della formazione per generare un link di feedback personalizzato. Attualmente restituisce sempre lo stesso link statico.
+    
 3.  **Recupero Dati Inefficiente per Comandi Bot:**
     *   **File:** `app/services/bot/telegram_commands.py`
     *   **Problema:** I comandi `/oggi`, `/domani` e `/settimana` caricano tutte le formazioni con stato "Calendarizzata" da Notion per poi filtrarle localmente per data. Questo approccio è altamente inefficiente e non scala.

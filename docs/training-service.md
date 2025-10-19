@@ -824,18 +824,11 @@ code = self._generate_training_code(training)
 
 #### **`_generate_feedback_link(training: Dict) -> str`**
 
-**Scopo:** Genera link feedback personalizzato
+**Scopo:** Ritorna link feedback personalizzato
+**Pattern:** `https://forms.office.com/e/6dbjt4hkiV`
 
-**Pattern:** `https://forms.office.com/feedback-{codice}`
+Abbiamo deciso di utilizzare un link statico per il feedback in questa versione, poiché non è possibile generare link dinamici con microsoft forms. Lo si potrebbe fare con google forms in futuro. Per ora si utilizza un link generico.
 
-**Example:**
-```python
-training = {'Codice': 'IT-Python_Avanzato-2024-SPRING-01'}
-link = self._generate_feedback_link(training)
-# → "https://forms.office.com/feedback-IT-Python_Avanzato-2024-SPRING-01"
-```
-
-**TODO:** Integrare con sistema reale Microsoft Forms (attualmente placeholder)
 
 ---
 
