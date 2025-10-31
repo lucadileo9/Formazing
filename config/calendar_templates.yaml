@@ -4,14 +4,15 @@
 
 calendar_event:
   subject: |
-    {Nome}
+    Formazione {Nome}
   
   body: |
-    🎓 Formazione Programmata
+    🎓 Formazione Programmata!
     
-    📋 Codice: {Codice}
+    🎯 Area: {Area}    
     📅 Data: {Data}
-    🎯 Area: {Area}
+    📋 Codice: {Codice}
+
     
     ---
-    Per maggiori informazioni contattare il coordinatore della formazione.
+    Per dubbi o informazioni contattare il responsabile formazioni.
