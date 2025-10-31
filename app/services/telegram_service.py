@@ -393,6 +393,8 @@ class TelegramService:
         
         # Invia richiesta feedback a ogni gruppo area
         for group_key in target_groups:
+            if group_key=='Prova':
+                continue
             message = self.formatter.format_feedback_message(training_data, feedback_link, group_key)
             success = await self.send_message_to_group(group_key, message)
             results[group_key] = success
