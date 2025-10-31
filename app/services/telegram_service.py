@@ -68,8 +68,6 @@ class TelegramService:
             templates_config_path (str): Path message_templates.yaml
         """
         self.token = token
-        self.bot = telegram.Bot(token=token)
-        self.application = None
         self.notion_service = notion_service  # ✅ Dipendenza esplicita e obbligatoria
         
         # Carica configurazioni
@@ -274,15 +272,17 @@ class TelegramService:
             return False
 
         try:
-            kwargs = {
-                'chat_id': chat_id,
-                'text': message,
-                'parse_mode': parse_mode
-            }
-            if topic_id:
-                kwargs['message_thread_id'] = topic_id
-            
-            await self.bot.send_message(**kwargs)
+            # Crea un client bot temporaneo per questa operazione
+            async with telegram.Bot(token=self.token) as bot:
+                kwargs = {
+                    'chat_id': chat_id,
+                    'text': message,
+                    'parse_mode': parse_mode
+                }
+                if topic_id:
+                    kwargs['message_thread_id'] = topic_id
+                
+                await bot.send_message(**kwargs)
             
             log_message = f"✅ Messaggio inviato a {group_key} (chat_id: {chat_id}"
             if topic_id:
@@ -294,6 +294,9 @@ class TelegramService:
             
         except telegram.error.TelegramError as e:
             logger.error(f"❌ Errore nell'invio del messaggio al gruppo {group_key}: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"❌ Errore imprevisto durante l'invio del messaggio a {group_key}: {e}", exc_info=True)
             return False
     
     
@@ -397,106 +400,9 @@ class TelegramService:
         logger.info(f"Richiesta feedback inviata a {len(results)} gruppi area: {list(results.keys())}")
         return results
     
-        
     # ===============================
-    # COMANDI BOT TELEGRAM INTERATTIVI
+    # GESTIONE LIFECYCLE BOT TELEGRAM (per run_bot.py)
     # ===============================
-    
-    def setup_bot_commands(self):
-        """
-        Configura tutti i comandi disponibili del bot Telegram delegando al modulo TelegramCommands.
-        """
-        if self.application is None:
-            self.application = Application.builder().token(self.token).build()
-        
-        # Registrazione handler comandi tramite il modulo TelegramCommands
-        self.commands.register_handlers(self.application)
-        
-        logger.info("✅ Comandi bot configurati tramite TelegramCommands")
-       
-    
-    # ===============================
-    # GESTIONE LIFECYCLE BOT TELEGRAM
-    # ===============================
-    
-    async def start_bot(self):
-        """
-        Avvia il bot Telegram per ricevere e rispondere a comandi utente.
-        
-        SCOPO:
-        - Inizializza e avvia il bot per mode interattivo
-        - Configura automaticamente comandi se non già fatto
-        - Avvia polling per ricevere messaggi da Telegram
-        
-        QUANDO USARE:
-        - All'avvio dell'applicazione Flask se si vuole bot interattivo
-        - In script standalone per testing comandi
-        - Dopo aver configurato notion_service per abilitare comandi dati
-        
-        PROCESSO:
-        1. Setup comandi se non già configurati
-        2. Inizializzazione Application Telegram
-        3. Start application e updater
-        4. Inizio polling continuo per messaggi
-        
-        PREREQUISITI:
-        - Token valido configurato in __init__
-        - Connessione internet per comunicazione Telegram API
-        - (Opzionale) notion_service per comandi /oggi, /domani, /settimana
-        
-        ERRORI:
-        - Token invalido: eccezione durante initialize()
-        - Problemi rete: eccezione durante start_polling()
-        - Bot già in uso: conflitto con altre istanze
-        """
-        if self.application is None:
-            self.setup_bot_commands()
-        
-        try:
-            logger.info("🚀 Avvio del bot Telegram...")
-            await self.application.initialize()
-            await self.application.start()
-            await self.application.updater.start_polling()
-            logger.info("✅ Bot Telegram avviato con successo e in ascolto comandi")
-        except Exception as e:
-            logger.error(f"❌ Errore nell'avvio del bot: {e}")
-            raise
-    
-    async def stop_bot(self):
-        """
-        Ferma il bot Telegram e chiude tutte le connessioni in modo pulito.
-        
-        SCOPO:
-        - Shutdown graceful del bot per evitare connessioni pendenti
-        - Chiamato durante shutdown applicazione o script
-        - Pulisce risorse e connessioni Telegram
-        
-        QUANDO USARE:
-        - Shutdown dell'applicazione Flask
-        - Fine script standalone
-        - Gestione eccezioni durante startup
-        - Signal handler per SIGTERM/SIGINT
-        
-        PROCESSO:
-        1. Stop polling messaggi Telegram
-        2. Stop application
-        3. Shutdown completo con cleanup risorse
-        4. Logging stati per debugging
-        
-        SICUREZZA:
-        - Gestisce eccezioni durante shutdown per evitare hang
-        - Non rilancia eccezioni (solo logging)
-        - Garantisce sempre completion anche in caso di errori parziali
-        """
-        if self.application and self.application.updater:
-            try:
-                logger.info("🛑 Fermata del bot Telegram...")
-                await self.application.updater.stop()
-                await self.application.stop()
-                await self.application.shutdown()
-                logger.info("✅ Bot Telegram fermato con successo")
-            except Exception as e:
-                logger.error(f"⚠️ Errore nella fermata del bot (non critico): {e}")
     
     def run_bot_sync(self):
         """
@@ -524,17 +430,38 @@ class TelegramService:
             service.run_bot_sync()  # Bot resta attivo fino a CTRL+C
         """
         async def main():
-            await self.start_bot()
+            # Crea l'Application instance qui, solo per il processo del bot
+            application = Application.builder().token(self.token).build()
+            
+            # Registra i comandi sull'istanza dell'applicazione
+            self.commands.register_handlers(application)
+            logger.info("✅ Comandi bot configurati per il processo di polling.")
+
             try:
-                # Mantieni il bot in esecuzione indefinitamente
+                logger.info("🚀 Avvio del bot Telegram in modalità polling...")
+                await application.initialize()
+                await application.start()
+                await application.updater.start_polling()
+                logger.info("✅ Bot Telegram avviato con successo e in ascolto comandi.")
+                
+                # Mantieni il processo in vita
                 await asyncio.Event().wait()
-            except KeyboardInterrupt:
-                logger.info("⌨️ Interruzione da tastiera ricevuta")
+
+            except (KeyboardInterrupt, SystemExit):
+                logger.info("🛑 Interruzione ricevuta, avvio spegnimento pulito del bot...")
+            
             finally:
-                await self.stop_bot()
+                if application.updater and application.updater.is_running:
+                    await application.updater.stop()
+                if application.running:
+                    await application.stop()
+                await application.shutdown()
+                logger.info("✅ Bot Telegram fermato con successo.")
         
-        # Esecuzione sincrona con gestione event loop
-        asyncio.run(main())
+        try:
+            asyncio.run(main())
+        except Exception as e:
+            logger.critical(f"Errore critico nel loop principale del bot: {e}", exc_info=True)
 
 
 
