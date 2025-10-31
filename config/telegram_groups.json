@@ -2,25 +2,48 @@
   "_comment": "Mappa Aree -> ID Chat e Topic ID di Telegram. topic_id è opzionale.",
   "_created": "Generato con get_chat_ids.py e modificato per supportare i topic",
   "main_group": {
-    "chat_id": "-1002605869080",
-    "topic_id": "5"
+    "chat_id": "-1003291398390",
+    "topic_id": "7"
   },
   "IT": {
-    "chat_id": "-1003002711100"
+    "chat_id": "-1003155075409"
   },
   "R&D": {
-    "chat_id": "-1002521246693"
+    "chat_id": "-1003203633640"
   },
   "HR": {
-    "chat_id": "-1002755879096"
+    "chat_id": "-1003170828447"
   },
   "Legale": {
-    "chat_id": "-1006677889900"
+    "chat_id": "-1003282092085"
   },
   "Commerciale": {
-    "chat_id": "-1002768585820"
+    "chat_id": "-1003193872855"
   },
   "Marketing": {
-    "chat_id": "-1003043652052"
+    "chat_id": "-1003218215819"
+  },
+  "Prova": {
+    "chat_id": "-1003291398390",
+    "topic_id": "7"
+  },
+  "IT_in_prova": {
+    "chat_id": "-1003155075409"
+  },
+  "R&D_in_prova": {
+    "chat_id": "-1003203633640"
+  },
+  "HR_in_prova": {
+    "chat_id": "-1003170828447"
+  },
+  "Legale_in_prova": {
+    "chat_id": "-1003282092085"
+  },
+  "Commerciale_in_prova": {
+    "chat_id": "-1003193872855"
+  },
+  "Marketing_in_prova": {
+    "chat_id": "-1003218215819"
   }
+
 }
