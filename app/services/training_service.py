@@ -551,5 +551,5 @@ class TrainingService:
             str: Link di feedback
         """
 
-        feedback_link = "https://forms.office.com/e/6dbjt4hkiV"
+        feedback_link = "https://forms.office.com/Pages/ResponsePage.aspx?id=JO7KyoQGGkC5EEkYgD6mIjL0jCxS46xHtwtc9qTqajFUMTlBRU5VRzlRUjhGSFdCUEI3QU9YWU5GNC4u"
         return feedback_link
