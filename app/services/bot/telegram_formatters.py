@@ -34,7 +34,7 @@ class TelegramFormatter:
             templates (Dict): Template strutturati da file YAML
         """
         self.templates = templates
-        logger.debug("TelegramFormatter inizializzato")
+        logger.debug("🚀 TelegramFormatter inizializzato")
     
     def format_training_message(self, training_data: Dict, group_key: str) -> str:
         """
@@ -88,10 +88,10 @@ class TelegramFormatter:
         # Formattazione con gestione errori
         try:
             formatted_message = template.format(**template_data)
-            logger.debug(f"Messaggio training formattato per {group_key}: {len(formatted_message)} caratteri")
+            logger.debug(f"📱 Messaggio training formattato per {group_key}: {len(formatted_message)} caratteri")
             return formatted_message
         except (KeyError, ValueError) as e:
-            logger.error(f"Errore formattazione template training per {group_key}: {e}")
+            logger.error(f"❌ Errore formattazione template training per {group_key}: {e}")
             return f"❌ Errore nella formattazione del messaggio per la formazione: {nome}"
     
     def format_feedback_message(self, training_data: Dict, feedback_link: str, group_key: str) -> str:
@@ -139,10 +139,10 @@ class TelegramFormatter:
         # Formattazione con gestione errori
         try:
             formatted_message = feedback_template.format(**template_data)
-            logger.debug(f"Messaggio feedback formattato per {group_key}: {len(formatted_message)} caratteri")
+            logger.debug(f"📱 Messaggio feedback formattato per {group_key}: {len(formatted_message)} caratteri")
             return formatted_message
         except (KeyError, ValueError) as e:
-            logger.error(f"Errore formattazione template feedback: {e}")
+            logger.error(f"❌ Errore formattazione template feedback: {e}")
             return f"❌ Errore nella formattazione del messaggio feedback per la formazione: {nome}"
     
     def _format_date_time(self, data_ora) -> str:
@@ -171,5 +171,5 @@ class TelegramFormatter:
             else:
                 return str(data_ora)
         except Exception as e:
-            logger.warning(f"Errore parsing data '{data_ora}': {e}")
+            logger.warning(f"⚠️ Errore parsing data '{data_ora}': {e}")
             return str(data_ora)

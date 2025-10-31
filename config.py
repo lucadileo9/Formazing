@@ -42,6 +42,8 @@ class Config:
     
     # ===== LOGGING CONFIG =====
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
+    LOG_FILE = os.getenv('LOG_FILE', 'app.log')
+    LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     
     @classmethod
     def validate_config(cls) -> dict:

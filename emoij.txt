@@ -1,0 +1,23 @@
+# Lifecycle events
+🚀 Startup/Initialization
+✅ Success/Completion
+❌ Error/Failure
+⚠️ Warning
+🔄 Processing/In Progress
+⏸️ Paused/Waiting
+🛑 Stopped/Terminated
+
+# Module-specific
+📝 Notion operations
+📱 Telegram operations
+🏢 Microsoft operations
+🎯 Coordinator operations
+
+# Technical details
+🔧 Configuration
+🔌 Connection/API calls
+💾 Data operations
+🔐 Authentication
+📊 Stats/Metrics
+⏱️ Performance/Timing
+🐛 Debug info

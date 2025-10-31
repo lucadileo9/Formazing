@@ -450,7 +450,7 @@ class TestTelegramFormatter:
         
         # Deve loggare warning e restituire fallback
         mock_logger.warning.assert_called_once()
-        assert "Errore parsing data" in mock_logger.warning.call_args[0][0]
+        assert "⚠️ Errore parsing data" in mock_logger.warning.call_args[0][0]
         assert result == bad_date  # Fallback alla stringa originale
     
     # ================================

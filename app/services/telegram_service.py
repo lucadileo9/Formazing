@@ -28,8 +28,6 @@ try:
 except ImportError:
     from bot import TelegramFormatter, TelegramCommands
 
-# Configurazione logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 

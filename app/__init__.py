@@ -34,9 +34,27 @@ def create_app():
     # Carica configurazione
     app.config.from_object(Config)
     
-    # Configura logging
-    if not app.debug:
-        logging.basicConfig(level=logging.INFO)
+    # Configura logging centralizzato
+    log_level = app.config.get('LOG_LEVEL', 'INFO').upper()
+    log_file = app.config.get('LOG_FILE', 'app.log')
+    log_format = app.config.get('LOG_FORMAT', '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
+    # Rimuovi eventuali handler pre-esistenti per evitare duplicati
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
+        
+    # Configura handler per file
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setFormatter(logging.Formatter(log_format))
+    
+    # Configura handler per console
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(logging.Formatter(log_format))
+    
+    # Aggiungi handler al root logger
+    logging.root.addHandler(file_handler)
+    logging.root.addHandler(stream_handler)
+    logging.root.setLevel(log_level)
     
     # Registra il sistema di autenticazione
     @auth.verify_password

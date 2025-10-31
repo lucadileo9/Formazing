@@ -18,16 +18,6 @@ import logging
 import traceback
 import asyncio
 
-# Configura logging con più dettagli
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),  # Console
-        logging.FileHandler('app.log')  # File
-    ]
-)
-
 logger = logging.getLogger(__name__)
 
 # Blueprint principale per le routes
