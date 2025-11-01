@@ -773,6 +773,27 @@ async def dashboard():
 
 ### **🔒 Metodi Privati (Core Implementation)**
 
+#### **`_normalize_area(area: str) -> str`**
+
+**Scopo:** Normalizza l'area rimuovendo il suffisso "in prova"
+
+**Mapping:**
+- `"IT in prova"` → `"IT"`
+- `"HR in prova"` → `"HR"`
+- `"In prova"` → `"All"`
+- Aree standard rimangono invariate (`"IT"`, `"HR"`, `"Test"`)
+
+**Example:**
+```python
+area = self._normalize_area("IT in prova")
+# → "IT"
+
+area = self._normalize_area("R&D")
+# → "R&D"
+```
+
+---
+
 #### **`_generate_training_code(training: Dict) -> str`**
 
 **Scopo:** Genera codice formazione univoco
@@ -782,19 +803,21 @@ async def dashboard():
 **Example:**
 ```python
 training = {
-    'Area': ['IT'],
+    'Area': ['IT in prova'],
     'Nome': 'Sicurezza Informatica Avanzata',
     'Periodo': 'SPRING'
 }
 
 code = self._generate_training_code(training)
 # → "IT-Sicurezza_Informatica_Avanzata-2024-SPRING-01"
+# (Area normalizzata: "IT in prova" → "IT")
 ```
 
 **Normalizzazioni:**
+- Area → normalizzata con `_normalize_area()` (rimuove "in prova")
+- Multi-area → usa prima area della lista
 - Spazi → `_`
 - Trattini → `_`
-- Multi-area → usa prima area della lista
 
 **TODO:** Implementare sequenza intelligente basata su database (attualmente fixed "01")
 
