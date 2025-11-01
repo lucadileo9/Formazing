@@ -458,6 +458,45 @@ class TrainingService:
     
     # === PRIVATE UTILITY METHODS ===
     
+    def _normalize_area(self, area: str) -> str:
+        """
+        Normalizza l'area rimuovendo il suffisso "in prova".
+        
+        Mapping:
+        - "IT" → "IT"
+        - "IT in prova" → "IT"
+        - "HR" → "HR"
+        - "HR in prova" → "HR"
+        - "All" → "All"
+        - "Test" → "Test"
+        - etc.
+        
+        Args:
+            area: Area originale (può contenere "in prova")
+            
+        Returns:
+            str: Area normalizzata senza suffisso
+        """
+        # Mapping esplicito per casi speciali
+        area_mapping = {
+            'IT in prova': 'IT',
+            'HR in prova': 'HR',
+            'R&D in prova': 'R&D',
+            'Marketing in prova': 'Marketing',
+            'Commerciale in prova': 'Commerciale',
+            'Legale in prova': 'Legale',
+            'In prova': 'All',  # "In prova" generico mappa ad "All"
+        }
+        
+        # Controlla se c'è un mapping esplicito
+        if area in area_mapping:
+            normalized = area_mapping[area]
+            logger.debug(f"Area normalizzata: '{area}' → '{normalized}'")
+            return normalized
+        
+        # Se non c'è mapping, ritorna l'area originale (es: IT, HR, All, Test)
+        return area
+
     def _generate_training_code(self, training: Dict, write: bool = True) -> str:
         """
         Genera codice formazione univoco.
@@ -486,9 +525,11 @@ class TrainingService:
         # Area può essere lista o stringa - gestisci entrambi i casi
         area_raw = training.get('Area', ['IT'])
         if isinstance(area_raw, list):
-            area = area_raw[0] if area_raw else 'IT'
+            # Prendi il primo elemento dalla lista e normalizzalo
+            area = self._normalize_area(area_raw[0]) if area_raw else 'IT'
         else:
-            area = area_raw
+            # Normalizza l'area singola
+            area = self._normalize_area(area_raw)
         
         nome = training.get('Nome', 'Formazione').replace(' ', '_').replace('-', '_')
         periodo = training.get('Periodo', 'ONCE')
