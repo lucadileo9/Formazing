@@ -4,7 +4,7 @@
 training_notification:
   telegram:
     main_group: |
-      🎉 <b>Formazione per {area}!</b>
+      🎉 <b>Formazione per i soci {area}!</b>
       
       📚 <b>Argomento:</b> {nome}
       🏢 <b>Area:</b> {area}
@@ -50,12 +50,13 @@ feedback_request:
       ⭐ <b>La vostra opinione vale oro!</b>
       
       📚 <b>Formazione completata:</b> {nome}
-      🏢 <b>Area:</b> {area}
       🏷 <b>Codice:</b> <code>{codice}</code>
 
-      📢 Inserisci il codice della formazione nella prima domanda del form!!! 📢
-      
-      📝 <b><a href="{feedback_link}">👆 Clicca qui per inviare il feedback</a></b>
+      📢 
+      Inserisci il codice della formazione nella prima domanda del form!!!
+      📢
+
+      📝 <b><a href="{feedback_link}"> Clicca qui per inviare il feedback</a></b>
       
       ⏰ Il feedback è molto importante per migliorare le nostre formazioni!
       
