@@ -2,8 +2,8 @@
   "_comment": "Mappa Aree -> ID Chat e Topic ID di Telegram. topic_id è opzionale.",
   "_created": "Generato con get_chat_ids.py e modificato per supportare i topic",
   "main_group": {
-    "chat_id": "-1003291398390",
-    "topic_id": "7"
+    "chat_id": "-1002262146419",
+    "topic_id": "8"
   },
   "IT": {
     "chat_id": "-1003155075409"
