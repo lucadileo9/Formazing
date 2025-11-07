@@ -13,3 +13,4 @@ venv.bak/
 .vscode/
 .idea/
 *.log
+sequence_counter.txt
