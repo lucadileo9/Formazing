@@ -7,6 +7,7 @@ Gestisce l'autenticazione OAuth2 con Microsoft Graph API usando MSAL.
 import logging
 from msal import ConfidentialClientApplication
 import requests
+from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -40,13 +41,31 @@ class GraphClient:
         
         self._msal_client = None
         self._access_token = None
+        self._token_expiry = None  # Traccia scadenza token
         
         logger.info(f"GraphClient initialized for {user_email}")
     
     def _get_access_token(self) -> str:
-        """Acquisisce access token via OAuth2."""
-        if self._access_token:
-            return self._access_token
+        """
+        Acquisisce access token via OAuth2 con gestione automatica scadenza.
+        
+        Il token viene automaticamente rinnovato se:
+        - Non esiste ancora
+        - È scaduto
+        - Sta per scadere (entro 5 minuti)
+        
+        Returns:
+            str: Access token valido
+        """
+        # Controlla se token valido e non scaduto
+        if self._access_token and self._token_expiry:
+            # Buffer di 5 minuti prima della scadenza per sicurezza
+            if datetime.now() < self._token_expiry - timedelta(minutes=5):
+                logger.debug("Using cached access token (still valid)")
+                return self._access_token
+            else:
+                logger.info("Token expired or expiring soon, refreshing...")
+                self._access_token = None  # Invalida token scaduto
             
         try:
             if not self._msal_client:
@@ -60,7 +79,12 @@ class GraphClient:
             
             if "access_token" in result:
                 self._access_token = result["access_token"]
-                logger.info("Access token acquired successfully")
+                
+                # Calcola scadenza token (default 3600 secondi = 1 ora)
+                expires_in = result.get("expires_in", 3600)
+                self._token_expiry = datetime.now() + timedelta(seconds=expires_in)
+                
+                logger.info(f"✅ Access token acquired successfully (expires at {self._token_expiry.strftime('%H:%M:%S')})")
                 return self._access_token
             else:
                 error_msg = result.get("error_description", "Unknown error")
