@@ -86,7 +86,18 @@ class NotionDataParser:
             
             # Validazione campi critici
             if not all([nome, area_list, data_ora, status, notion_id]):
-                logger.warning(f"⚠️ Formazione incompleta | Name: {nome or 'unknown'} | ID: {notion_id or 'unknown'} | Campi mancanti")
+                logger.warning(f"⚠️ Formazione incompleta")
+                # Stampa dettagli per debug
+                for field, value in {
+                    'ID': notion_id,
+                    'Nome': nome,
+                    'Area': area_list,
+                    'Data/Ora': data_ora,
+                    'Stato': status
+                }.items():
+                    if not value:
+                        logger.warning(f"  - Mancante: {field}") 
+                
                 return None
             
             # Estrazione campi opzionali
