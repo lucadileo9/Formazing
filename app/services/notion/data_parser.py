@@ -43,7 +43,7 @@ class NotionDataParser:
         Returns:
             List[Dict]: Lista formazioni normalizzate (filtra malformate)
         """
-        logger.debug(f"Parsing {len(notion_response.get('results', []))} formazioni da Notion")
+        logger.debug(f"Parsing formazioni da Notion | Records raw: {len(notion_response.get('results', []))}")
         
         formazioni = []
         for page in notion_response.get('results', []):
@@ -51,7 +51,7 @@ class NotionDataParser:
             if formazione:  # Filtra righe malformate
                 formazioni.append(formazione)
         
-        logger.info(f"Parsate {len(formazioni)} formazioni valide")
+        logger.info(f"✅ Parsing completato | Formazioni valide: {len(formazioni)}/{len(notion_response.get('results', []))}")
         return formazioni
     
     def parse_single_formazione(self, page: Dict) -> Optional[Dict]:
@@ -86,7 +86,7 @@ class NotionDataParser:
             
             # Validazione campi critici
             if not all([nome, area_list, data_ora, status, notion_id]):
-                logger.warning(f"Formazione con campi mancanti: {notion_id or 'unknown'}")
+                logger.warning(f"⚠️ Formazione incompleta | Name: {nome or 'unknown'} | ID: {notion_id or 'unknown'} | Campi mancanti")
                 return None
             
             # Estrazione campi opzionali
@@ -107,11 +107,11 @@ class NotionDataParser:
                 '_notion_id': notion_id         # Mantieni per backward compatibility
             }
             
-            logger.debug(f"Formazione parsata: {nome} ({', '.join(area_list)}) - {data_ora}")
+            logger.debug(f"Formazione parsata | Nome: {nome} | Area: {', '.join(area_list)} | Data: {data_ora}")
             return formazione
             
         except Exception as e:
-            logger.error(f"Errore parsing formazione {page.get('id', 'unknown')}: {e}")
+            logger.error(f"❌ Errore parsing formazione | ID: {page.get('id', 'unknown')[:8]} | Error: {e}")
             return None
     
     # ===============================
@@ -247,9 +247,9 @@ class NotionDataParser:
             
             # Formattazione output standard
             formatted_date = dt.strftime('%d/%m/%Y %H:%M')
-            logger.debug(f"Data convertita: {start_date} → {formatted_date}")
+            logger.debug(f"Data convertita | Input: {start_date} | Output: {formatted_date}")
             return formatted_date
             
         except Exception as e:
-            logger.warning(f"Errore parsing data '{start_date}': {e}")
+            logger.warning(f"⚠️ Errore parsing data | Input: '{start_date}' | Error: {e}")
             return start_date  # Fallback a stringa originale
