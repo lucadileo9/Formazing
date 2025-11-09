@@ -28,15 +28,16 @@ def create_app():
     Returns:
         Flask: Applicazione configurata e pronta
     """
+    # Configura logging PRIMA di tutto (setup centralizzato)
+    Config.setup_logging()
+    logger.info("🏗️ Inizializzazione Flask app Formazing...")
+    
     # Crea l'app Flask
     app = Flask(__name__)
     
     # Carica configurazione
     app.config.from_object(Config)
-    
-    # Configura logging
-    if not app.debug:
-        logging.basicConfig(level=logging.INFO)
+    logger.info(f"✅ Configurazione Flask caricata (DEBUG={Config.DEBUG})")
     
     # Registra il sistema di autenticazione
     @auth.verify_password
@@ -45,16 +46,19 @@ def create_app():
         return (username == Config.BASIC_AUTH_USERNAME and 
                 password == Config.BASIC_AUTH_PASSWORD)
     
+    logger.info("🔐 Basic Authentication configurata")
+    
     # Registra le routes
     from app.routes import main
     app.register_blueprint(main)
+    logger.info("🛤️ Routes registrate (Blueprint 'main')")
     
     # 🎯 Inizializza TrainingService Singleton all'avvio
     # Questo garantisce che il bot Telegram sia online PRIMA di gestire richieste
     logger.info("🎯 Inizializzazione TrainingService Singleton...")
     from app.services.training_service import TrainingService
     training_service = TrainingService.get_instance()
-    logger.info("✅ TrainingService pronto (bot Telegram avviato se processo principale)")
+    logger.info("✅ TrainingService pronto (bot Telegram configurato)")
     
     # ✨ Filtri Jinja2 personalizzati
     @app.template_filter('format_area')
@@ -75,13 +79,21 @@ def create_app():
         else:
             return 'N/A'
     
+    logger.info("✨ Filtri Jinja2 personalizzati registrati")
+    
     # Error handlers
     @app.errorhandler(404)
     def not_found_error(error):
+        from flask import request
+        logger.warning(f"❌ 404 - Risorsa non trovata: {request.path}")
         return {'error': 'Risorsa non trovata'}, 404
     
     @app.errorhandler(500) 
     def internal_error(error):
+        logger.error(f"❌ 500 - Errore interno: {error}")
         return {'error': 'Errore interno del server'}, 500
+    
+    logger.info("🔧 Error handlers configurati")
+    logger.info("🎉 Flask app creata con successo e pronta all'uso")
     
     return app
