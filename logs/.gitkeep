@@ -1,0 +1,2 @@
+# Directory per i file di log
+# I file .log sono ignorati da git (vedi .gitignore)
