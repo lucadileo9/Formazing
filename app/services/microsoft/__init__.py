@@ -73,7 +73,7 @@ class MicrosoftService:
             email_formatter=self.email_formatter
         )
         
-        logger.info("MicrosoftService initialized successfully")
+        logger.info("✅ MicrosoftService inizializzato | Componenti: GraphClient, EmailFormatter, CalendarOperations")
     
     async def create_training_event(self, formazione_data: Dict) -> Dict:
         """
@@ -119,7 +119,7 @@ class MicrosoftService:
             'https://teams.microsoft.com/l/meetup-join/...'
         """
         try:
-            logger.info(f"Creating training event: {formazione_data.get('Nome')}")
+            logger.info(f"Creazione evento Teams | Formazione: {formazione_data.get('Nome')}")
             
             # Valida dati input
             self._validate_formazione_data(formazione_data)
@@ -131,17 +131,17 @@ class MicrosoftService:
             result['status'] = 'success'
             
             logger.info(
-                f"Training event created successfully: {result.get('subject')} | "
-                f"Event ID: {result.get('event_id')}"
+                f"✅ Evento Teams creato | Subject: {result.get('subject')} | "
+                f"Event ID: ...{result.get('event_id', '')[-12:]}"
             )
             
             return result
             
         except (CalendarOperationsError, EmailFormatterError, GraphClientError) as e:
-            logger.error(f"Microsoft service error: {e}")
+            logger.error(f"❌ MicrosoftService error | Component error: {e}")
             raise MicrosoftServiceError(f"Failed to create training event: {str(e)}")
         except Exception as e:
-            logger.error(f"Unexpected error in create_training_event: {e}")
+            logger.error(f"❌ Errore imprevisto creazione evento | Error: {e}")
             raise MicrosoftServiceError(f"Unexpected error: {str(e)}")
     
     def _validate_formazione_data(self, formazione_data: Dict) -> None:
@@ -163,7 +163,7 @@ class MicrosoftService:
                 f"Missing required fields: {', '.join(missing_fields)}"
             )
         
-        logger.debug("Formazione data validated successfully")
+        logger.debug(f"Validazione dati formazione completata | Nome: {formazione_data.get('Nome')}")
     
     def get_service_info(self) -> Dict:
         """
