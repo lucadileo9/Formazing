@@ -145,7 +145,7 @@ class Config:
                     'level': cls.LOG_LEVEL,
                     'propagate': False
                 },
-                # 📧 MICROSOFT SERVICE - Graph API, Calendar, Email
+                # MICROSOFT SERVICE - Graph API, Calendar, Email
                 'app.services.microsoft': {
                     'handlers': ['console', 'file'],
                     'level': cls.LOG_LEVEL,
@@ -161,7 +161,7 @@ class Config:
                     'level': cls.LOG_LEVEL,
                     'propagate': False
                 },
-                # 📱 TELEGRAM SERVICE - Bot e messaging
+                # TELEGRAM SERVICE - Bot e messaging
                 'app.services.telegram': {
                     'handlers': ['console', 'file'],
                     'level': cls.LOG_LEVEL,
