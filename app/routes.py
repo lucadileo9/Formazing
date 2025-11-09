@@ -18,16 +18,7 @@ import logging
 import traceback
 import asyncio
 
-# Configura logging con più dettagli
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),  # Console
-        logging.FileHandler('app.log')  # File
-    ]
-)
-
+# Logger per routes (configurazione centralizzata già attiva)
 logger = logging.getLogger(__name__)
 
 # Blueprint principale per le routes
@@ -50,14 +41,15 @@ def home():
 async def dashboard():
     """Dashboard principale con formazioni organizzate per status (Flask Async)."""
     try:
-        logger.info("Caricamento dashboard con Flask Async...")
+        logger.info("📊 Caricamento dashboard - richiesta ricevuta")
         
         # Inizializzazione NotionService (via Singleton)
         training_service = TrainingService.get_instance()
         notion_service = training_service.notion_service
-        logger.info("NotionService recuperato da TrainingService (Singleton)")
+        logger.debug("✅ NotionService recuperato da TrainingService Singleton")
         
         # PERFORMANCE BOOST: Chiamate parallele con asyncio.gather()
+        logger.debug("🔄 Recupero formazioni da Notion (chiamate parallele)...")
         formazioni_results = await asyncio.gather(
             notion_service.get_formazioni_by_status('Programmata'),
             notion_service.get_formazioni_by_status('Calendarizzata'),
@@ -70,6 +62,12 @@ async def dashboard():
         formazioni_calendarizzata = formazioni_results[1] if not isinstance(formazioni_results[1], Exception) else []
         formazioni_conclusa = formazioni_results[2] if not isinstance(formazioni_results[2], Exception) else []
         
+        # Log eventuali errori nelle chiamate Notion
+        for idx, result in enumerate(formazioni_results):
+            if isinstance(result, Exception):
+                status = ['Programmata', 'Calendarizzata', 'Conclusa'][idx]
+                logger.error(f"❌ Errore recupero formazioni '{status}': {result}")
+        
         # Statistiche con null safety
         stats = {
             'programmata': len(formazioni_programmata or []),
@@ -78,7 +76,10 @@ async def dashboard():
         }
         stats['totale'] = stats['programmata'] + stats['calendarizzata'] + stats['conclusa']
         
-        logger.info(f"Dashboard caricata con successo (Atomic Design). Totale formazioni: {stats['totale']}")
+        logger.info(f"✅ Dashboard caricata | Totale: {stats['totale']} | "
+                   f"Programmata: {stats['programmata']} | Calendarizzata: {stats['calendarizzata']} | "
+                   f"Conclusa: {stats['conclusa']}")
+        
         # Usa il nuovo template atomic design
         return render_template('pages/dashboard.html',
                              formazioni_programmata=formazioni_programmata or [],
@@ -89,13 +90,13 @@ async def dashboard():
                              
     except NotionServiceError as e:
         # Errore specifico NotionService
-        logger.error(f"NotionService error: {e}")
+        logger.error(f"❌ NotionService error nella dashboard: {e}", exc_info=True)
         flash(f"❌ Errore servizio Notion: {e}", 'error')
         return redirect(url_for('main.home'))
         
     except Exception as e:
         # Errore generico
-        logger.error(f"Errore imprevisto nella dashboard: {e}")
+        logger.error(f"❌ Errore imprevisto nella dashboard: {e}", exc_info=True)
         flash(f"❌ Errore imprevisto: {e}", 'error')
         return redirect(url_for('main.home'))
 
@@ -107,11 +108,13 @@ async def dashboard():
 def preview_notification_page(training_id):
     """Pagina preview calendarizzazione con form conferma."""
     try:
-        logger.info(f"📄 Apertura preview calendarizzazione per {training_id}")
+        logger.info(f"� Preview calendarizzazione richiesta | Training ID: {training_id}")
         
         # Usa Singleton TrainingService
         training_service = TrainingService.get_instance()
         preview_data = asyncio.run(training_service.generate_preview(training_id))
+        
+        logger.info(f"✅ Preview generata | Formazione: {preview_data['training'].get('Nome', 'N/A')}")
         
         # Renderizza template preview
         return render_template('pages/preview.html',
@@ -123,11 +126,11 @@ def preview_notification_page(training_id):
                              title=f"Preview - {preview_data['training']['Nome']}")
         
     except TrainingServiceError as e:
-        logger.error(f"Errore preview notification: {e}")
+        logger.error(f"❌ Errore preview calendarizzazione | Training ID: {training_id} | Error: {e}")
         flash(f'❌ Errore: {e}', 'error')
         return redirect(url_for('main.dashboard'))
     except Exception as e:
-        logger.error(f"Errore imprevisto preview notification: {e}")
+        logger.error(f"❌ Errore imprevisto preview calendarizzazione | Training ID: {training_id} | Error: {e}", exc_info=True)
         flash(f'❌ Errore imprevisto: {e}', 'error')
         return redirect(url_for('main.dashboard'))
 
@@ -137,11 +140,13 @@ def preview_notification_page(training_id):
 def preview_feedback_page(training_id):
     """Pagina preview richiesta feedback con form conferma."""
     try:
-        logger.info(f"📄 Apertura preview feedback per {training_id}")
+        logger.info(f"� Preview feedback richiesta | Training ID: {training_id}")
         
         # Usa Singleton TrainingService
         training_service = TrainingService.get_instance()
         preview_data = asyncio.run(training_service.generate_feedback_preview(training_id))
+        
+        logger.info(f"✅ Preview feedback generata | Formazione: {preview_data['training'].get('Nome', 'N/A')}")
         
         # Renderizza template preview
         return render_template('pages/preview.html',
@@ -153,11 +158,11 @@ def preview_feedback_page(training_id):
                              title=f"Preview Feedback - {preview_data['training']['Nome']}")
         
     except TrainingServiceError as e:
-        logger.error(f"Errore preview feedback: {e}")
+        logger.error(f"❌ Errore preview feedback | Training ID: {training_id} | Error: {e}")
         flash(f'❌ Errore: {e}', 'error')
         return redirect(url_for('main.dashboard'))
     except Exception as e:
-        logger.error(f"Errore imprevisto preview feedback: {e}")
+        logger.error(f"❌ Errore imprevisto preview feedback | Training ID: {training_id} | Error: {e}", exc_info=True)
         flash(f'❌ Errore imprevisto: {e}', 'error')
         return redirect(url_for('main.dashboard'))
 
@@ -167,24 +172,25 @@ def preview_feedback_page(training_id):
 def confirm_notification(training_id):
     """Conferma ed esegue calendarizzazione (chiamata da form preview)."""
     try:
-        logger.info(f"✅ Conferma calendarizzazione per {training_id}")
+        logger.info(f"🚀 Conferma calendarizzazione | Training ID: {training_id}")
         
         # Usa Singleton TrainingService
         training_service = TrainingService.get_instance()
         result = asyncio.run(training_service.send_training_notification(training_id))
         
-        logger.info(f"Calendarizzazione completata - Codice: {result['codice_generato']}")
-        flash('✅ Comunicazione inviata con successo! La formazione è stata calendarizzata.', 'success')
+        logger.info(f"✅ Calendarizzazione completata | Training ID: {training_id} | "
+                   f"Codice: {result.get('codice_generato', 'N/A')} | "
+                   f"Gruppi notificati: {len(result.get('telegram_results', {}))}")
         
-        # Redirect a dashboard
+        flash('✅ Comunicazione inviata con successo! La formazione è stata calendarizzata.', 'success')
         return redirect(url_for('main.dashboard'))
         
     except TrainingServiceError as e:
-        logger.error(f"Errore conferma notification: {e}")
+        logger.error(f"❌ Errore conferma calendarizzazione | Training ID: {training_id} | Error: {e}")
         flash(f'❌ Errore: {e}', 'error')
         return redirect(url_for('main.dashboard'))
     except Exception as e:
-        logger.error(f"Errore imprevisto conferma notification: {e}")
+        logger.error(f"❌ Errore imprevisto conferma calendarizzazione | Training ID: {training_id} | Error: {e}", exc_info=True)
         flash(f'❌ Errore imprevisto: {e}', 'error')
         return redirect(url_for('main.dashboard'))
 
@@ -194,23 +200,23 @@ def confirm_notification(training_id):
 def confirm_feedback(training_id):
     """Conferma ed esegue invio feedback (chiamata da form preview)."""
     try:
-        logger.info(f"✅ Conferma feedback per {training_id}")
+        logger.info(f"📝 Conferma invio feedback | Training ID: {training_id}")
         
         # Usa Singleton TrainingService
         training_service = TrainingService.get_instance()
         result = asyncio.run(training_service.send_feedback_request(training_id))
         
-        logger.info("Feedback inviato con successo")
-        flash('✅ Richiesta feedback inviata con successo! La formazione è stata conclusa.', 'success')
+        logger.info(f"✅ Feedback inviato con successo | Training ID: {training_id} | "
+                   f"Gruppi notificati: {len(result.get('telegram_results', {}))}")
         
-        # Redirect a dashboard
+        flash('✅ Richiesta feedback inviata con successo! La formazione è stata conclusa.', 'success')
         return redirect(url_for('main.dashboard'))
         
     except TrainingServiceError as e:
-        logger.error(f"Errore conferma feedback: {e}")
+        logger.error(f"❌ Errore conferma feedback | Training ID: {training_id} | Error: {e}")
         flash(f'❌ Errore: {e}', 'error')
         return redirect(url_for('main.dashboard'))
     except Exception as e:
-        logger.error(f"Errore imprevisto conferma feedback: {e}")
+        logger.error(f"❌ Errore imprevisto conferma feedback | Training ID: {training_id} | Error: {e}", exc_info=True)
         flash(f'❌ Errore imprevisto: {e}', 'error')
         return redirect(url_for('main.dashboard'))
