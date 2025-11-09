@@ -56,7 +56,7 @@ class NotionCrudOperations:
         Returns:
             bool: True se aggiornamento successful
         """
-        logger.info(f"Aggiorno status formazione {notion_id} → '{new_status}'")
+        logger.info(f"Aggiorno status | ID: ...{notion_id[-8:]} | Status: {new_status}")
         
         try:
             response = self.client.pages.update(
@@ -70,14 +70,14 @@ class NotionCrudOperations:
                 }
             )
             
-            logger.info(f"Status aggiornato con successo: {notion_id}")
+            logger.info(f"✅ Status aggiornato | ID: ...{notion_id[-8:]} | New status: {new_status}")
             return True
             
         except APIResponseError as e:
-            logger.error(f"Errore aggiornamento status {notion_id}: {e}")
+            logger.error(f"❌ Errore API aggiornamento status | ID: ...{notion_id[-8:]} | Error: {e}")
             return False
         except Exception as e:
-            logger.error(f"Errore generico aggiornamento status {notion_id}: {e}")
+            logger.error(f"❌ Errore generico aggiornamento status | ID: ...{notion_id[-8:]} | Error: {e}")
             return False
     
     async def update_codice_e_link(self, notion_id: str, codice: str, link_teams: str) -> bool:
@@ -96,7 +96,7 @@ class NotionCrudOperations:
         Returns:
             bool: True se aggiornamento successful
         """
-        logger.info(f"Aggiorno codice e link per formazione {notion_id}")
+        logger.info(f"Aggiorno codice e link | ID: ...{notion_id[-8:]} | Codice: {codice}")
         
         try:
             properties = {
@@ -122,7 +122,7 @@ class NotionCrudOperations:
                 properties=properties
             )
             
-            logger.info(f"Codice e link aggiornati: {notion_id} - {codice}")
+            logger.info(f"✅ Codice e link aggiornati | ID: ...{notion_id[-8:]} | Codice: {codice}")
             return True
             
         except APIResponseError as e:
@@ -148,7 +148,7 @@ class NotionCrudOperations:
         Returns:
             Dict: Formazione normalizzata o None se non trovata
         """
-        logger.debug(f"Recupero formazione per ID: {notion_id}")
+        logger.debug(f"Recupero formazione | ID: ...{notion_id[-8:]}")
         
         try:
             response = self.client.pages.retrieve(page_id=notion_id)
@@ -181,7 +181,7 @@ class NotionCrudOperations:
         Returns:
             bool: True se aggiornamento successful
         """
-        logger.info(f"Aggiorno multipli campi per formazione {notion_id}")
+        logger.info(f"Aggiorno multipli campi | ID: ...{notion_id[-8:]} | Campi: {list(updates.keys())}")
         
         try:
             properties = {}
@@ -203,7 +203,7 @@ class NotionCrudOperations:
                 properties=properties
             )
             
-            logger.info(f"Multipli campi aggiornati: {notion_id} - {list(updates.keys())}")
+            logger.info(f"✅ Multipli campi aggiornati | ID: ...{notion_id[-8:]} | Campi: {list(updates.keys())}")
             return True
             
         except APIResponseError as e:
@@ -226,7 +226,7 @@ class NotionCrudOperations:
         Returns:
             Dict: Risultati batch (success_count, failed_ids)
         """
-        logger.info(f"Batch update status per {len(formazioni_ids)} formazioni → '{new_status}'")
+        logger.info(f"Batch update status | Formazioni: {len(formazioni_ids)} | Target status: {new_status}")
         
         results = {
             'success_count': 0,
@@ -241,5 +241,5 @@ class NotionCrudOperations:
             else:
                 results['failed_ids'].append(notion_id)
         
-        logger.info(f"Batch update completato: {results['success_count']}/{results['total']} successi")
+        logger.info(f"✅ Batch update completato | Successo: {results['success_count']}/{results['total']}")
         return results

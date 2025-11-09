@@ -57,10 +57,10 @@ class NotionService:
             self.crud_operations = NotionCrudOperations(self.client)
             self.diagnostics = NotionDiagnostics(self.client)
             
-            logger.info("NotionService modulare inizializzato con successo")
+            logger.info("✅ NotionService modulare inizializzato | Componenti: Client, QueryBuilder, DataParser, CRUD, Diagnostics")
             
         except Exception as e:
-            logger.error(f"Errore inizializzazione NotionService: {e}")
+            logger.error(f"❌ Errore inizializzazione NotionService | Error: {e}")
             raise NotionServiceError(f"Inizializzazione fallita: {e}")
     
     # ===============================
@@ -82,7 +82,7 @@ class NotionService:
         Raises:
             NotionServiceError: Errori API o parsing dati
         """
-        logger.info(f"Recupero formazioni con status: '{status}'")
+        logger.info(f"Query formazioni by status | Status: '{status}'")
         
         try:
             # 1. Costruisci query con QueryBuilder
@@ -97,11 +97,11 @@ class NotionService:
             # 3. Parsa risultati con DataParser
             formazioni = self.data_parser.parse_formazioni_list(response)
             
-            logger.info(f"Recuperate {len(formazioni)} formazioni con status '{status}'")
+            logger.info(f"✅ Formazioni recuperate | Status: '{status}' | Count: {len(formazioni)}")
             return formazioni
             
         except Exception as e:
-            logger.error(f"Errore recupero formazioni '{status}': {e}")
+            logger.error(f"❌ Errore query formazioni | Status: '{status}' | Error: {e}")
             raise NotionServiceError(f"Errore recupero formazioni: {e}")
     
     async def update_formazione(self, notion_id: str, updates: Dict) -> bool:
@@ -121,7 +121,7 @@ class NotionService:
         Raises:
             NotionServiceError: Errori API o validazione
         """
-        logger.info(f"Aggiornamento formazione {notion_id}: {list(updates.keys())}")
+        logger.info(f"Aggiornamento formazione | ID: ...{notion_id[-8:]} | Campi: {list(updates.keys())}")
         
         try:
             success = await self.crud_operations.update_multiple_fields(notion_id, updates)
@@ -134,7 +134,7 @@ class NotionService:
             return success
             
         except Exception as e:
-            logger.error(f"Errore aggiornamento formazione {notion_id}: {e}")
+            logger.error(f"❌ Errore aggiornamento formazione | ID: ...{notion_id[-8:]} | Error: {e}")
             raise NotionServiceError(f"Errore aggiornamento: {e}")
     
     async def update_formazione_status(self, notion_id: str, new_status: str) -> bool:
@@ -144,7 +144,7 @@ class NotionService:
         DEPRECATO: Usa update_formazione({'Stato': new_status}) invece.
         Mantenuto per backward compatibility.
         """
-        logger.warning("update_formazione_status è deprecato, usa update_formazione invece")
+        logger.warning("⚠️ DEPRECATED: update_formazione_status | Usa update_formazione invece")
         return await self.update_formazione(notion_id, {'Stato': new_status})
     
     async def update_codice_e_link(self, notion_id: str, codice: str, link_teams: str) -> bool:
@@ -154,7 +154,7 @@ class NotionService:
         DEPRECATO: Usa update_formazione({'Codice': codice, 'Link Teams': link_teams}) invece.
         Mantenuto per backward compatibility.
         """
-        logger.warning("update_codice_e_link è deprecato, usa update_formazione invece")
+        logger.warning("⚠️ DEPRECATED: update_codice_e_link | Usa update_formazione invece")
         return await self.update_formazione(notion_id, {
             'Codice': codice,
             'Link Teams': link_teams
@@ -194,7 +194,7 @@ class NotionService:
         
         NUOVA FUNZIONALITÀ abilitata dall'architettura modulare.
         """
-        logger.info(f"Recupero formazioni per area: '{area}'")
+        logger.info(f"Query formazioni by area | Area: '{area}'")
         
         try:
             query = self.query_builder.build_area_filter_query(
@@ -205,11 +205,11 @@ class NotionService:
             response = self.client.get_client().databases.query(**query)
             formazioni = self.data_parser.parse_formazioni_list(response)
             
-            logger.info(f"Recuperate {len(formazioni)} formazioni per area '{area}'")
+            logger.info(f"✅ Formazioni recuperate | Area: '{area}' | Count: {len(formazioni)}")
             return formazioni
             
         except Exception as e:
-            logger.error(f"Errore recupero formazioni area '{area}': {e}")
+            logger.error(f"❌ Errore query formazioni | Area: '{area}' | Error: {e}")
             raise NotionServiceError(f"Errore recupero per area: {e}")
     
     async def get_formazioni_by_status_and_area(self, status: str, area: str) -> List[Dict]:
@@ -218,7 +218,7 @@ class NotionService:
         
         NUOVA FUNZIONALITÀ per query complesse.
         """
-        logger.info(f"Recupero formazioni: status='{status}', area='{area}'")
+        logger.info(f"Query formazioni con filtri combinati | Status: '{status}' | Area: '{area}'")
         
         try:
             query = self.query_builder.build_combined_filter_query(
@@ -230,11 +230,11 @@ class NotionService:
             response = self.client.get_client().databases.query(**query)
             formazioni = self.data_parser.parse_formazioni_list(response)
             
-            logger.info(f"Recuperate {len(formazioni)} formazioni con filtri combinati")
+            logger.info(f"✅ Formazioni recuperate | Filtri combinati | Count: {len(formazioni)}")
             return formazioni
             
         except Exception as e:
-            logger.error(f"Errore recupero formazioni combinate: {e}")
+            logger.error(f"❌ Errore query filtri combinati | Error: {e}")
             raise NotionServiceError(f"Errore recupero combinato: {e}")
     
     async def validate_database_structure(self) -> Dict:
